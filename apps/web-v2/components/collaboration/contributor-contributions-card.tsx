@@ -128,7 +128,7 @@ function LearnerRow({
             )}
             <Link
               href={contributorInputFlowPath(summary.role, summary.learnerId)}
-              className="text-sm font-medium text-aivo-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+              className="text-sm font-medium text-iw-warm hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
             >
               {copy.addAnotherCta}
             </Link>
@@ -162,7 +162,7 @@ function LearnerRow({
   // never_contributed — the gentle invite.
   return (
     <li>
-      <Card className="border-aivo-accent/40 bg-aivo-accent/5 p-4">
+      <Card className="border-iw-warm/40 bg-iw-warm/5 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="font-semibold text-iw-ink">{copy.neverTitle({ name })}</p>
@@ -170,7 +170,7 @@ function LearnerRow({
           </div>
           <Link
             href={contributorInputFlowPath(summary.role, summary.learnerId)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-aivo-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-iw-warm px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             {copy.neverCta}
           </Link>

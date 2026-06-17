@@ -1,15 +1,9 @@
 import Link from "next/link";
 import { requirePlatformPage } from "@aivo/admin-auth";
-import { type AiEvalRunStatus, listAiEvals } from "@aivo/admin-api/ai-governance";
+import { listAiEvals } from "@aivo/admin-api/ai-governance";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime, formatPercent } from "@/components/admin-format";
-
-const STATUS_TONE: Record<AiEvalRunStatus, string> = {
-  queued: "text-slate-500",
-  running: "text-blue-700",
-  passed: "text-emerald-700",
-  failed: "text-red-700",
-};
+import { StatusPill } from "@/components/status-pill";
 
 export default async function AiEvalsPage() {
   const session = await requirePlatformPage("platform:read");
@@ -20,7 +14,6 @@ export default async function AiEvalsPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Responsible AI"
       title="Eval runs"
       description="Safety, accuracy and bias harness runs from responsible-ai-svc."
       action={
@@ -55,27 +48,27 @@ export default async function AiEvalsPage() {
                 <tr key={run.id}>
                   <td className="font-bold">
                     <Link
-                      className="text-blue-700"
+                      className="text-violet-700 hover:text-violet-800"
                       href={`/platform/ai/models/${run.modelId}`}
                     >
                       {run.modelId}
                     </Link>
                   </td>
                   <td className="text-sm">{run.harness}</td>
-                  <td className={`font-bold uppercase ${STATUS_TONE[run.status]}`}>
-                    {run.status}
+                  <td>
+                    <StatusPill status={run.status} />
                   </td>
-                  <td className="text-sm">
+                  <td className="text-sm tabular-nums">
                     {run.metrics ? formatPercent(run.metrics.safety) : "—"}
                   </td>
-                  <td className="text-sm">
+                  <td className="text-sm tabular-nums">
                     {run.metrics ? formatPercent(run.metrics.accuracy) : "—"}
                   </td>
-                  <td className="text-sm">
+                  <td className="text-sm tabular-nums">
                     {run.metrics ? formatPercent(run.metrics.bias) : "—"}
                   </td>
-                  <td className="text-sm">{run.caseCount}</td>
-                  <td className="text-sm">{formatDateTime(run.startedAt)}</td>
+                  <td className="text-sm tabular-nums">{run.caseCount}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(run.startedAt)}</td>
                 </tr>
               ))}
               {runs.length === 0 ? (

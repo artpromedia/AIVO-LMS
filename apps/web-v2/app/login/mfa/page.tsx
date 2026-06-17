@@ -2,12 +2,18 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { AuthCard, AuthInput } from "@aivo/ui/auth";
-import { AivoIcon } from "@aivo/ui/icon";
+import { AuthInput } from "@aivo/ui/auth";
 import { Button } from "@/components/ui/button";
-import { SiteHeader } from "@/components/marketing/site-header";
-import { SiteFooter } from "@/components/marketing/site-footer";
 import { MFA_CHALLENGE_COOKIE, parseMfaChallengeCookie } from "@/lib/auth/mfa-cookies";
+import {
+  AuthSplitLayout,
+  AuthSidePanel,
+  AuthTrustCard,
+  AuthSecureFooter,
+} from "@/components/auth/auth-split-layout";
+import { AivoBrandMark } from "@/components/auth/auth-brand-mark";
+import { OtpInput } from "@/components/auth/otp-input";
+import { MfaResend } from "./_components/mfa-resend";
 
 /**
  * MFA challenge surface. Reached when /api/auth/login returns
@@ -15,6 +21,11 @@ import { MFA_CHALLENGE_COOKIE, parseMfaChallengeCookie } from "@/lib/auth/mfa-co
  * login server action — this page reads it, the verify server action
  * consumes it, and either clears it (success or terminal failure) or
  * leaves it in place so the user can retry.
+ *
+ * Redesign: shared auth split layout (form card left, cloud-mascot shield
+ * panel right). Numeric methods (totp/email) use the 6-box OtpInput;
+ * webauthn recovery codes fall back to a plain text field. All verify /
+ * resend / cancel wiring is unchanged.
  */
 async function verifyMfaAction(formData: FormData) {
   "use server";
@@ -115,6 +126,7 @@ export default async function MfaChallengePage({
 }) {
   const { error, notice } = await searchParams;
   const t = await getTranslations("auth.mfa");
+  const ts = await getTranslations("auth.shell");
   const errorMessage = error && ERROR_CODES.has(error) ? t(`errors.${error}` as never) : null;
   const noticeMessage = notice && NOTICE_CODES.has(notice) ? t(`notices.${notice}` as never) : null;
 
@@ -129,100 +141,95 @@ export default async function MfaChallengePage({
   const subtitle = t(`${prefix}_subtitle` as never);
   const cta = t(`${prefix}_cta` as never);
   const canResend = challenge.method === "email";
-  const placeholder =
-    challenge.method === "totp"
-      ? "123456"
-      : challenge.method === "webauthn"
-        ? "XXXX-XXXX-XXXX"
-        : "123456";
+  const isWebauthn = challenge.method === "webauthn";
 
   return (
-    <>
-      <SiteHeader />
-      <main id="main" className="mx-auto flex w-full max-w-md flex-col gap-4 px-6 py-12 sm:py-16">
-        <div className="flex items-center gap-3">
-          <span
-            aria-hidden="true"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-iw-card bg-iw-accent-soft text-iw-primary"
-          >
-            <AivoIcon name="safetyOk" size={22} />
-          </span>
-          <h2 className="font-iw-display text-2xl font-bold leading-tight text-iw-ink">
-            {t("heading")}
-          </h2>
-        </div>
-
-        <AuthCard
-          eyebrow={t("card_eyebrow")}
-          title={title}
-          subtitle={subtitle}
-          actions={
-            <>
-              <Button type="submit" form="mfa-form" variant="default" size="lg" className="w-full">
-                {cta}
-              </Button>
-              {canResend ? (
-                <form action={resendMfaAction}>
-                  <Button
-                    type="submit"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full text-iw-primary"
-                  >
-                    {t("resend_code")}
-                  </Button>
-                </form>
-              ) : null}
-              <p className="text-sm text-iw-ink-muted text-center">
-                <Link
-                  href="/login"
-                  className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
-                >
-                  {t("cancel")}
-                </Link>
-              </p>
-            </>
-          }
+    <AuthSplitLayout
+      panel={
+        <AuthSidePanel
+          variant="shield"
+          title={t("panel_title")}
+          accent={t("panel_accent")}
+          body={t("panel_body")}
         >
-          <form id="mfa-form" action={verifyMfaAction} className="flex flex-col gap-4">
-            <AuthInput
-              id="code"
-              name="code"
-              label={t("code_label")}
-              type="text"
-              inputMode={challenge.method === "webauthn" ? "text" : "numeric"}
-              autoComplete="one-time-code"
-              placeholder={placeholder}
-              required
-              minLength={4}
-              maxLength={32}
-              autoFocus
-            />
-            <p className="text-xs text-iw-ink-muted">{t("recovery_hint")}</p>
-          </form>
-        </AuthCard>
+          <AuthTrustCard>{ts("trust_secure")}</AuthTrustCard>
+        </AuthSidePanel>
+      }
+    >
+      <div className="flex flex-col gap-6">
+        <AivoBrandMark sublabel={ts("wordmark_account")} />
+
+        <div className="text-center">
+          <p className="text-xs font-semibold uppercase tracking-wide text-iw-primary">
+            {t("card_eyebrow")}
+          </p>
+          <h1 className="mt-1 font-iw-display text-2xl font-bold text-iw-ink">{title}</h1>
+          <p className="mt-1.5 text-sm text-iw-ink-muted">{subtitle}</p>
+        </div>
 
         {noticeMessage ? (
           <div
             role="status"
             aria-live="polite"
-            className="rounded-iw-card border border-iw-success/40 bg-iw-success/10 px-4 py-3 text-sm text-iw-success"
+            className="rounded-iw-card border border-iw-success/40 bg-iw-success/10 px-4 py-3 text-center text-sm text-iw-success"
           >
             {noticeMessage}
           </div>
         ) : null}
-
         {errorMessage ? (
           <div
             role="alert"
             aria-live="polite"
-            className="rounded-iw-card border border-iw-danger/40 bg-iw-danger/10 px-4 py-3 text-sm text-iw-danger"
+            className="rounded-iw-card border border-iw-error/40 bg-iw-error/10 px-4 py-3 text-center text-sm text-iw-error"
           >
             {errorMessage}
           </div>
         ) : null}
-      </main>
-      <SiteFooter />
-    </>
+
+        <form id="mfa-form" action={verifyMfaAction} className="flex flex-col gap-4">
+          {isWebauthn ? (
+            <AuthInput
+              id="code"
+              name="code"
+              label={t("code_label")}
+              type="text"
+              inputMode="text"
+              autoComplete="one-time-code"
+              placeholder="XXXX-XXXX-XXXX"
+              required
+              minLength={4}
+              maxLength={32}
+              autoFocus
+            />
+          ) : (
+            <OtpInput name="code" length={6} ariaLabel={t("code_label")} autoFocus />
+          )}
+          <p className="text-center text-xs text-iw-ink-muted">{t("recovery_hint")}</p>
+        </form>
+
+        <div className="flex flex-col gap-3">
+          <Button type="submit" form="mfa-form" variant="default" size="lg" className="w-full">
+            {cta}
+          </Button>
+          {canResend ? (
+            <MfaResend
+              action={resendMfaAction}
+              idleLabel={t("resend_code")}
+              countdownLabel={t("resend_in")}
+            />
+          ) : null}
+          <p className="text-center text-sm text-iw-ink-muted">
+            <Link
+              href="/login"
+              className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
+            >
+              {t("cancel")}
+            </Link>
+          </p>
+        </div>
+
+        <AuthSecureFooter lead={ts("secure_signin")} sub={ts("encrypted")} />
+      </div>
+    </AuthSplitLayout>
   );
 }

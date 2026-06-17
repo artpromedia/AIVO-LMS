@@ -64,7 +64,7 @@ export function ModelCard({ model, card }: ModelCardProps) {
       {card?.body ? (
         <div className="mt-6">
           <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">Card document</p>
-          <pre className="mt-2 whitespace-pre-wrap rounded-md bg-aivo-surface-2 p-4 text-sm text-aivo-ink-soft">
+          <pre className="mt-2 whitespace-pre-wrap rounded-md bg-iw-raised p-4 text-sm text-iw-ink-muted">
             {String(card.body)}
           </pre>
         </div>

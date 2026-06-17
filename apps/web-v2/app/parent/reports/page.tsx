@@ -13,6 +13,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageHeader } from "@/components/layout/page-header";
 import { InsightChip, GlassCard, EmptyState } from "@aivo/ui";
 import { KpiCard } from "@aivo/ui/chart";
 import { PARENT_NAV } from "@/components/layout/role-shells";
@@ -50,14 +51,11 @@ export default async function Page() {
       navItems={PARENT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <header className="flex flex-col gap-2 mb-6">
-        <p className="iw-label text-iw-text-muted">{t("eyebrow")}</p>
-        <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">{t("title")}</h1>
-        <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
-          A plain-language view of each learner's last few sessions. Numbers are starting points,
-          not scores — AIVO uses them to plan calm, just-right lessons.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description="A plain-language view of each learner's last few sessions. Numbers are starting points, not scores — AIVO uses them to plan calm, just-right lessons."
+      />
 
       {learners.length === 0 ? (
         <div className="rounded-iw-card-lg bg-white border border-iw-border p-6">

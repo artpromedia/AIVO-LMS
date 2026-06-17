@@ -41,20 +41,20 @@ export default async function SubjectsIndex() {
           <Link
             key={s.slug}
             href={`/subjects/${s.slug}`}
-            className="block rounded-3xl border border-slate-100 bg-white p-6 hover:border-purple-200 hover:shadow-lg transition"
+            className="block rounded-iw-card-lg border border-iw-border bg-white p-6 hover:border-iw-purple-200 hover:shadow-soft-3 transition"
           >
             <div className="flex items-start gap-4">
-              <span className="inline-flex w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-700 items-center justify-center font-heading font-bold text-lg shrink-0">
+              <span className="inline-flex w-12 h-12 rounded-iw-control bg-iw-accent-soft text-iw-teal-800 items-center justify-center font-heading font-bold text-lg shrink-0">
                 {s.tutorName[0]}
               </span>
               <div className="min-w-0 flex-1">
-                <h2 className="font-heading font-bold text-slate-900 text-lg">{s.name}</h2>
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400 mt-0.5">
+                <h2 className="font-heading font-bold text-iw-ink text-lg">{s.name}</h2>
+                <p className="text-xs font-bold uppercase tracking-wide text-iw-ink-muted mt-0.5">
                   Tutor: {s.tutorName}
                 </p>
-                <p className="text-sm text-slate-600 font-body mt-2 leading-relaxed">{s.short}</p>
+                <p className="text-sm text-iw-ink-muted font-body mt-2 leading-relaxed">{s.short}</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-slate-300 shrink-0 mt-2" aria-hidden="true" />
+              <ArrowRight className="w-5 h-5 text-iw-ink-muted shrink-0 mt-2" aria-hidden="true" />
             </div>
           </Link>
         ))}

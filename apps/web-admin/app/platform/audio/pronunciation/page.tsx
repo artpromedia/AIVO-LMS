@@ -11,6 +11,7 @@ import {
 } from "@aivo/admin-api/pronunciation";
 import { AdminCard, AdminPageFrame , ConfirmDangerDialog } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
@@ -65,7 +66,6 @@ export default async function PronunciationPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Audio"
       title="Pronunciation overrides"
       description="Token → SSML/phoneme replacements used by the read-aloud TTS adapter, persisted in admin-svc (Postgres)."
     >
@@ -120,10 +120,10 @@ export default async function PronunciationPage({
                   <td className="font-mono text-sm">{override.replacement}</td>
                   <td className="text-sm">{override.encoding}</td>
                   <td>
-                    <span className="admin-status">{override.scope}</span>
+                    <StatusPill status={override.scope} />
                   </td>
                   <td className="text-sm">{override.tenantId ?? "all"}</td>
-                  <td className="text-sm">{formatDateTime(override.createdAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(override.createdAt)}</td>
                   <td>
                     <ConfirmDangerDialog
                       action={deleteAction}

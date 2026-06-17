@@ -8,6 +8,7 @@ import {
   revokePlatformDistrictInvite,
 } from "@aivo/admin-api/identity";
 import { AdminCard, AdminPageFrame, BulkSelectionBar, ConfirmDangerDialog } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 const STATUSES: DistrictInviteStatus[] = ["pending", "accepted", "expired", "revoked"];
@@ -82,7 +83,6 @@ export default async function DistrictInvitesPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform onboarding"
       title="District invitations"
       description="Track, resend, or revoke first-admin invitations across every district."
       action={
@@ -144,7 +144,7 @@ export default async function DistrictInvitesPage({
                         name="bulk-district-invites"
                         value={invite.id}
                         aria-label={`Select invitation for ${invite.email}`}
-                        className="h-4 w-4 accent-blue-700"
+                        className="h-4 w-4 accent-violet-700"
                       />
                     ) : null}
                   </td>
@@ -154,9 +154,9 @@ export default async function DistrictInvitesPage({
                     <span className="text-sm text-slate-500">{invite.email}</span>
                   </td>
                   <td>
-                    <span className={`admin-status admin-status-${invite.status}`}>{invite.status}</span>
+                    <StatusPill status={invite.status} />
                   </td>
-                  <td>{formatDate(invite.createdAt)}</td>
+                  <td className="tabular-nums">{formatDate(invite.createdAt)}</td>
                   <td>
                     {invite.status === "pending" || invite.status === "expired" ? (
                       <div className="flex gap-2">

@@ -108,9 +108,9 @@ export function ObservationRow({
     <Card className="flex flex-col gap-1 p-4">
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-semibold">
-          {obs.learnerName} · <span className="text-aivo-ink-soft">{obs.location}</span>
+          {obs.learnerName} · <span className="text-iw-ink-muted">{obs.location}</span>
           {obs.edited ? (
-            <span className="ml-2 text-xs font-normal text-aivo-ink-soft">{t("edited_label")}</span>
+            <span className="ml-2 text-xs font-normal text-iw-ink-muted">{t("edited_label")}</span>
           ) : null}
         </p>
         {showEdit && !editing ? (
@@ -124,7 +124,7 @@ export function ObservationRow({
           </button>
         ) : null}
       </div>
-      <p className="text-xs text-aivo-ink-soft">
+      <p className="text-xs text-iw-ink-muted">
         {formatWhen(obs.observedAt)}
         {obs.durationMinutes !== null ? ` · ${obs.durationMinutes} min` : ""}
         {obs.mood ? ` · ${t("mood_prefix")} ${moodLabel(t, obs.mood)}` : ""}
@@ -133,34 +133,34 @@ export function ObservationRow({
       {editing ? (
         <div className="mt-2 flex flex-col gap-2">
           <label className="flex flex-col gap-1 text-sm">
-            <span className="iw-label text-aivo-ink-soft">{t("label_behaviour")}</span>
+            <span className="iw-label text-iw-ink-muted">{t("label_behaviour")}</span>
             <textarea
               rows={2}
               value={behaviour}
               onChange={(e) => setBehaviour(e.target.value)}
-              className="rounded border border-aivo-border px-2 py-1.5"
+              className="rounded border border-iw-border px-2 py-1.5"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="iw-label text-aivo-ink-soft">{t("label_antecedent")}</span>
+            <span className="iw-label text-iw-ink-muted">{t("label_antecedent")}</span>
             <textarea
               rows={2}
               value={antecedent}
               onChange={(e) => setAntecedent(e.target.value)}
-              className="rounded border border-aivo-border px-2 py-1.5"
+              className="rounded border border-iw-border px-2 py-1.5"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="iw-label text-aivo-ink-soft">{t("label_consequence")}</span>
+            <span className="iw-label text-iw-ink-muted">{t("label_consequence")}</span>
             <textarea
               rows={2}
               value={consequence}
               onChange={(e) => setConsequence(e.target.value)}
-              className="rounded border border-aivo-border px-2 py-1.5"
+              className="rounded border border-iw-border px-2 py-1.5"
             />
           </label>
           {error ? (
-            <p className="text-sm text-aivo-danger" role="alert">
+            <p className="text-sm text-iw-error" role="alert">
               {error}
             </p>
           ) : null}
@@ -182,7 +182,7 @@ export function ObservationRow({
                 setConsequence(obs.consequence);
                 setError(null);
               }}
-              className="rounded border border-aivo-border px-3 py-1.5 text-sm"
+              className="rounded border border-iw-border px-3 py-1.5 text-sm"
             >
               {t("edit_cancel")}
             </button>
@@ -191,15 +191,15 @@ export function ObservationRow({
       ) : (
         <dl className="mt-2 grid grid-cols-1 gap-1 text-sm md:grid-cols-3">
           <div>
-            <dt className="iw-label text-aivo-ink-soft">{t("label_antecedent")}</dt>
+            <dt className="iw-label text-iw-ink-muted">{t("label_antecedent")}</dt>
             <dd>{obs.antecedent || "—"}</dd>
           </div>
           <div>
-            <dt className="iw-label text-aivo-ink-soft">{t("label_behaviour")}</dt>
+            <dt className="iw-label text-iw-ink-muted">{t("label_behaviour")}</dt>
             <dd className="font-medium">{obs.behaviour}</dd>
           </div>
           <div>
-            <dt className="iw-label text-aivo-ink-soft">{t("label_consequence")}</dt>
+            <dt className="iw-label text-iw-ink-muted">{t("label_consequence")}</dt>
             <dd>{obs.consequence || "—"}</dd>
           </div>
         </dl>

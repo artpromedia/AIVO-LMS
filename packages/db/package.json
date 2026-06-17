@@ -13,6 +13,7 @@
     "db:seed": "tsx src/seed.ts",
     "db:seed:demo": "tsx src/seed-demo.ts",
     "db:seed:pilots": "tsx src/seed-pilots.ts",
+    "db:seed:district": "tsx src/seed-district-overview.ts",
     "db:studio": "drizzle-kit studio",
     "check:schema-drift": "tsx scripts/check-schema-drift.ts"
   },

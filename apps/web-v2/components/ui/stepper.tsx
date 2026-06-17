@@ -23,7 +23,7 @@ export function Stepper({
               aria-current={state === "active" ? "step" : undefined}
               className={cn(
                 "flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold",
-                state === "done" && "border-aivo-primary bg-aivo-primary text-aivo-primary-fg",
+                state === "done" && "border-iw-primary bg-iw-primary text-iw-primary-fg",
                 state === "active" && "border-aivo-primary text-aivo-primary",
                 state === "todo" && "border-aivo-border text-aivo-muted",
               )}
@@ -32,7 +32,7 @@ export function Stepper({
             </span>
             <span className="text-sm text-aivo-ink-soft">{step.label}</span>
             {idx < steps.length - 1 ? (
-              <span aria-hidden className="mx-1 h-px w-6 bg-aivo-border" />
+              <span aria-hidden className="mx-1 h-px w-6 bg-iw-border" />
             ) : null}
           </li>
         );

@@ -51,19 +51,19 @@ export default async function LevelPage({ params }: Props) {
       ]}
     >
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-3">{t("who_its_for")}</h2>
-        <p className="text-slate-700 font-body leading-relaxed">{lvl.who}</p>
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-3">{t("who_its_for")}</h2>
+        <p className="text-iw-ink font-body leading-relaxed">{lvl.who}</p>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-4">
           {t("whats_included")}
         </h2>
         <ul className="space-y-2">
           {lvl.features.map((f) => (
-            <li key={f} className="flex items-start gap-3 text-slate-700 font-body">
+            <li key={f} className="flex items-start gap-3 text-iw-ink font-body">
               <CheckCircle2
-                className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0"
+                className="w-5 h-5 text-iw-success mt-0.5 shrink-0"
                 aria-hidden="true"
               />
               <span>{f}</span>
@@ -73,14 +73,14 @@ export default async function LevelPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-4">
           {t("builtin_accommodations")}
         </h2>
         <ul className="space-y-2">
           {lvl.accommodations.map((a) => (
-            <li key={a} className="flex items-start gap-3 text-slate-700 font-body">
+            <li key={a} className="flex items-start gap-3 text-iw-ink font-body">
               <CheckCircle2
-                className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0"
+                className="w-5 h-5 text-iw-success mt-0.5 shrink-0"
                 aria-hidden="true"
               />
               <span>{a}</span>
@@ -90,12 +90,12 @@ export default async function LevelPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-4">
           {t("sample_activities")}
         </h2>
         <ul className="space-y-2">
           {lvl.sample.map((s) => (
-            <li key={s} className="flex items-start gap-3 text-slate-700 font-body">
+            <li key={s} className="flex items-start gap-3 text-iw-ink font-body">
               <span
                 className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0"
                 aria-hidden="true"
@@ -106,14 +106,14 @@ export default async function LevelPage({ params }: Props) {
         </ul>
       </section>
 
-      <section className="mt-14 pt-8 border-t border-slate-100">
-        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">{t("other_levels")}</h2>
+      <section className="mt-14 pt-8 border-t border-iw-border">
+        <h2 className="text-xl font-heading font-bold text-iw-ink mb-4">{t("other_levels")}</h2>
         <div className="flex flex-wrap gap-3">
           {LEVELS.filter((l) => l.slug !== lvl.slug).map((other) => (
             <Link
               key={other.slug}
               href={`/levels/${other.slug}`}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-iw-chip bg-iw-raised text-iw-ink font-bold text-sm hover:bg-iw-border transition"
             >
               Level {other.level}: {other.name}
             </Link>

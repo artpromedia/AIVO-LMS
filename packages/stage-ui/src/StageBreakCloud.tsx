@@ -44,16 +44,16 @@ export function StageBreakCloud({
       aria-modal="true"
       aria-label="Break options"
     >
-      <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4">
+      <div className="bg-white rounded-iw-card-lg shadow-soft-5 p-8 max-w-md w-full mx-4">
         <div className="text-center mb-6">
           <div
-            className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-sky-100 text-sky-500 flex items-center justify-center"
+            className="w-16 h-16 mx-auto mb-3 rounded-iw-control bg-iw-accent-soft text-iw-accent flex items-center justify-center"
             aria-hidden="true"
           >
             <Cloud className="w-8 h-8" strokeWidth={2} />
           </div>
-          <h2 className="text-2xl font-heading font-bold text-slate-800">Take a break</h2>
-          <p className="text-slate-500 mt-1">Your lesson is paused</p>
+          <h2 className="text-2xl font-iw-display font-bold text-iw-ink">Take a break</h2>
+          <p className="text-iw-ink-muted mt-1">Your lesson is paused</p>
         </div>
 
         {!activity ? (
@@ -63,16 +63,16 @@ export function StageBreakCloud({
                 <button
                   key={option.id}
                   onClick={() => setActivity(option.id)}
-                  className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-sky-50 border-2 border-transparent hover:border-sky-300 hover:bg-sky-100 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-sky-400"
+                  className="flex flex-col items-center gap-2 p-5 rounded-iw-card bg-iw-accent-soft border-2 border-transparent hover:border-iw-accent hover:bg-iw-accent-soft transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-iw-ring"
                   style={{ minHeight: "var(--learner-hit-target, 72px)" }}
                 >
                   <option.Icon
-                    className="w-8 h-8 text-sky-600"
+                    className="w-8 h-8 text-iw-accent"
                     strokeWidth={2}
                     aria-hidden="true"
                   />
-                  <span className="font-heading font-bold text-sky-800">{option.label}</span>
-                  <span className="text-xs text-sky-600">{option.description}</span>
+                  <span className="font-iw-display font-bold text-iw-teal-800">{option.label}</span>
+                  <span className="text-xs text-iw-teal-700">{option.description}</span>
                 </button>
               ))}
             </div>
@@ -83,7 +83,7 @@ export function StageBreakCloud({
                   setActivity(null);
                   onClose();
                 }}
-                className="w-full px-6 py-3 rounded-2xl bg-purple-100 text-purple-700 font-heading font-bold hover:bg-purple-200 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-purple-400"
+                className="w-full px-6 py-3 rounded-iw-control bg-iw-purple-100 text-iw-primary font-iw-display font-bold hover:bg-iw-purple-200 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-iw-ring"
                 style={{ minHeight: "var(--learner-hit-target, 48px)" }}
               >
                 Keep going
@@ -91,7 +91,7 @@ export function StageBreakCloud({
               {onHome && (
                 <button
                   onClick={onHome}
-                  className="w-full px-6 py-3 rounded-2xl bg-slate-100 text-slate-600 font-heading font-bold hover:bg-slate-200 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-slate-400 inline-flex items-center justify-center gap-2"
+                  className="w-full px-6 py-3 rounded-iw-control bg-iw-raised text-iw-ink-muted font-iw-display font-bold hover:bg-iw-raised transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-iw-ring inline-flex items-center justify-center gap-2"
                   style={{ minHeight: "var(--learner-hit-target, 48px)" }}
                 >
                   <Home className="w-4 h-4" strokeWidth={2.5} aria-hidden /> Go home (progress
@@ -104,7 +104,7 @@ export function StageBreakCloud({
           <>
             <div className="text-center py-8">
               <div
-                className="w-20 h-20 mx-auto mb-4 rounded-3xl bg-sky-50 text-sky-500 flex items-center justify-center"
+                className="w-20 h-20 mx-auto mb-4 rounded-iw-control bg-iw-accent-soft text-iw-accent flex items-center justify-center"
                 aria-hidden="true"
               >
                 {(() => {
@@ -114,20 +114,20 @@ export function StageBreakCloud({
                   return <I className="w-12 h-12" strokeWidth={2} />;
                 })()}
               </div>
-              <p className="text-lg font-heading font-bold text-slate-700 mb-2">
+              <p className="text-lg font-iw-display font-bold text-iw-ink mb-2">
                 {activity === "breathe" && "Breathe in slowly... hold... breathe out..."}
                 {activity === "music" && "Close your eyes and listen..."}
                 {activity === "stretch" && "Reach up high, then gently touch your toes..."}
                 {activity === "quiet" && "It's okay to just sit quietly. Take as long as you need."}
               </p>
-              <p className="text-sm text-slate-400 mt-4">Take as long as you need</p>
+              <p className="text-sm text-iw-ink-muted mt-4">Take as long as you need</p>
             </div>
             <button
               onClick={() => {
                 setActivity(null);
                 onClose();
               }}
-              className="w-full px-6 py-3 rounded-2xl bg-purple-600 text-white font-heading font-bold hover:bg-purple-700 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-purple-400"
+              className="w-full px-6 py-3 rounded-iw-control bg-iw-primary text-white font-iw-display font-bold hover:bg-iw-primary-hover transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-iw-ring"
               style={{ minHeight: "var(--learner-hit-target, 48px)" }}
             >
               I&apos;m ready to go back

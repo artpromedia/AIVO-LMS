@@ -105,10 +105,10 @@ export function LearnerWorkspaceRail({
         approvalStatus={approvalStatus}
       />
 
-      <section className="flex flex-col gap-5 p-5 rounded-3xl bg-white border border-iw-border/60">
+      <section className="flex flex-col gap-5 p-5 rounded-iw-card-lg bg-white border border-iw-border/60">
         <header className="flex items-start gap-2.5">
           <span
-            className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl"
+            className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-iw-control"
             style={{
               background: "var(--color-aivo-primary-soft)",
               color: "var(--color-aivo-primary)",

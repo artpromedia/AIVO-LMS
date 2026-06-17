@@ -120,9 +120,17 @@
     },
     "status": {
       "success": "#22c55e",
+      "success-subtle": "#dcfce7",
+      "success-strong": "#15803d",
       "warning": "#f59e0b",
+      "warning-subtle": "#fef3c7",
+      "warning-strong": "#b45309",
       "error": "#ef4444",
-      "info": "#7c3aed"
+      "error-subtle": "#fee2e2",
+      "error-strong": "#b91c1c",
+      "info": "#7c3aed",
+      "info-subtle": "#ede9fe",
+      "info-strong": "#6d28d9"
     }
   }
 }

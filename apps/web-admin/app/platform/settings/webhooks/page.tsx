@@ -3,6 +3,7 @@ import { requirePageRole } from "@aivo/admin-auth";
 import { getWebhooks, setWebhookActive } from "@aivo/admin-api/platform-settings";
 import { AdminCard, AdminKpiCard, AdminPageFrame , ConfirmDangerDialog, FlashRegion } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 async function toggleAction(formData: FormData) {
@@ -33,7 +34,6 @@ export default async function WebhooksPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Settings"
       title="Webhooks"
       description="Registered webhook endpoints and recent delivery attempts, read from the webhooks tables (Postgres). Secrets are never shown."
     >
@@ -64,9 +64,9 @@ export default async function WebhooksPage({
                   <td className="max-w-sm truncate font-mono text-xs">{webhook.url}</td>
                   <td className="text-sm">{webhook.events.join(", ") || "—"}</td>
                   <td>
-                    <span className="admin-status">{webhook.active ? "active" : "disabled"}</span>
+                    <StatusPill status={webhook.active ? "active" : "disabled"} />
                   </td>
-                  <td className="text-sm">{formatDateTime(webhook.lastDeliveryAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(webhook.lastDeliveryAt)}</td>
                   <td className="text-sm">{webhook.lastDeliveryStatus ?? "—"}</td>
                   <td>
                     {webhook.active ? (
@@ -118,16 +118,17 @@ export default async function WebhooksPage({
             <tbody>
               {deliveries.map((delivery) => (
                 <tr key={delivery.id}>
-                  <td className="text-sm">{formatDateTime(delivery.deliveredAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(delivery.deliveredAt)}</td>
                   <td className="font-bold">{delivery.event}</td>
-                  <td
-                    className={`text-sm font-bold ${
-                      delivery.responseStatus && delivery.responseStatus >= 400
-                        ? "text-red-700"
-                        : "text-emerald-700"
-                    }`}
-                  >
-                    {delivery.responseStatus ?? "—"}
+                  <td>
+                    {delivery.responseStatus ? (
+                      <StatusPill
+                        status={delivery.responseStatus >= 400 ? "error" : "ok"}
+                        label={delivery.responseStatus}
+                      />
+                    ) : (
+                      "—"
+                    )}
                   </td>
                   <td className="font-mono text-xs text-slate-500">{delivery.webhookId}</td>
                 </tr>

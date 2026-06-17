@@ -96,7 +96,7 @@ export function ConnectorWizard({ tenantId }: { tenantId: string }) {
             {PROVIDERS.map((p) => (
               <label
                 key={p.value}
-                className={`cursor-pointer rounded-md border p-3 text-sm ${provider === p.value ? "border-aivo-primary bg-aivo-primary-soft" : "border-aivo-border hover:bg-aivo-surface-2"}`}
+                className={`cursor-pointer rounded-md border p-3 text-sm ${provider === p.value ? "border-iw-primary bg-iw-purple-100" : "border-iw-border hover:bg-iw-raised"}`}
               >
                 <input
                   type="radio"
@@ -169,7 +169,7 @@ export function ConnectorWizard({ tenantId }: { tenantId: string }) {
 
       {step === "dryrun" ? (
         <div className="space-y-3">
-          <div className="rounded-md border border-aivo-border bg-aivo-surface-2 p-4 text-sm">
+          <div className="rounded-md border border-iw-border bg-iw-raised p-4 text-sm">
             <p className="font-semibold">{t("dry_run_result")}</p>
             <p className="mt-1 text-aivo-ink-soft">
               {dryRunCounts

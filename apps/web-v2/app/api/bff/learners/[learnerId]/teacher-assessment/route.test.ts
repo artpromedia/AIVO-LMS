@@ -146,8 +146,8 @@ describe("teacher-assessment BFF", () => {
     const learnerId = await inScopeLearner();
     const patchRes = await PATCH(
       req(learnerId, "PATCH", {
-        section: "context",
-        data: { teacherRole: "general_ed", gradeLevel: "3-5" },
+        section: "classroom_context",
+        data: { cc_role: "general_ed", cc_grade: "3-5" },
       }),
       params(learnerId),
     );
@@ -159,17 +159,17 @@ describe("teacher-assessment BFF", () => {
     const json = (await getRes.json()) as {
       data: { draft: { answers: Record<string, unknown>; completedSections: string[] } };
     };
-    expect(json.data.draft.completedSections).toContain("context");
-    expect(json.data.draft.answers.context).toMatchObject({
-      teacherRole: "general_ed",
-      gradeLevel: "3-5",
+    expect(json.data.draft.completedSections).toContain("classroom_context");
+    expect(json.data.draft.answers.classroom_context).toMatchObject({
+      cc_role: "general_ed",
+      cc_grade: "3-5",
     });
   });
 
   it("rejects an invalid section payload with 400", async () => {
     const learnerId = await inScopeLearner();
     const res = await PATCH(
-      req(learnerId, "PATCH", { section: "context", data: { teacherRole: "principal" } }),
+      req(learnerId, "PATCH", { section: "classroom_context", data: { cc_role: "principal" } }),
       params(learnerId),
     );
     expect(res.status).toBe(400);
@@ -180,15 +180,15 @@ describe("teacher-assessment BFF", () => {
     // Build a draft across two sections.
     await PATCH(
       req(learnerId, "PATCH", {
-        section: "context",
-        data: { teacherRole: "general_ed", gradeLevel: "3-5" },
+        section: "classroom_context",
+        data: { cc_role: "general_ed", cc_grade: "3-5" },
       }),
       params(learnerId),
     );
     await PATCH(
       req(learnerId, "PATCH", {
-        section: "strengths",
-        data: { strengths: ["number sense"], recommendedFocusAreas: ["fluency"] },
+        section: "academic_strengths",
+        data: { as_strong_subjects: ["reading", "math"] },
       }),
       params(learnerId),
     );
@@ -208,7 +208,7 @@ describe("teacher-assessment BFF", () => {
     // Mirror fired with a strengths-first summary.
     expect(createTeacherInsightMock).toHaveBeenCalledTimes(1);
     const mirrorArg = createTeacherInsightMock.mock.calls[0]![1] as { insightText: string };
-    expect(mirrorArg.insightText).toContain("number sense");
+    expect(mirrorArg.insightText).toContain("Reading");
 
     // Telemetry: a submit audit event carrying elapsedSeconds (DoD: median
     // time-to-complete must be measurable).
@@ -223,8 +223,8 @@ describe("teacher-assessment BFF", () => {
     const learnerId = await inScopeLearner();
     await PATCH(
       req(learnerId, "PATCH", {
-        section: "context",
-        data: { teacherRole: "special_ed", gradeLevel: "6-8" },
+        section: "classroom_context",
+        data: { cc_role: "special_ed", cc_grade: "6-8" },
       }),
       params(learnerId),
     );
@@ -246,8 +246,8 @@ describe("teacher-assessment BFF", () => {
     const learnerId = await inScopeLearner();
     await PATCH(
       req(learnerId, "PATCH", {
-        section: "context",
-        data: { teacherRole: "general_ed", gradeLevel: "K" },
+        section: "classroom_context",
+        data: { cc_role: "general_ed", cc_grade: "K" },
       }),
       params(learnerId),
     );

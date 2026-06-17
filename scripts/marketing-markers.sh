@@ -8,16 +8,13 @@
 # marker, update it here and both checks stay in sync.
 #
 # Coverage (path -> required substrings, asserted case-insensitively):
-#   /                    Hero headline + philosophy section + Footer trust lock
+#   /                    Hero headline + features section + Footer trust lock
 #                        - apps/marketing/src/app/page.tsx
-#                          (Inclusive Lab — Warm hero: "Learning that" and
-#                          "to your child." — the word "adapts" between them
-#                          is wrapped in a gradient/underline span pair for
-#                          the design, so the literal substring
-#                          "Learning that adapts" does not survive in the
-#                          rendered HTML; the two halves on either side of
-#                          the span are stable and equivalent in coverage)
-#                          (philosophy section: "Engineered for the margins")
+#                          ("A calmer, more personal way to learn" hero: the
+#                          word "learn" is wrapped in a gradient span, so we
+#                          assert the stable lead-in "calmer, more personal
+#                          way to"; the features section heading is asserted
+#                          via "Everything needed to support")
 #                        - apps/marketing/src/components/marketing/Footer.tsx
 #                          ("COPPA · FERPA · SOC 2")
 #   /privacy-policy      apps/marketing/src/app/privacy-policy/page.tsx
@@ -64,9 +61,8 @@ marketing_markers_for() {
   case "${1:-}" in
     "/")
       printf '%s\n' \
-        "Learning that" \
-        "to your child." \
-        "Engineered for the margins" \
+        "calmer, more personal way to" \
+        "Everything needed to support" \
         "COPPA" \
         "FERPA" \
         "SOC 2"

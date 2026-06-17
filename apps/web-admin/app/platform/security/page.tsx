@@ -17,7 +17,6 @@ export default async function SecurityPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Security posture"
       description="SOC 2 / Trust Services control coverage, backed by admin-svc (Postgres)."
       action={
@@ -57,7 +56,7 @@ export default async function SecurityPage() {
           Manage the full control register — add controls, assign owners, and record implementation
           status — from the control register. Each change is hash-chained into the admin audit log.
         </p>
-        <Link className="mt-4 inline-flex font-bold text-blue-700" href="/platform/security/controls">
+        <Link className="mt-4 inline-flex font-bold text-violet-700" href="/platform/security/controls">
           Open control register
         </Link>
       </AdminCard>

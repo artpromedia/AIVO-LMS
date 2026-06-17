@@ -71,6 +71,7 @@ class AgentTurnRequest(BaseModel):
     token_envelope: TokenEnvelope = Field(default_factory=lambda: TokenEnvelope(limit=8000))
     delivery_level: str = "3"
     functioning_level: str = "STANDARD"
+    locale: str | None = None
 
 
 class TurnUsage(BaseModel):
@@ -163,6 +164,7 @@ async def run_turn(req: AgentTurnRequest) -> TurnResult:
             history_digest=req.history_digest,
             tool_results=[r.model_dump() for r in req.tool_results],
             validation_feedback=validation_feedback,
+            locale=req.locale,
         )
         try:
             completion = await generate_completion(

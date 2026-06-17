@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import { colors } from "@/constants/colors";
 
 /**
  * Non-destructive showcase group for the new @aivo/mobile-ui/shell
@@ -15,7 +16,7 @@ export default function ShellDemoLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: "#F4F6F5" },
+        contentStyle: { backgroundColor: colors.background },
       }}
     />
   );

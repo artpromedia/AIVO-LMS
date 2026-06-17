@@ -2,6 +2,7 @@ import { requirePlatformPage } from "@aivo/admin-auth";
 import { listContentPacks } from "@aivo/admin-api/content";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill } from "@/components/status-pill";
 
 export default async function ContentPacksPage() {
   const session = await requirePlatformPage("platform:read");
@@ -9,7 +10,6 @@ export default async function ContentPacksPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Content packs"
       description="Sealed, versioned activity bundles for cold-start, offline, and budget-capped delivery."
     >
@@ -31,15 +31,15 @@ export default async function ContentPacksPage() {
               {packs.map((pack) => (
                 <tr key={pack.id}>
                   <td className="font-bold">
-                    <a className="text-blue-700" href={`/platform/content/${pack.id}`}>
+                    <a className="text-violet-700" href={`/platform/content/${pack.id}`}>
                       {pack.title}
                     </a>
                   </td>
                   <td>{pack.subject}</td>
                   <td>{pack.gradeBand}</td>
-                  <td className="text-sm">{pack.version}</td>
+                  <td className="text-sm tabular-nums">{pack.version}</td>
                   <td>
-                    <span className="admin-status">{pack.status}</span>
+                    <StatusPill status={pack.status} />
                   </td>
                   <td className="text-sm">
                     {pack.validation
@@ -48,7 +48,7 @@ export default async function ContentPacksPage() {
                         : `${pack.validation.issueCount} issues`
                       : "—"}
                   </td>
-                  <td className="text-sm">{formatDateTime(pack.updatedAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(pack.updatedAt)}</td>
                 </tr>
               ))}
               {packs.length === 0 ? (

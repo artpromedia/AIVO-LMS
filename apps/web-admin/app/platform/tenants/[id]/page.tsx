@@ -16,7 +16,6 @@ export default async function TenantDetailPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Tenant"
       title={tenant.name}
       description={`${tenant.typeLabel} · created ${formatDate(tenant.createdAt)}`}
       action={

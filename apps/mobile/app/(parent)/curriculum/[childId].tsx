@@ -9,7 +9,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import {
   useCurriculumUploads,
@@ -182,7 +182,7 @@ export default function ParentCurriculumScreen() {
           ]}
         >
           {parseMutation.isPending ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.white} />
           ) : (
             <Text style={styles.primaryBtnText}>
               {t("parentCurriculum.parse", "Preview with AI")}
@@ -229,7 +229,7 @@ export default function ParentCurriculumScreen() {
             ]}
           >
             {saveMutation.isPending ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.white} />
             ) : (
               <Text style={styles.primaryBtnText}>
                 {t("parentCurriculum.save", "Save for this week")}
@@ -301,8 +301,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     marginTop: spacing.sm,
   },
-  primaryBtnText: { color: "#fff", fontSize: 15, fontFamily: fontFamilies.bodyBold },
-  error: { color: "#B3261E", fontSize: 13, fontFamily: fontFamilies.bodyRegular },
+  primaryBtnText: { color: colors.white, fontSize: 15, fontFamily: fontFamilies.bodyBold },
+  error: { color: colors.error, fontSize: 13, fontFamily: fontFamilies.bodyRegular },
   saved: { fontSize: 13, fontFamily: fontFamilies.bodyRegular },
   fileRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   fileName: { flex: 1, fontSize: 14, fontFamily: fontFamilies.bodySemiBold },

@@ -82,7 +82,7 @@ export function CalmCorner({
           {t(`affirmations.${affirmation}`)}
         </h2>
         {streakDays > 0 ? (
-          <p className="mt-2 text-sm font-medium text-aivo-ink-soft">
+          <p className="mt-2 text-sm font-medium text-iw-ink-muted">
             {t("streak.label", { count: streakDays })}
           </p>
         ) : null}
@@ -153,12 +153,12 @@ function ActivityCard({
         "w-full min-h-11 rounded-iw-card-lg border p-4 text-left transition-shadow " +
         "focus:outline-none focus:ring-2 focus:ring-offset-2 " +
         (highlighted
-          ? "border-aivo-primary bg-aivo-primary/5"
-          : "border-iw-border bg-white hover:shadow-[0_12px_32px_-12px_rgba(15,23,42,0.18)]")
+          ? "border-iw-primary bg-iw-primary/5"
+          : "border-iw-border bg-white hover:shadow-soft-3")
       }
     >
       <p className="font-semibold text-iw-text-strong">{t(activity.titleKey)}</p>
-      <p className="mt-1 text-sm text-aivo-ink-soft">{t(activity.bodyKey)}</p>
+      <p className="mt-1 text-sm text-iw-ink-muted">{t(activity.bodyKey)}</p>
     </button>
   );
 }
@@ -266,12 +266,12 @@ function BoxBreathing({
 
   return (
     <Card className="mt-6 flex flex-col items-center gap-5 p-8 text-center">
-      <p className="text-sm text-aivo-ink-soft">{t("round", { round, rounds })}</p>
+      <p className="text-sm text-iw-ink-muted">{t("round", { round, rounds })}</p>
       <div
         aria-hidden="true"
         data-phase={phase}
         className={
-          "h-40 w-40 rounded-full bg-aivo-primary/20 " +
+          "h-40 w-40 rounded-full bg-iw-primary/20 " +
           (reducedMotion ? "" : "transition-transform duration-4000 ease-in-out ") +
           (!reducedMotion && (phase === "inhale" || phase === "hold_in")
             ? "scale-110"
@@ -316,7 +316,7 @@ function StaticActivity({
   return (
     <Card className="mt-6 flex flex-col gap-4 p-6">
       <h2 className="font-display text-2xl font-bold">{t(activity.titleKey)}</h2>
-      <p className="text-aivo-ink-soft">{t(activity.bodyKey)}</p>
+      <p className="text-iw-ink-muted">{t(activity.bodyKey)}</p>
       <div className="flex gap-3">
         <Button
           onClick={() => onDone(Math.round((Date.now() - startedAt.current) / 1000))}

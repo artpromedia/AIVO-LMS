@@ -57,6 +57,7 @@ import type {
   TTSGenerationJob,
   TutorResponseAudit,
   Classroom,
+  CalendarEvent,
   Course,
   Coupon,
   DailyBillingBatch,
@@ -263,6 +264,31 @@ export interface LearnerStore {
     tenantId: string;
     parentUserId: string;
     data: CreateLearnerInput;
+  }): Promise<LearnerProfile>;
+  /**
+   * Cross-platform unification (Task #34): link an existing web profile to
+   * its canonical identity-svc learner UUID. Returns the updated learner, or
+   * null if the learner doesn't belong to the tenant.
+   */
+  setIdentityLink(
+    id: string,
+    tenantId: string,
+    identityLearnerId: string,
+  ): Promise<LearnerProfile | null>;
+  /**
+   * Cross-platform unification (Task #34): materialize a web profile for a
+   * learner that already exists in identity-svc (e.g. enrolled from mobile),
+   * pre-linked to the canonical UUID, plus the parent's primary relationship.
+   * Used by the BFF reconcile step to surface mobile-origin learners in web.
+   */
+  createFromIdentity(input: {
+    tenantId: string;
+    parentUserId: string;
+    identityLearnerId: string;
+    name: string;
+    birthYear: number;
+    gradeBand?: LearnerProfile["gradeBand"];
+    primaryLanguage?: string | null;
   }): Promise<LearnerProfile>;
   /** Patch by id. Returns null if the learner doesn't belong to tenant. */
   update(id: string, tenantId: string, patch: PatchLearnerInput): Promise<LearnerProfile | null>;
@@ -704,6 +730,15 @@ export interface AdminStore {
     teacherId: string,
     tenantId: string,
   ): Promise<boolean>;
+
+  // Calendar events (teacher personal calendar — teacher home "Upcoming")
+  /** Events owned by a teacher, ascending by date; `fromIso` keeps upcoming. */
+  listCalendarEventsForTeacher(
+    teacherUserId: string,
+    tenantId: string,
+    opts?: { fromIso?: string; limit?: number },
+  ): Promise<CalendarEvent[]>;
+  upsertCalendarEvent(event: CalendarEvent): Promise<CalendarEvent>;
 }
 
 /**

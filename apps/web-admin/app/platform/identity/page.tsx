@@ -8,6 +8,7 @@ import {
   revokePlatformDistrictInvite,
 } from "@aivo/admin-api/identity";
 import { AdminCard, AdminPageFrame , ConfirmDangerDialog } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 import { formatDateTime } from "@/components/admin-format";
 import { actionError } from "@/lib/action-errors";
 
@@ -53,7 +54,6 @@ export default async function PlatformIdentityPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Enterprise identity"
       description="District administrator invitations and per-tenant SCIM provisioning tokens."
       action={
@@ -105,14 +105,12 @@ export default async function PlatformIdentityPage({
                     <span className="text-sm font-normal text-slate-500">{invite.email}</span>
                   </td>
                   <td>
-                    <span className={`admin-status admin-status-${invite.status}`}>
-                      {invite.status}
-                    </span>
+                    <StatusPill status={invite.status} />
                   </td>
-                  <td className="text-sm">{formatDateTime(invite.expiresAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(invite.expiresAt)}</td>
                   <td className="text-sm">
                     <Link
-                      className="font-semibold text-blue-700"
+                      className="font-semibold text-violet-700"
                       href={`/platform/identity/${invite.tenantId}`}
                     >
                       Tokens

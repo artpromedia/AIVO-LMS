@@ -32,7 +32,7 @@ import type { AccessibilityPreferences } from "@/lib/db/types";
 export function a11yRootClass(accessibility: AccessibilityPreferences): string {
   return [
     accessibility.largeText ? "text-lg leading-relaxed" : "",
-    accessibility.highContrast ? "bg-aivo-surface text-black" : "",
+    accessibility.highContrast ? "bg-iw-card text-black" : "",
   ]
     .filter(Boolean)
     .join(" ");

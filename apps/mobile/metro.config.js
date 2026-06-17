@@ -14,6 +14,7 @@ config.watchFolders = [
   path.resolve(monorepoRoot, "node_modules"),
   path.resolve(monorepoRoot, "packages/aac-bridge"),
   path.resolve(monorepoRoot, "packages/accessibility-contract"),
+  path.resolve(monorepoRoot, "packages/adaptive-baseline"),
   path.resolve(monorepoRoot, "packages/billing-entitlements"),
   path.resolve(monorepoRoot, "packages/brand"),
   path.resolve(monorepoRoot, "packages/mobile-ui"),

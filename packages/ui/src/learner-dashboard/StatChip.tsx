@@ -47,7 +47,7 @@ export function StatChip({ icon, label, value, tone = "primary", className }: St
       <span
         aria-hidden="true"
         className={cn(
-          "w-11 h-11 inline-flex items-center justify-center rounded-2xl shrink-0",
+          "w-11 h-11 inline-flex items-center justify-center rounded-iw-control shrink-0",
           TONE_BG[tone],
           TONE_FG[tone],
         )}

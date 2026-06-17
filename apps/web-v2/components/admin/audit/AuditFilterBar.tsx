@@ -105,8 +105,8 @@ export function AuditFilterBar({
               key={a}
               className={`cursor-pointer rounded-full border px-2 py-0.5 text-xs ${
                 value.actions.includes(a)
-                  ? "border-aivo-primary bg-aivo-primary-soft"
-                  : "border-aivo-border"
+                  ? "border-iw-primary bg-iw-purple-100"
+                  : "border-iw-border"
               }`}
             >
               <input

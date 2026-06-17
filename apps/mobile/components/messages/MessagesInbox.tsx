@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { API } from "@/constants/api";
 import { apiFetch, getToken } from "@/lib/api";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { useSse } from "@/hooks/useSse";
 
@@ -203,7 +203,7 @@ export function MessagesInbox() {
                     },
                   ]}
                 >
-                  <Text style={{ color: m.mine ? "#ffffff" : palette.ink, fontSize: 14 }}>
+                  <Text style={{ color: m.mine ? palette.primaryFg : palette.ink, fontSize: 14 }}>
                     {m.body}
                   </Text>
                 </View>
@@ -230,7 +230,7 @@ export function MessagesInbox() {
               { backgroundColor: palette.primary, opacity: sending || !draft.trim() ? 0.5 : 1 },
             ]}
           >
-            <Ionicons name="send" size={18} color="#ffffff" />
+            <Ionicons name="send" size={18} color={palette.primaryFg} />
           </Pressable>
         </View>
         {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -332,12 +332,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 6,
   },
-  badgeText: { color: "#ffffff", fontSize: 12, fontFamily: fontFamilies.bodyBold },
+  badgeText: { color: colors.white, fontSize: 12, fontFamily: fontFamilies.bodyBold },
   empty: {
     fontSize: 14,
     fontFamily: fontFamilies.bodyRegular,
     marginTop: spacing.lg,
     lineHeight: 21,
   },
-  error: { fontSize: 13, color: "#ef4444", marginTop: spacing.sm },
+  error: { fontSize: 13, color: colors.error, marginTop: spacing.sm },
 });

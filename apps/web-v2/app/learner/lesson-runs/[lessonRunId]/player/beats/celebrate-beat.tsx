@@ -61,7 +61,7 @@ export function CelebrateBeat({ body, tutorSlug, motionOff }: CelebrateBeatProps
   const portrait = motionOff ? tutor.avatarReduced : tutor.avatar;
   return (
     <div className="space-y-4" data-testid="celebrate-beat">
-      <div className="relative flex items-center gap-3 rounded-xl border-2 border-[color:var(--tutor-accent,transparent)] bg-[color:var(--tutor-accent-soft,transparent)] px-4 py-3">
+      <div className="relative flex items-center gap-3 rounded-iw-card border-2 border-[color:var(--tutor-accent,transparent)] bg-[color:var(--tutor-accent-soft,transparent)] px-4 py-3">
         {!motionOff && <SparkleBurst />}
         <img
           src={portrait}
@@ -70,7 +70,7 @@ export function CelebrateBeat({ body, tutorSlug, motionOff }: CelebrateBeatProps
           width={48}
           height={48}
           data-testid="tutor-portrait"
-          className={`relative h-12 w-12 shrink-0 rounded-full bg-aivo-surface-2 object-cover ${
+          className={`relative h-12 w-12 shrink-0 rounded-full bg-iw-raised object-cover ${
             motionOff ? "" : "lx-check-pop"
           }`}
         />

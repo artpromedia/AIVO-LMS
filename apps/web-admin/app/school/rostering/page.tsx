@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requirePageRole } from "@aivo/admin-auth";
 import { type AdminImportJob, listImportJobs } from "@aivo/admin-api/rostering";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 
 const ROSTERING_ROLES = ["school_admin", "district_admin", "platform_admin"] as const;
 
@@ -70,7 +71,11 @@ export default async function SchoolRosteringPage({
                 <tr key={job.jobId}>
                   <td className="font-bold">{job.jobId}</td>
                   <td>
-                    <span className="admin-status">{statusLabel(job)}</span>
+                    <StatusPill
+                      status={job.status}
+                      tone={job.status === "done" ? "positive" : undefined}
+                      label={statusLabel(job)}
+                    />
                   </td>
                   <td className="text-sm">{job.summary.total.toLocaleString()}</td>
                   <td className="text-sm">{job.summary.created.toLocaleString()}</td>

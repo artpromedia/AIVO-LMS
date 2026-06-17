@@ -80,7 +80,7 @@ export function SortingCalm({
               <span
                 aria-hidden="true"
                 className={
-                  "flex items-center justify-center rounded-full bg-aivo-primary/30 " +
+                  "flex items-center justify-center rounded-full bg-iw-primary/30 " +
                   "text-sm font-semibold text-iw-text-strong " +
                   (reducedMotion ? "" : "transition-all duration-300")
                 }
@@ -94,7 +94,7 @@ export function SortingCalm({
                   disabled={index === 0 || solved}
                   onClick={() => move(index, -1)}
                   aria-label={t("sorting_move_left", { value: item.value })}
-                  className="flex h-11 w-11 items-center justify-center rounded-iw-control border border-iw-border bg-white text-lg text-iw-text-strong focus:outline-none focus:ring-2 focus:ring-aivo-primary focus:ring-offset-2 disabled:opacity-40"
+                  className="flex h-11 w-11 items-center justify-center rounded-iw-control border border-iw-border bg-white text-lg text-iw-text-strong focus:outline-none focus:ring-2 focus:ring-iw-primary focus:ring-offset-2 disabled:opacity-40"
                 >
                   ←
                 </button>
@@ -103,7 +103,7 @@ export function SortingCalm({
                   disabled={index === items.length - 1 || solved}
                   onClick={() => move(index, 1)}
                   aria-label={t("sorting_move_right", { value: item.value })}
-                  className="flex h-11 w-11 items-center justify-center rounded-iw-control border border-iw-border bg-white text-lg text-iw-text-strong focus:outline-none focus:ring-2 focus:ring-aivo-primary focus:ring-offset-2 disabled:opacity-40"
+                  className="flex h-11 w-11 items-center justify-center rounded-iw-control border border-iw-border bg-white text-lg text-iw-text-strong focus:outline-none focus:ring-2 focus:ring-iw-primary focus:ring-offset-2 disabled:opacity-40"
                 >
                   →
                 </button>

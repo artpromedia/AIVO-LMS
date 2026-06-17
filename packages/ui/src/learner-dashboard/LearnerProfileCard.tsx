@@ -45,7 +45,7 @@ export function LearnerProfileCard({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 p-3 rounded-2xl bg-white border border-iw-border/60",
+        "flex items-center gap-3 p-3 rounded-iw-card bg-white border border-iw-border/60",
         className,
       )}
     >

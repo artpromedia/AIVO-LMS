@@ -7,8 +7,9 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
-import { AivoCard } from "@aivo/mobile-ui";
+import { Card } from "@/components/ui";
 import { colors, spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 
 interface QuestWorld {
   key: string;
@@ -188,7 +189,7 @@ export default function QuestWorldScreen() {
       {decorated.map((q) => {
         const locked = q.uiStatus === "locked";
         return (
-          <AivoCard key={q.id} style={[styles.chapterCard, locked ? { opacity: 0.55 } : null]}>
+          <Card key={q.id} style={[styles.chapterCard, locked ? { opacity: 0.55 } : null]}>
             <View style={styles.chapterHeader}>
               <Text style={styles.chapterTitle}>{q.title}</Text>
               <Text style={styles.xpBadge}>+{q.xpReward ?? 0} XP</Text>
@@ -196,8 +197,8 @@ export default function QuestWorldScreen() {
             {q.description ? <Text style={styles.chapterDesc}>{q.description}</Text> : null}
             <View style={styles.chapterActions}>
               {q.uiStatus === "completed" && (
-                <View style={[styles.statusPill, { backgroundColor: "#16a34a" }]}>
-                  <Ionicons name="checkmark" size={14} color="#fff" />
+                <View style={[styles.statusPill, { backgroundColor: colors.success }]}>
+                  <Ionicons name="checkmark" size={14} color={colors.white} />
                   <Text style={styles.statusPillText}>Completed</Text>
                 </View>
               )}
@@ -227,7 +228,7 @@ export default function QuestWorldScreen() {
                 </View>
               )}
             </View>
-          </AivoCard>
+          </Card>
         );
       })}
     </ScrollView>
@@ -237,21 +238,21 @@ export default function QuestWorldScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
-  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
-  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  backText: { fontSize: 16, fontFamily: fontFamilies.bodySemiBold, color: colors.primary },
+  title: { fontSize: 24, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   subtitle: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: 4,
     marginBottom: spacing.md,
   },
   statsRow: { flexDirection: "row", gap: spacing.lg, marginBottom: spacing.lg },
   stat: { gap: 2 },
-  statValue: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  statValue: { fontSize: 22, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   statLabel: {
     fontSize: 11,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.textSecondary,
     textTransform: "uppercase",
   },
@@ -265,14 +266,14 @@ const styles = StyleSheet.create({
   chapterTitle: {
     flex: 1,
     fontSize: 16,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.text,
     marginRight: spacing.sm,
   },
-  xpBadge: { fontSize: 13, fontFamily: "Nunito-Bold", color: "#d97706" },
+  xpBadge: { fontSize: 13, fontFamily: fontFamilies.bodyBold, color: colors.warning },
   chapterDesc: {
     fontSize: 13,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: "center",
   },
-  primaryButtonText: { color: "#fff", fontFamily: "Nunito-Bold", fontSize: 14 },
+  primaryButtonText: { color: colors.white, fontFamily: fontFamilies.bodyBold, fontSize: 14 },
   statusPill: {
     flexDirection: "row",
     alignItems: "center",
@@ -294,22 +295,22 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: radius.lg,
   },
-  statusPillText: { color: "#fff", fontFamily: "Nunito-Bold", fontSize: 12 },
+  statusPillText: { color: colors.white, fontFamily: fontFamilies.bodyBold, fontSize: 12 },
   lockedRow: { flexDirection: "row", alignItems: "center", gap: 4 },
   lockedText: {
     fontSize: 12,
     color: colors.textSecondary,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
   },
   notFoundTitle: {
     fontSize: 20,
-    fontFamily: "Nunito-ExtraBold",
+    fontFamily: fontFamilies.bodyExtraBold,
     color: colors.text,
     marginTop: spacing.xl,
   },
   notFoundSlug: {
     fontSize: 13,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },

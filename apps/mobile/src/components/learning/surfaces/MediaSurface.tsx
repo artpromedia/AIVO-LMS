@@ -7,6 +7,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { Audio, Video, ResizeMode } from "expo-av";
+import { colors } from "@/constants/colors";
 import { createSurfaceStyles, readString } from "./shared";
 import type { SurfaceProps } from "./types";
 
@@ -60,7 +61,7 @@ export function MediaSurface({ theme, surfaceKind, cfg, onSubmit }: SurfaceProps
               width: "100%",
               aspectRatio: 16 / 9,
               borderRadius: 12,
-              backgroundColor: "#000",
+              backgroundColor: colors.black,
             }}
           />
         ) : (

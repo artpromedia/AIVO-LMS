@@ -11,7 +11,11 @@ from pydantic import BaseModel, Field
 from ..vision.ocr_processor import process_ocr
 from ..vision.homework_adapter import adapt_homework
 from ..services.llm_gateway import generate_completion
-from ..services.prompt_builder import build_tutor_system_prompt, _build_language_directive, _normalize_locale
+from ..services.prompt_builder import (
+    build_tutor_system_prompt,
+    _build_language_directive,
+    _effective_locale,
+)
 from ..services.responsible_ai_client import evaluate as evaluate_responsible_ai
 
 logger = logging.getLogger("ai-svc.homework")
@@ -134,7 +138,10 @@ async def homework_chat(body: HomeworkChatRequest):
     # final instruction the model sees is "respond in {language}". The
     # wrapper above is hard-coded English and would otherwise pull the
     # response back to English even when the persona block asked for Spanish.
-    system_prompt += "\n" + _build_language_directive(_normalize_locale(body.locale))
+    # An explicit (valid) locale wins; otherwise fall back to the learner's
+    # stored instruction language so the helper matches their enrolled language.
+    resolved_locale = _effective_locale(body.locale, body.brain_context)
+    system_prompt += "\n" + _build_language_directive(resolved_locale)
 
     try:
         result = await generate_completion(

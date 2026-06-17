@@ -110,7 +110,7 @@ export function AttributeMappingEditor({
                 aria-label={t("aivo_role")}
                 value={aivoRole}
                 onChange={(e) => updateMapValue(idpValue, e.target.value)}
-                className="h-9 flex-1 rounded-md border border-aivo-border bg-aivo-surface px-2 text-sm"
+                className="h-9 flex-1 rounded-md border border-iw-border bg-iw-card px-2 text-sm"
               >
                 {PROVISIONABLE_ROLES.map((r) => (
                   <option key={r} value={r}>
@@ -141,7 +141,7 @@ export function AttributeMappingEditor({
           id="attr-default-role"
           value={value.defaultRole}
           onChange={(e) => setField("defaultRole", e.target.value)}
-          className="mt-1 h-9 w-full rounded-md border border-aivo-border bg-aivo-surface px-2 text-sm"
+          className="mt-1 h-9 w-full rounded-md border border-iw-border bg-iw-card px-2 text-sm"
         >
           {PROVISIONABLE_ROLES.map((r) => (
             <option key={r} value={r}>

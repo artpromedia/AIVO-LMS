@@ -8,7 +8,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card, Button } from "@/components/ui";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -23,6 +23,7 @@ export default function ParentLearnerNewScreen() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gradeLevel, setGradeLevel] = useState("");
+  const [language, setLanguage] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [pin, setPin] = useState("");
 
@@ -41,6 +42,7 @@ export default function ParentLearnerNewScreen() {
         gradeLevel: gradeLevel.trim(),
         pin: pin.trim(),
         dateOfBirth: birthDate.trim(),
+        preferredLanguage: language.trim(),
       });
       const id = created?.id;
       if (id) router.replace(`/(parent)/learners/${id}` as never);
@@ -84,6 +86,11 @@ export default function ParentLearnerNewScreen() {
         {field(t("parentLearnerNew.lastName", "Last name"), lastName, setLastName)}
         {field(t("parentLearnerNew.grade", "Grade level"), gradeLevel, setGradeLevel)}
         {field(
+          t("parentLearnerNew.language", "Preferred language (optional)"),
+          language,
+          setLanguage,
+        )}
+        {field(
           t("parentLearnerNew.birthDate", "Birth date (YYYY-MM-DD)"),
           birthDate,
           setBirthDate,
@@ -91,7 +98,7 @@ export default function ParentLearnerNewScreen() {
         )}
         {birthDate.length > 0 && birthDateError ? (
           <Text
-            style={[styles.label, { color: "#b91c1c" }]}
+            style={[styles.label, { color: colors.error }]}
             accessibilityLiveRegion="polite"
           >
             {t(`parentLearnerNew.birthDateError.${birthDateError}`)}

@@ -2,6 +2,7 @@ import { requirePlatformPage } from "@aivo/admin-auth";
 import { getPlatformAiCosts } from "@aivo/admin-api/platform";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatUsd } from "@/components/admin-format";
+import { StatusPill } from "@/components/status-pill";
 
 export default async function AiCostsPage() {
   const session = await requirePlatformPage("platform:read");
@@ -10,7 +11,6 @@ export default async function AiCostsPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="AI costs"
       description="Per-tenant AI spend over the last 24 hours, with budget warning and cap signals."
     >
@@ -50,11 +50,11 @@ export default async function AiCostsPage() {
                   <tr key={tenant.tenantId}>
                     <td className="font-bold">{tenant.tenantName ?? tenant.tenantId}</td>
                     <td>{tenant.tenantTypeLabel}</td>
-                    <td>{tenant.requestCount24h.toLocaleString()}</td>
-                    <td>{formatUsd(tenant.estimatedCostUsd24h)}</td>
-                    <td className="text-sm">{Math.round(tenant.avgLatencyMs24h)} ms</td>
+                    <td className="tabular-nums">{tenant.requestCount24h.toLocaleString()}</td>
+                    <td className="tabular-nums">{formatUsd(tenant.estimatedCostUsd24h)}</td>
+                    <td className="text-sm tabular-nums">{Math.round(tenant.avgLatencyMs24h)} ms</td>
                     <td>
-                      <span className="admin-status">{budgetState}</span>
+                      <StatusPill status={budgetState} />
                     </td>
                   </tr>
                 );

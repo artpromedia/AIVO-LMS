@@ -71,7 +71,7 @@ export function DsarIntakeForm() {
   if (step === "confirmed" && confirmed) {
     return (
       <div className="rounded-iw-card border border-iw-border bg-iw-raised p-8 text-center">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-aivo-success/15 text-aivo-success text-xl font-bold mb-4">
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-iw-success/15 text-iw-success text-xl font-bold mb-4">
           ✓
         </div>
         <h2 className="font-iw-display text-2xl font-bold text-iw-ink">Request submitted</h2>
@@ -113,7 +113,7 @@ export function DsarIntakeForm() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold mb-1.5 text-iw-ink" htmlFor="req-email">
-              Your email address <span className="text-aivo-danger">*</span>
+              Your email address <span className="text-iw-error">*</span>
             </label>
             <Input
               id="req-email"
@@ -174,7 +174,7 @@ export function DsarIntakeForm() {
                 htmlFor="subject-id"
               >
                 Subject identifier (learner ID, email, or username){" "}
-                <span className="text-aivo-danger">*</span>
+                <span className="text-iw-error">*</span>
               </label>
               <Input
                 id="subject-id"
@@ -195,7 +195,7 @@ export function DsarIntakeForm() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold mb-1.5 text-iw-ink" htmlFor="dsar-type">
-              Request type <span className="text-aivo-danger">*</span>
+              Request type <span className="text-iw-error">*</span>
             </label>
             <select
               id="dsar-type"
@@ -232,7 +232,7 @@ export function DsarIntakeForm() {
       </section>
 
       {error && (
-        <p role="alert" className="text-sm text-aivo-danger">
+        <p role="alert" className="text-sm text-iw-error">
           {error}
         </p>
       )}

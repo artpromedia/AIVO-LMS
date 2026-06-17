@@ -13,7 +13,6 @@ export default async function TrialsReportPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform billing"
       title="Trials & pilot conversion"
       description="Trial volume, upcoming trial ends, and trial-to-paid / pilot-coupon conversion. Pilots are subscriptions created from a coupon."
       action={

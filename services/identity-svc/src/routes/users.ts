@@ -413,14 +413,25 @@ export async function registerUserRoutes(app: FastifyInstance) {
         }
 
         if (body.preferredLanguage) {
-          await db
-            .insert(languageProfiles)
-            .values({
-              learnerId: learner.id,
-              primaryLanguage: body.preferredLanguage,
-              preferredInstructionLanguage: body.preferredLanguage,
-            })
-            .catch(() => {});
+          // Cross-platform unification (Task #34): the learner's preferred
+          // language drives tutor-response language across web + mobile, so a
+          // failed write must be visible (logged), not silently swallowed.
+          // It stays non-fatal — the learner is already created — but is no
+          // longer invisible when it breaks.
+          try {
+            await db
+              .insert(languageProfiles)
+              .values({
+                learnerId: learner.id,
+                primaryLanguage: body.preferredLanguage,
+                preferredInstructionLanguage: body.preferredLanguage,
+              });
+          } catch (langErr) {
+            app.log.error(
+              { err: langErr, learnerId: learner.id, preferredLanguage: body.preferredLanguage },
+              "Failed to persist learner language profile",
+            );
+          }
         }
 
         if (body.pin) {

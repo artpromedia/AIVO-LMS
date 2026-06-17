@@ -58,7 +58,7 @@ export function LearnerNotificationsList({
             <p className="font-medium">{n.title}</p>
             {!n.readAt ? <Badge tone="primary">New</Badge> : null}
           </div>
-          <p className="mt-1 text-sm text-aivo-ink-soft">{n.body}</p>
+          <p className="mt-1 text-sm text-iw-ink-muted">{n.body}</p>
         </Card>
       ))}
     </div>

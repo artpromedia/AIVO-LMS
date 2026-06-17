@@ -494,7 +494,7 @@ export function CsvImportWizard({ schoolId }: WizardProps) {
                   {validation.missingColumns.length > 0 && (
                     <p
                       role="alert"
-                      className="rounded-lg bg-aivo-danger/10 p-3 text-sm text-aivo-danger"
+                      className="rounded-lg bg-iw-error/10 p-3 text-sm text-iw-error"
                     >
                       Missing required columns: {validation.missingColumns.join(", ")}
                     </p>
@@ -661,7 +661,7 @@ export function CsvImportWizard({ schoolId }: WizardProps) {
                   </div>
 
                   {pollJob.status === "completed" && (
-                    <div className="rounded-lg border border-aivo-success/30 bg-aivo-success/10 p-4">
+                    <div className="rounded-lg border border-iw-success/30 bg-iw-success/10 p-4">
                       <p className="font-semibold text-aivo-success">Import complete!</p>
                       <div className="mt-2 grid grid-cols-3 gap-2 text-sm">
                         <div>

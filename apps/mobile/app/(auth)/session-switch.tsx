@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontFamily: fontFamilies.displayBold,
     fontSize: 18,
-    color: "#ffffff",
+    color: colors.white,
   },
   profileName: {
     fontFamily: fontFamilies.bodyBold,
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontFamily: fontFamilies.bodyRegular,
     fontSize: 13,
-    color: "#b91c1c",
+    color: colors.error,
     paddingVertical: spacing.sm,
   },
   emptyText: {

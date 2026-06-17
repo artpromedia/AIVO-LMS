@@ -11,7 +11,6 @@ import {
   BaselineProgressDots,
   PersonalizationChip,
   HintCard,
-  ReadAloudButton,
   BreakCard,
   CompletionHero,
   ProctorBanner,
@@ -26,6 +25,7 @@ import {
   setBaselineAdaptiveSessionId,
   getIEPForLearner,
   getLearner,
+  getLearnerVoicePreference,
   getOrCreateParentAssessment,
   listBaselineAttempts,
   listBaselineQuestions,
@@ -38,9 +38,12 @@ import {
 import { learnerPrefStyleVars } from "@/lib/a11y/learner-prefs";
 import { resolveBaselineScanConfig } from "@/lib/a11y/baseline-scan";
 import { BaselineScanProvider } from "./baseline-scan-provider";
+import { buildBaselineAnswerRedirect } from "./answer-redirect";
+import { buildCompletionLearnedChips } from "./completion-chips";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { TutorFace } from "@/components/learner/art/tutor-character";
 import { resolveBaselineImage } from "@/lib/learner/baseline-image";
 import { baselineAdaptiveEnabled, baselineStreamingEnabled } from "@/lib/feature-flags";
 import {
@@ -55,6 +58,7 @@ import { mintAssessmentSvcToken } from "@/lib/learner/assessment-svc-auth";
 import { serverEnv } from "@/lib/env";
 import { BASELINE_BREAK_EVERY } from "@aivo/adaptive-baseline";
 import { LatencyTimer } from "./latency-timer";
+import { BaselineListenAudio } from "./listen-audio";
 import type { BaselineQuestion } from "@/lib/db/types";
 
 /**
@@ -92,7 +96,6 @@ async function answerAction(formData: FormData) {
   const questionId = String(formData.get("questionId") || "");
   const response = String(formData.get("response") || "");
   const skipped = String(formData.get("skipped") || "") === "1";
-  const asParent = String(formData.get("asParent") || "") === "1";
   const latencyRaw = Number.parseInt(String(formData.get("latencyMs") || ""), 10);
   const latencyMs = Number.isFinite(latencyRaw) && latencyRaw >= 0 ? latencyRaw : undefined;
 
@@ -126,10 +129,7 @@ async function answerAction(formData: FormData) {
       metadata: { baselineId, questionId, skipped, isCorrect: attempt.isCorrect },
     });
   }
-  const path = asParent
-    ? `/learner/baseline/${baselineId}?as=parent`
-    : `/learner/baseline/${baselineId}`;
-  redirect(path);
+  redirect(buildBaselineAnswerRedirect(baselineId, formData));
 }
 
 async function completeAction(formData: FormData) {
@@ -189,10 +189,18 @@ export default async function BaselineRunnerPage({
   searchParams,
 }: {
   params: Promise<{ baselineId: string }>;
-  searchParams: Promise<{ as?: string; resume?: string; paused?: string }>;
+  searchParams: Promise<{
+    as?: string;
+    resume?: string;
+    paused?: string;
+    listen?: string;
+  }>;
 }) {
   const sp = await searchParams;
   const asParent = sp.as === "parent";
+  // Audio-first modality switch offered at a struggle break (never shame):
+  // the learner can resume "listening" instead of pushing through.
+  const listenMode = sp.listen === "1";
   const session = await requirePageRole(asParent ? ["parent"] : ["learner", "parent"]);
   const { baselineId } = await params;
   const t = await getTranslations("learner.baseline_runner");
@@ -214,6 +222,10 @@ export default async function BaselineRunnerPage({
   // baseline shell so they apply INSIDE the question card, not just on chrome.
   const a11yPrefs = await getAccessibilityPrefs(baseline.learnerId, session.tenantId);
   const shellStyle = learnerPrefStyleVars(a11yPrefs);
+  // The learner's saved read-aloud voice/speed (set by the parent). The non-scan
+  // listen control tunes the browser SpeechSynthesis voice + rate to match these
+  // so playback respects the learner's preference instead of the browser default.
+  const voicePref = await getLearnerVoicePreference(baseline.learnerId);
   // Sprint C-15 — switch/AAC scanning. Resolve the learner's persisted AAC
   // prefs into a scan config; the runner wraps its interactive region in the
   // aac-bridge scan provider (single-source SwitchScanController) when the
@@ -349,19 +361,7 @@ export default async function BaselineRunnerPage({
           total={baseline.summary?.totalQuestions ?? 0}
           showAnswered={asParent}
           body={baseline.summary?.learnerSafeSummary ?? undefined}
-          learned={[
-            ...subjectMastery.map(
-              // Defensive: a malformed summary entry (missing estimate) must
-              // never throw and white-screen the whole runner — fall back to a
-              // neutral phrase so the completion hero still renders.
-              (s) =>
-                `${s.subjectName}: starting at ${
-                  s.estimate ? s.estimate.replaceAll("_", " ") : "their level"
-                }`,
-            ),
-            ...(chips.includes("iep") ? ["IEP supports stay on"] : []),
-            ...(chips.includes("calm_mode") ? ["Calm pacing locked in"] : []),
-          ]}
+          learned={buildCompletionLearnedChips({ asParent, subjectMastery, chips })}
           primary={
             <Link
               href={
@@ -502,16 +502,42 @@ export default async function BaselineRunnerPage({
               </Link>
             }
             secondary={
-              <Link
-                href={
-                  asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"
-                }
-                className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
-                data-scan-target={scanConfig.active ? "break-stop" : undefined}
-                data-scan-label={scanConfig.active ? t("stop_for_today") : undefined}
-              >
-                {t("stop_for_today")}
-              </Link>
+              <>
+                {struggleVariant ? (
+                  <Link
+                    href={`/learner/baseline/${baseline.id}?resume=1&listen=1${asParent ? "&as=parent" : ""}`}
+                    className="inline-flex items-center gap-2 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-[var(--aivo-color-aivoPurple-700)] bg-[var(--aivo-color-aivoPurple-50)] border border-[var(--aivo-color-aivoPurple-100)] hover:brightness-105"
+                    data-scan-target={scanConfig.active ? "break-listen" : undefined}
+                    data-scan-label={scanConfig.active ? t("listen_instead") : undefined}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                    </svg>
+                    {t("listen_instead")}
+                  </Link>
+                ) : null}
+                <Link
+                  href={
+                    asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"
+                  }
+                  className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
+                  data-scan-target={scanConfig.active ? "break-stop" : undefined}
+                  data-scan-label={scanConfig.active ? t("stop_for_today") : undefined}
+                >
+                  {t("stop_for_today")}
+                </Link>
+              </>
             }
           />
         </BaselineScanProvider>
@@ -613,11 +639,11 @@ export default async function BaselineRunnerPage({
           companion={
             tutor ? (
               <span
-                className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl"
-                style={{ backgroundColor: `${tutor.color}1A`, color: tutor.color }}
+                className="w-12 h-12 rounded-full inline-flex items-center justify-center overflow-hidden"
+                style={{ backgroundColor: `${tutor.color}1A` }}
                 aria-hidden="true"
               >
-                {tutor.emoji}
+                <TutorFace tutorKey={tutor.tutorKey} size={36} />
               </span>
             ) : null
           }
@@ -629,12 +655,59 @@ export default async function BaselineRunnerPage({
           }
           readAloud={
             next.readAloudText ? (
-              <ReadAloudButton
-                href={`?read=${next.id}`}
-                scanTargetId={scanConfig.active ? `q-${next.id}-readaloud` : undefined}
-                scanLabel={tScan("target_read_aloud")}
-                scanReadText={`${next.prompt}. ${next.readAloudText}`}
-              />
+              <div className="flex flex-col gap-1.5">
+                {scanConfig.active ? (
+                  // Scan/AAC path: the same server-TTS listen island as the
+                  // non-scan path, but registered as a scan target. The scan
+                  // controller activates it by clicking the real control (no
+                  // `data-scan-action`), so it speaks via the server TTS
+                  // pipeline AND shows captions in sync — falling back to the
+                  // browser voice (no caption timings) when the server can't
+                  // help. Keyed by question id so each new question re-fires.
+                  <BaselineListenAudio
+                    key={next.id}
+                    learnerId={baseline.learnerId}
+                    text={`${next.prompt}. ${next.readAloudText}`}
+                    contextRefId={next.id}
+                    speed={voicePref?.speed}
+                    voiceId={voicePref?.voiceId}
+                    captionsAlways={voicePref?.captionsAlways}
+                    scanTargetId={`q-${next.id}-readaloud`}
+                    scanLabel={tScan("target_read_aloud")}
+                    className={
+                      listenMode
+                        ? "ring-2 ring-[var(--aivo-sensory-ringFocus)] ring-offset-2 ring-offset-white"
+                        : undefined
+                    }
+                  />
+                ) : (
+                  // Non-scan path: a real read-aloud control backed by the
+                  // server TTS pipeline (falls back to the browser voice).
+                  // Taps speak the prompt, and in listening mode it
+                  // auto-starts on load. Keyed by question id so each new
+                  // question re-fires.
+                  <BaselineListenAudio
+                    key={next.id}
+                    learnerId={baseline.learnerId}
+                    text={`${next.prompt}. ${next.readAloudText}`}
+                    contextRefId={next.id}
+                    autoStart={listenMode}
+                    speed={voicePref?.speed}
+                    voiceId={voicePref?.voiceId}
+                    captionsAlways={voicePref?.captionsAlways}
+                    className={
+                      listenMode
+                        ? "ring-2 ring-[var(--aivo-sensory-ringFocus)] ring-offset-2 ring-offset-white"
+                        : undefined
+                    }
+                  />
+                )}
+                {listenMode ? (
+                  <p className="text-xs text-[var(--aivo-color-aivoPurple-700)]">
+                    {t("listen_mode_hint")}
+                  </p>
+                ) : null}
+              </div>
             ) : null
           }
           footer={
@@ -646,6 +719,7 @@ export default async function BaselineRunnerPage({
                   <input type="hidden" name="questionId" value={next.id} />
                   <input type="hidden" name="skipped" value="1" />
                   {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+                  {listenMode ? <input type="hidden" name="listen" value="1" /> : null}
                   <Button
                     type="submit"
                     variant="outline"
@@ -700,6 +774,7 @@ export default async function BaselineRunnerPage({
             <input type="hidden" name="learnerId" value={baseline.learnerId} />
             <input type="hidden" name="questionId" value={next.id} />
             {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+            {listenMode ? <input type="hidden" name="listen" value="1" /> : null}
             {/* Stamps time-on-item into `latencyMs` at submit. Keyed by
               question id so the timer resets for each new item. */}
             <LatencyTimer key={next.id} />

@@ -59,7 +59,7 @@ export function BaselinePendingCard({
       <div className="flex items-start gap-4">
         <span
           className={cn(
-            "shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center",
+            "shrink-0 w-12 h-12 rounded-iw-control flex items-center justify-center",
             "bg-[var(--aivo-color-aivoPurple-50,#f5f3ff)] text-[var(--aivo-sensory-primary,#7c3aed)]",
           )}
           aria-hidden="true"

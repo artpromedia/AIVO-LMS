@@ -13,6 +13,7 @@ import {
   listSubjects,
 } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { TutorFace } from "@/components/learner/art/tutor-character";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 
@@ -132,15 +133,15 @@ export default async function BaselineSubjectsPage({
                   />
                   <header className="flex items-center justify-between gap-2">
                     <span
-                      className="w-12 h-12 rounded-iw-control flex items-center justify-center text-2xl"
-                      style={
-                        tutor
-                          ? { backgroundColor: `${tutor.color}1A`, color: tutor.color }
-                          : undefined
-                      }
+                      className="w-12 h-12 rounded-iw-control flex items-center justify-center overflow-hidden"
+                      style={tutor ? { backgroundColor: `${tutor.color}1A` } : undefined}
                       aria-hidden="true"
                     >
-                      {tutor?.emoji ?? "📘"}
+                      {tutor ? (
+                        <TutorFace tutorKey={tutor.tutorKey} size={36} />
+                      ) : (
+                        <span className="text-2xl">📘</span>
+                      )}
                     </span>
                     <span
                       className="w-6 h-6 rounded-full border-2 border-iw-border bg-white group-has-[:checked]:border-[var(--aivo-sensory-primary)] group-has-[:checked]:bg-[var(--aivo-sensory-primary)] flex items-center justify-center"

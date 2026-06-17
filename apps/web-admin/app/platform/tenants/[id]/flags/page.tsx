@@ -88,7 +88,6 @@ export default async function TenantFlagsPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform administration"
       title="Tenant feature flags"
       description="Per-district overrides over the environment defaults. The env kill switch (AIVO_KILL_*) beats everything for emergency shut-off."
     >

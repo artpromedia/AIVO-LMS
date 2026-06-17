@@ -1,0 +1,92 @@
+
+# Sprint HW-1 — Homework list, start & multimodal capture (web + mobile)
+## Goal
+Build the homework entry + problem-capture flow on both platforms: list/resume sessions, start a new one,
+and capture the problem via photo→OCR, handwriting/math, voice, or text with a preview/confirm step.
+## Context
+Web: `apps/web-v2/app/learner/homework/page.tsx` (list), `homework/start-form.tsx` (start); BFF
+`app/api/bff/learners/[learnerId]/homework/route.ts` + `app/api/bff/.../safety/validate-homework-input/
+route.ts`. Mobile: `apps/mobile/src/components/learning/HomeworkWorkspace.tsx`,
+`apps/mobile/app/(learner)/homework/index.tsx`. Backend: `services/homework-svc/src/routes/{homework-
+sessions,uploads}.ts`, `services/homework-svc/src/services/homework-ocr.ts`; `math-recognizer-svc` for
+handwriting/math; audio via `@aivo/stage-runtime` `useSpeechInput`.
+## Work orders
+- CREATE (web + mobile): a capture component — photo (camera/upload → `homework-ocr`/`uploads`),
+  handwriting/math (`math-recognizer-svc`), voice (`useSpeechInput`), text — with a preview + confirm step.
+- EDIT (web): `homework/page.tsx` list (resume/new + empty state) and `start-form.tsx` (subject + capture
+  method) to the learner design; create the session via the homework BFF.
+- EDIT (mobile): `HomeworkWorkspace.tsx` + `(learner)/homework/index.tsx` to parity (camera capture).
+- EDIT: route captured input through `safety/validate-homework-input` before the session starts.
+- REFACTOR: shared capture types/util so web + mobile stay in lockstep.
+## Definition of done
+Start + capture work on web + mobile (photo-OCR, handwriting/math, voice, text, with confirm); input
+safety-validated; audio-first + AAC; AA; renders at every FL incl. PRE_SYMBOLIC; honest empty/error
+states; no stubs (grep the surface for TODO/stub/mock/placeholder).
+## Tests
+Capture→OCR/recognizer wiring; create-session BFF; safety-validate; a11y; mobile camera path.
+## Out of scope
+The chat work-through (HW-2); focus/self-regulation + completion (HW-3).
+## Depends on
+F2/F3 (learner shell + typography).
+# Sprint HW-2 — Homework tutor-chat work-through engine (web + mobile)
+## Goal
+Implement the conversational, step-scaffolded work-through inside a homework session on both platforms,
+as a shared `<TutorChat>` reused by the tutor tab and in-lesson panel.
+## Context
+Web: `apps/web-v2/app/learner/homework/[sessionId]/page.tsx` + `chat.tsx`; `learner/tutor/chat.tsx`;
+`components/learner/in-lesson-tutor-panel.tsx`, `components/learner/art/tutor-character.tsx`. Mobile:
+`src/components/learning/MobileTutorPanel.tsx`, `(learner)/homework/[sessionId].tsx`,
+`(learner)/tutor/[tutorSlug].tsx`. BFF: `homework/[sessionId]/route.ts` + `/[sessionId]/message/route.ts`.
+Engines: `@aivo/tutor-runtime` (`planSession`/`scaffold`/`applyOutcome`), `homework-svc/.../homework-step-
+engine.ts`; inline surfaces via `@aivo/tutor-surface-protocol` (`buildScratchpadCommand`,
+`buildNumberLineCommand`, `buildGraphCommand`, `buildGeometryCommand`, `buildReadingAnnotationCommand`,
+`normalizeTutorSurfaceResponse`, `validateTutorSurfaceResponse`); audio via `@aivo/stage-runtime`
+(`useTTS`/`useSpeechInput`/`voiceMatch`); per-tutor theme via `@aivo/brand` `tutor-themes`.
+## Work orders
+- CREATE: a shared `<TutorChat>` (web in `components/learner`, mobile in `src/components/learning`) — turn
+  thread, tutor character + `data-tutor` theme, hints-before-answers via tutor-runtime/step-engine,
+  one-response-at-a-time input (text/voice/AAC), `LiveRegion` for new turns, step progress.
+- EDIT: `homework/[sessionId]/chat.tsx` + the mobile session screen to render `<TutorChat>` wired to the
+  `message` BFF + step engine.
+- CREATE: inline tutor-surface rendering (scratchpad/number-line/graph/geometry/reading-annotation),
+  validated with `validateTutorSurfaceResponse`.
+- REFACTOR: route `learner/tutor/chat.tsx`, `in-lesson-tutor-panel.tsx`, and `MobileTutorPanel.tsx` onto
+  the shared `<TutorChat>`; deprecate divergent copies.
+- EDIT: read-aloud every tutor turn (`useTTS`); accept voice answers (`useSpeechInput`/`voiceMatch`).
+## Definition of done
+One `<TutorChat>` used by homework + tutor + in-lesson on web + mobile; hints-first scaffolding with
+visible step progress; inline interactive surfaces; audio-first + AAC; safety-validated input; AA; FL incl.
+PRE_SYMBOLIC; gentle (no-shame) errors; no stubs.
+## Tests
+Message turn round-trip (BFF + step engine); surface-command render/validate; TTS/speech; a11y/LiveRegion;
+mobile parity.
+## Out of scope
+Capture (HW-1); focus/self-regulation + completion (HW-3).
+## Depends on
+HW-1; F3; `@aivo/stage-runtime` audio.
+# Sprint HW-3 — Focus, self-regulation & completion (web + mobile)
+## Goal
+Wire the neurodiverse self-regulation loop and a calm, strengths-based completion into homework sessions
+on both platforms.
+## Context
+Backend: `homework-svc/src/services/{focus-monitor,self-regulation-recommender,homework-profile-adapter}.ts`;
+BFF `homework/[sessionId]/complete/route.ts`. UI: web `homework/[sessionId]/page.tsx`, mobile
+`(learner)/homework/[sessionId].tsx` + `HomeworkWorkspace.tsx`; `BreakCloud` from `@aivo/learner-ui`;
+break interval from `@aivo/accessibility-contract`; the engagement write path (from the Parent data-truth
+sprint).
+## Work orders
+- EDIT: surface `focus-monitor` + `self-regulation-recommender` signals as gentle, dismissible,
+  non-punitive break offers (`BreakCloud`) per the learner's break interval — never gate or shame.
+- CREATE: a calm, strengths-based completion screen ("here's what you worked through") wired to the
+  `complete` BFF; feed real engagement (XP/streak) via the write path.
+- EDIT (web + mobile): integrate break + completion into the session screens; respect Mood/reduced-motion.
+- REFACTOR: make resume/abandon states honest (no fake "saved").
+## Definition of done
+Focus-aware break suggestions appear + are dismissible (non-punitive); completion is calm + strengths-based
+and feeds real engagement; resume/abandon honest; AA; FL incl. PRE_SYMBOLIC; web + mobile parity; no stubs.
+## Tests
+Focus→break-offer; complete→engagement write; resume/abandon; a11y; mobile parity.
+## Out of scope
+Capture (HW-1); chat engine (HW-2).
+## Depends on
+HW-2; the engagement write path (Parent `P1` data-truth sprint).

@@ -9,6 +9,7 @@ import {
   updateLeadStatus,
 } from "@aivo/admin-api/leads";
 import { AdminPageFrame, DataTable, FlashRegion } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 const PAGE_SIZE = 50;
@@ -80,7 +81,6 @@ export default async function LeadsPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Sales"
       title="Leads"
       description={`${result.total.toLocaleString()} website demo, waitlist, and contact leads — with campaign attribution and a status lifecycle (new → contacted → qualified → pilot → won/lost).`}
     >
@@ -147,9 +147,7 @@ export default async function LeadsPage({
             {
               key: "status",
               header: "Status",
-              render: (row) => (
-                <span className={`admin-status admin-status-${row.status}`}>{row.status}</span>
-              ),
+              render: (row) => <StatusPill status={row.status} />,
             },
             {
               key: "received",

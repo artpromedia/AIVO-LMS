@@ -15,14 +15,13 @@ export default async function PlatformInvoicesPage({
   if (!tenantId) {
     return (
       <AdminPageFrame
-        eyebrow="Platform · Billing"
         title="Invoices"
         description="Stripe invoices, synced to billing-svc."
       >
         <AdminCard className="mt-6 p-6">
           <p className="text-slate-600">
             Select a tenant to view its invoices. Open a tenant from the{" "}
-            <Link className="font-bold text-blue-700" href="/platform/tenants">
+            <Link className="font-bold text-violet-700" href="/platform/tenants">
               tenants list
             </Link>{" "}
             and use its &ldquo;Invoices&rdquo; link.
@@ -36,7 +35,6 @@ export default async function PlatformInvoicesPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Billing"
       title="Invoices"
       description={`Stripe invoices for tenant ${tenantId}.`}
       action={

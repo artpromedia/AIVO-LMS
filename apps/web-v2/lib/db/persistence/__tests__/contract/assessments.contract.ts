@@ -122,22 +122,25 @@ export function assessmentSubmitContract(
 
     it("accumulates teacher draft answers + completed sections across patches", async () => {
       await store.upsertTeacherAssessmentDraft(
-        tad({ answers: { context: { teacherRole: "general_ed" } }, completedSections: ["context"] }),
+        tad({
+          answers: { classroom_context: { cc_role: "general_ed" } },
+          completedSections: ["classroom_context"],
+        }),
       );
       await store.upsertTeacherAssessmentDraft(
         tad({
           answers: {
-            context: { teacherRole: "general_ed" },
-            strengths: { strengths: ["asks questions"] },
+            classroom_context: { cc_role: "general_ed" },
+            academic_strengths: { as_strong_subjects: ["reading"] },
           },
-          completedSections: ["context", "strengths"],
+          completedSections: ["classroom_context", "academic_strengths"],
         }),
       );
       const got = await store.findTeacherAssessmentDraft("lrn_c1", T, "tch_c1");
-      expect(got!.completedSections).toEqual(["context", "strengths"]);
-      expect((got!.answers.strengths as { strengths: string[] }).strengths).toEqual([
-        "asks questions",
-      ]);
+      expect(got!.completedSections).toEqual(["classroom_context", "academic_strengths"]);
+      expect(
+        (got!.answers.academic_strengths as { as_strong_subjects: string[] }).as_strong_subjects,
+      ).toEqual(["reading"]);
     });
 
     it("isolates teacher drafts by submitting teacher (co-teachers don't collide)", async () => {

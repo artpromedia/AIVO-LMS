@@ -104,18 +104,18 @@ export default async function Page() {
         mockupTitle="Parent assessment · Section 2 of 5"
         mockup={
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-slate-900">{t("reading_question")}</p>
+            <p className="text-sm font-semibold text-iw-ink">{t("reading_question")}</p>
             <div className="grid grid-cols-2 gap-2">
               {["Loves it", "Mixed", "Avoids it", "Not sure"].map((o) => (
                 <div
                   key={o}
-                  className="rounded-lg border-2 border-slate-200 bg-white py-2 text-center text-sm font-body text-slate-700"
+                  className="rounded-lg border-2 border-iw-border bg-white py-2 text-center text-sm font-body text-iw-ink"
                 >
                   {o}
                 </div>
               ))}
             </div>
-            <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
+            <div className="rounded-lg bg-iw-raised p-3 text-xs text-iw-ink-muted">
               {t("answers_saved")}
             </div>
           </div>
@@ -133,7 +133,7 @@ export default async function Page() {
               relevant context with AIVO. We use it to adjust pacing, scaffolds, and supports —
               never to label your child or expose raw plan text inside the product.
             </p>
-            <p className="mt-3 text-sm text-slate-600">{t("aivo_disclaimer")}</p>
+            <p className="mt-3 text-sm text-iw-ink-muted">{t("aivo_disclaimer")}</p>
           </>
         }
         ctaLabel="Read our special education page"
@@ -155,21 +155,21 @@ export default async function Page() {
         mockupTitle="Baseline · Reading · Activity 3"
         mockup={
           <div className="space-y-3">
-            <p className="text-xs text-slate-500">{t("take_a_breath")}</p>
-            <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-sm text-slate-700">
+            <p className="text-xs text-iw-ink-muted">{t("take_a_breath")}</p>
+            <div className="rounded-iw-card border border-iw-border bg-iw-raised/60 p-4 text-sm text-iw-ink">
               {t("which_word_means")} <span className="font-bold">happy</span>?
             </div>
             <div className="grid grid-cols-2 gap-2">
               {["joyful", "tired", "loud", "quiet"].map((w) => (
                 <div
                   key={w}
-                  className="rounded-lg border-2 border-slate-200 bg-white py-2 text-center text-sm font-body text-slate-700"
+                  className="rounded-lg border-2 border-iw-border bg-white py-2 text-center text-sm font-body text-iw-ink"
                 >
                   {w}
                 </div>
               ))}
             </div>
-            <div className="flex justify-between text-xs text-slate-500">
+            <div className="flex justify-between text-xs text-iw-ink-muted">
               <span>🔊 Read aloud</span>
               <span>{t("need_a_break")}</span>
             </div>
@@ -190,14 +190,14 @@ export default async function Page() {
         mockupTitle="Today's Mission · Maya, Grade 3"
         mockup={
           <div className="space-y-3">
-            <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-4 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">
+            <div className="rounded-iw-card bg-iw-primary p-4 text-white">
+              <p className="text-xs uppercase tracking-wider text-iw-purple-100">
                 {t("todays_mission")}
               </p>
               <h3 className="mt-1 font-heading text-xl font-bold">{t("multiplying_by_3s")}</h3>
-              <p className="mt-1 text-xs text-purple-100">{t("with_atlas")}</p>
+              <p className="mt-1 text-xs text-iw-purple-100">{t("with_atlas")}</p>
             </div>
-            <div className="rounded-lg bg-slate-900 py-2.5 text-center text-sm font-semibold text-white">
+            <div className="rounded-lg bg-iw-ink py-2.5 text-center text-sm font-semibold text-white">
               {t("start_mission")}
             </div>
           </div>
@@ -218,10 +218,10 @@ export default async function Page() {
         mockupTitle="Parent summary · This week"
         mockup={
           <div className="space-y-3">
-            <h3 className="font-heading text-base font-bold text-slate-900">
+            <h3 className="font-heading text-base font-bold text-iw-ink">
               {t("maya_strong_week")}
             </h3>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-iw-ink-muted">
               5 of 5 missions completed. Focus areas adapted twice.
             </p>
             <div className="space-y-2">
@@ -232,10 +232,10 @@ export default async function Page() {
               ].map((r) => (
                 <div
                   key={r.l}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-2.5 text-xs"
+                  className="flex items-center justify-between rounded-lg border border-iw-border bg-white p-2.5 text-xs"
                 >
-                  <span className="font-semibold text-slate-900">{r.l}</span>
-                  <span className="text-slate-500">{r.s}</span>
+                  <span className="font-semibold text-iw-ink">{r.l}</span>
+                  <span className="text-iw-ink-muted">{r.s}</span>
                 </div>
               ))}
             </div>

@@ -47,7 +47,7 @@ export function SectionCard({
     <section
       className={[
         "rounded-iw-card-lg bg-white border border-iw-border",
-        "shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)]",
+        "shadow-soft-3",
         "p-5 sm:p-6 flex flex-col gap-4",
         className ?? "",
       ].join(" ")}

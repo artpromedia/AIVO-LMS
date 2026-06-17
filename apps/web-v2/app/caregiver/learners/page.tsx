@@ -72,7 +72,7 @@ export default async function CaregiverLearnersPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-base font-semibold">{l.displayName}</p>
-                    <p className="mt-0.5 text-xs text-aivo-ink-soft">
+                    <p className="mt-0.5 text-xs text-iw-ink-muted">
                       {l.gradeBand ? `Grade ${l.gradeBand}` : "Grade not set"}
                       {l.ageRange ? ` · ${l.ageRange}` : ""}
                     </p>
@@ -81,7 +81,7 @@ export default async function CaregiverLearnersPage() {
                     {formatReadiness(l.readinessState)}
                   </Badge>
                 </div>
-                <dl className="grid grid-cols-2 gap-y-1 text-xs text-aivo-ink-soft">
+                <dl className="grid grid-cols-2 gap-y-1 text-xs text-iw-ink-muted">
                   <dt>{t("primary_language")}</dt>
                   <dd className="text-right text-iw-ink">{l.primaryLanguage ?? "—"}</dd>
                   <dt>{t("reading_comfort")}</dt>
@@ -103,7 +103,7 @@ export default async function CaregiverLearnersPage() {
                     regulation/sensory types in opted-in tenants land;
                     everything else 403s with a clear message. */}
                 <details className="mt-1">
-                  <summary className="cursor-pointer text-xs font-medium text-aivo-ink-soft">
+                  <summary className="cursor-pointer text-xs font-medium text-iw-ink-muted">
                     {t("pending_recommendations")}
                   </summary>
                   <div className="mt-2">

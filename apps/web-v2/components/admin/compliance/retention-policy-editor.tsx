@@ -73,7 +73,7 @@ export function RetentionPolicyEditor({
         <input
           type="number"
           min={0}
-          className="w-24 rounded border border-aivo-border bg-aivo-surface-1 p-1 text-sm"
+          className="w-24 rounded border border-iw-border bg-iw-raised p-1 text-sm"
           value={retentionDays ?? ""}
           placeholder="∞"
           onChange={(e) => {
@@ -84,7 +84,7 @@ export function RetentionPolicyEditor({
       </td>
       <td className="p-3">
         <select
-          className="rounded border border-aivo-border bg-aivo-surface-1 p-1 text-sm"
+          className="rounded border border-iw-border bg-iw-raised p-1 text-sm"
           value={disposition}
           onChange={(e) => setDisposition(e.target.value as "purge" | "anonymize")}
         >

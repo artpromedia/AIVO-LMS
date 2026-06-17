@@ -116,13 +116,13 @@ export function ScheduleEditor({ reportId, schema }: { reportId: string; schema:
       </div>
 
       {success ? (
-        <div className="rounded-iw-card border border-aivo-success/40 bg-aivo-success/10 p-3 text-sm text-iw-ink">
+        <div className="rounded-iw-card border border-iw-success/40 bg-iw-success/10 p-3 text-sm text-iw-ink">
           Schedule saved.
         </div>
       ) : null}
 
       {errorCode ? (
-        <div className="rounded-iw-card border border-aivo-danger/40 bg-aivo-danger/10 p-3 text-sm">
+        <div className="rounded-iw-card border border-iw-error/40 bg-iw-error/10 p-3 text-sm">
           <p className="font-semibold text-iw-ink">{errorCode}</p>
           {errorMessage ? <p className="mt-0.5 text-iw-ink-muted">{errorMessage}</p> : null}
         </div>

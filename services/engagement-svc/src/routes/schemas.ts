@@ -343,7 +343,7 @@ export const shopEquipSchema = {
   operationId: "shopEquip",
   summary: "POST /api/engagement/shop/equip",
   body: passthroughObject,
-  response: { 200: passthroughObject, 404: errorResponse },
+  response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
 
 export const siblingsLinkSchema = {

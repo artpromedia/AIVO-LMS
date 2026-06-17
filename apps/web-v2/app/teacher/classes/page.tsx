@@ -43,12 +43,12 @@ export default async function Page() {
                 <Link
                   key={c.id}
                   href={`/teacher/classes/${c.id}`}
-                  className="block rounded-2xl border border-aivo-border bg-aivo-surface p-4 transition hover:border-aivo-primary"
+                  className="block rounded-iw-card border border-iw-border bg-iw-card p-4 transition hover:border-iw-primary"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-display text-base font-semibold">{c.name}</p>
-                      <p className="text-xs text-aivo-muted">
+                      <p className="text-xs text-iw-ink-muted">
                         {c.gradeBand} · {learners} learners
                       </p>
                     </div>

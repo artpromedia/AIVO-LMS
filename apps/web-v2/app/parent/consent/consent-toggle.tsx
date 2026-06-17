@@ -61,7 +61,7 @@ export function ConsentToggle({
           {pending ? "…" : "Accept"}
         </Button>
       )}
-      {error ? <p className="text-xs text-aivo-danger">{error}</p> : null}
+      {error ? <p className="text-xs text-iw-error">{error}</p> : null}
     </div>
   );
 }

@@ -162,7 +162,7 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
           onClick={() => setShowExamples((v) => !v)}
           aria-expanded={showExamples}
           aria-controls="abc-examples"
-          className="flex w-full items-center justify-between rounded-md bg-aivo-surface-soft px-3 py-2 text-left text-sm font-medium text-aivo-ink"
+          className="flex w-full items-center justify-between rounded-md bg-iw-raised px-3 py-2 text-left text-sm font-medium text-iw-ink"
         >
           <span>{t("examples_toggle")}</span>
           <span aria-hidden="true">{showExamples ? "−" : "+"}</span>
@@ -170,13 +170,13 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
         {showExamples ? (
           <div
             id="abc-examples"
-            className="mt-2 flex flex-col gap-2 rounded-md border border-aivo-line p-3 text-sm"
+            className="mt-2 flex flex-col gap-2 rounded-md border border-iw-border p-3 text-sm"
           >
-            <p className="text-aivo-ink-soft">{t("examples_intro")}</p>
+            <p className="text-iw-ink-muted">{t("examples_intro")}</p>
             <ul className="flex flex-col gap-2">
-              <li className="rounded bg-aivo-surface-soft p-2">{t("example_1")}</li>
-              <li className="rounded bg-aivo-surface-soft p-2">{t("example_2")}</li>
-              <li className="rounded bg-aivo-surface-soft p-2">{t("example_3")}</li>
+              <li className="rounded bg-iw-raised p-2">{t("example_1")}</li>
+              <li className="rounded bg-iw-raised p-2">{t("example_2")}</li>
+              <li className="rounded bg-iw-raised p-2">{t("example_3")}</li>
             </ul>
           </div>
         ) : null}
@@ -188,13 +188,13 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
         className="grid grid-cols-1 gap-3 md:grid-cols-2"
       >
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">{t("field_learner")}</span>
+          <span className="iw-label text-iw-ink-muted">{t("field_learner")}</span>
           <select
             name="learnerId"
             aria-required="true"
             value={learnerId}
             onChange={(e) => setLearnerId(e.target.value)}
-            className="rounded border border-aivo-border px-2 py-1.5"
+            className="rounded border border-iw-border px-2 py-1.5"
           >
             <option value="">{t("choose_learner")}</option>
             {learners.map((l) => (
@@ -205,12 +205,12 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">{t("field_location")}</span>
+          <span className="iw-label text-iw-ink-muted">{t("field_location")}</span>
           <select
             name="location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="rounded border border-aivo-border px-2 py-1.5"
+            className="rounded border border-iw-border px-2 py-1.5"
           >
             <option value="home">{t("loc_home")}</option>
             <option value="school">{t("loc_school")}</option>
@@ -219,7 +219,7 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm md:col-span-2">
-          <span className="iw-label text-aivo-ink-soft">{t("field_behaviour")}</span>
+          <span className="iw-label text-iw-ink-muted">{t("field_behaviour")}</span>
           <textarea
             name="behaviour"
             aria-required="true"
@@ -227,31 +227,31 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
             value={behaviour}
             onChange={(e) => setBehaviour(e.target.value)}
             placeholder={t("behaviour_placeholder")}
-            className="rounded border border-aivo-border px-2 py-1.5"
+            className="rounded border border-iw-border px-2 py-1.5"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">{t("field_antecedent")}</span>
+          <span className="iw-label text-iw-ink-muted">{t("field_antecedent")}</span>
           <textarea
             name="antecedent"
             rows={2}
             value={antecedent}
             onChange={(e) => setAntecedent(e.target.value)}
-            className="rounded border border-aivo-border px-2 py-1.5"
+            className="rounded border border-iw-border px-2 py-1.5"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">{t("field_consequence")}</span>
+          <span className="iw-label text-iw-ink-muted">{t("field_consequence")}</span>
           <textarea
             name="consequence"
             rows={2}
             value={consequence}
             onChange={(e) => setConsequence(e.target.value)}
-            className="rounded border border-aivo-border px-2 py-1.5"
+            className="rounded border border-iw-border px-2 py-1.5"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">{t("field_duration")}</span>
+          <span className="iw-label text-iw-ink-muted">{t("field_duration")}</span>
           <input
             type="number"
             name="durationMinutes"
@@ -259,13 +259,13 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
             max={600}
             value={durationMinutes}
             onChange={(e) => setDurationMinutes(e.target.value)}
-            className="rounded border border-aivo-border px-2 py-1.5"
+            className="rounded border border-iw-border px-2 py-1.5"
           />
         </label>
 
         {/* Gentle, optional mood picker. */}
         <fieldset className="flex flex-col gap-1 text-sm md:col-span-2">
-          <legend className="iw-label text-aivo-ink-soft">{t("field_mood")}</legend>
+          <legend className="iw-label text-iw-ink-muted">{t("field_mood")}</legend>
           <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t("field_mood")}>
             <button
               type="button"
@@ -275,7 +275,7 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
               className={`rounded-full border px-3 py-1 text-sm ${
                 mood === ""
                   ? "border-[var(--aivo-sensory-primary)] bg-[var(--aivo-sensory-primary)] text-white"
-                  : "border-aivo-border text-aivo-ink"
+                  : "border-iw-border text-iw-ink"
               }`}
             >
               {t("mood_unset")}
@@ -291,7 +291,7 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
                 className={`rounded-full border px-3 py-1 text-sm ${
                   mood === m
                     ? "border-[var(--aivo-sensory-primary)] bg-[var(--aivo-sensory-primary)] text-white"
-                    : "border-aivo-border text-aivo-ink"
+                    : "border-iw-border text-iw-ink"
                 }`}
               >
                 {t(`mood_${m}`)}
@@ -303,7 +303,7 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
         <div className="md:col-span-2 flex items-center justify-between gap-3">
           <div className="min-h-[1.25rem] flex-1">
             {error ? (
-              <p className="text-sm text-aivo-danger" role="alert" data-testid="observation-form-error">
+              <p className="text-sm text-iw-error" role="alert" data-testid="observation-form-error">
                 {error}
               </p>
             ) : null}
@@ -321,7 +321,7 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
 
       {/* Announced success — replaces the old silent router.refresh(). */}
       <p
-        className="mt-3 min-h-[1.25rem] text-sm text-emerald-700"
+        className="mt-3 min-h-[1.25rem] text-sm text-iw-success-strong"
         role="status"
         aria-live="polite"
         data-testid="observation-form-success"

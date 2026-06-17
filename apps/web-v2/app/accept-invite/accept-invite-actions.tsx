@@ -36,7 +36,7 @@ export function AcceptInviteActions({ pendingCount, continueHref, email }: Props
     if (accepted === 0) {
       return (
         <div className="space-y-3">
-          <p className="text-center text-sm text-aivo-ink-soft">
+          <p className="text-center text-sm text-iw-ink-muted">
             {t("no_pending_for")} <strong>{email}</strong>. If you were expecting one, ask the
             parent to re-send it to that address.
           </p>
@@ -48,8 +48,8 @@ export function AcceptInviteActions({ pendingCount, continueHref, email }: Props
     }
     return (
       <div className="space-y-3">
-        <div className="flex items-start gap-2 rounded-lg bg-emerald-50 p-3">
-          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" />
+        <div className="flex items-start gap-2 rounded-lg bg-iw-success-subtle p-3">
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-iw-success-strong" />
           <p className="text-sm">
             {t("added_to")} <strong>{accepted}</strong>{" "}
             {accepted === 1 ? "learner's team" : "learners' teams"}. Welcome!
@@ -64,15 +64,15 @@ export function AcceptInviteActions({ pendingCount, continueHref, email }: Props
 
   return (
     <div className="space-y-3">
-      <p className="text-center text-sm text-aivo-ink-soft">
-        {t("signed_in_as")} <strong className="text-aivo-ink">{email}</strong>.{" "}
+      <p className="text-center text-sm text-iw-ink-muted">
+        {t("signed_in_as")} <strong className="text-iw-ink">{email}</strong>.{" "}
         {pendingCount > 0
           ? `You have ${pendingCount} pending invitation${pendingCount === 1 ? "" : "s"}.`
           : "We'll check for any invitations waiting on this address."}
       </p>
       {error ? (
-        <div className="flex items-start gap-2 rounded-lg bg-rose-50 p-3" role="alert">
-          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-700" />
+        <div className="flex items-start gap-2 rounded-lg bg-iw-error-subtle p-3" role="alert">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-iw-error-strong" />
           <p className="text-sm">{error}</p>
         </div>
       ) : null}

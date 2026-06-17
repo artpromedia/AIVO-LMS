@@ -30,7 +30,7 @@
 
 | Component | Lang/Runtime | Build file | Port | In deploy matrix? |
 |---|---|---|---|---|
-| `assessment-svc` | Node 22 / Fastify | `docker/Dockerfile.service` | `3003` | ✅ |
+| `assessment-svc` | Node 22 / Fastify | `docker/Dockerfile.service` | `3012` | ✅ |
 | `ai-svc` | Python 3.12 / FastAPI | `docker/Dockerfile.python-service` | `3004`/`3000` | ✅ |
 | `brain-svc` | Python 3.12 / FastAPI | `docker/Dockerfile.python-service` | `3002`/`8000` | ✅ |
 | `apps/web-v2` | Node 22 / Next.js | `docker/Dockerfile.webapp` | `3000` | ✅ |
@@ -194,7 +194,7 @@ docker compose -f docker/docker-compose.iep.yml up --build --wait
 
 # 2. Smoke (uses /api/ai/iep/draft against the local stack)
 AI_SVC_URL=http://localhost:3004 \
-ASSESSMENT_SVC_URL=http://localhost:3003 \
+ASSESSMENT_SVC_URL=http://localhost:3012 \
 INTERNAL_AI_TOKEN=iep-local-internal-ai-token \
   ./scripts/smoke/iep-integration-smoke.sh
 

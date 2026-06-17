@@ -76,16 +76,16 @@ const SUBPROCESSORS: Subprocessor[] = [
 ];
 
 const STATUS_STYLES: Record<Subprocessor["status"], string> = {
-  Active: "bg-emerald-100 text-emerald-800",
-  Optional: "bg-sky-100 text-sky-800",
-  Planned: "bg-amber-100 text-amber-800",
+  Active: "bg-iw-success-subtle text-iw-success-strong",
+  Optional: "bg-iw-info-subtle text-iw-info-strong",
+  Planned: "bg-iw-warning-subtle text-iw-warning-strong",
 };
 
 export default async function SubprocessorsPage() {
   const t = await getTranslations("marketing.page_subprocessors");
   return (
     <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-50 border-b border-slate-100 bg-white">
+      <header className="sticky top-0 z-50 border-b border-iw-border bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 md:px-8">
           <Link href="/" className="flex items-center">
             <Image
@@ -101,13 +101,13 @@ export default async function SubprocessorsPage() {
             <LanguageSwitcher compact />
             <Link
               href="/"
-              className="hidden min-h-[44px] items-center rounded-lg px-5 py-2 font-semibold text-slate-600 transition hover:text-primary sm:inline-flex"
+              className="hidden min-h-[44px] items-center rounded-lg px-5 py-2 font-semibold text-iw-ink-muted transition hover:text-primary sm:inline-flex"
             >
               Home
             </Link>
             <a
               href={`${WEB_APP_URL}/signup?plan=free`}
-              className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 py-2.5 font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-primary-dark"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--aivo-sensory-primary)] px-5 text-sm font-semibold text-white shadow-[0_18px_40px_-12px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:brightness-110"
             >
               {t("get_started")}
             </a>
@@ -115,19 +115,19 @@ export default async function SubprocessorsPage() {
         </div>
       </header>
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-purple-50/40 via-white to-white py-16 md:py-20">
+      <section className="relative overflow-hidden bg-gradient-to-b from-iw-purple-50/40 via-white to-white py-16 md:py-20">
         <div className="mx-auto max-w-4xl px-6 md:px-8">
-          <span className="inline-flex items-center gap-2 rounded-full bg-purple-100 px-4 py-1 text-sm font-bold text-purple-700">
+          <span className="inline-flex items-center gap-2 rounded-iw-chip bg-iw-purple-100 px-4 py-1 text-sm font-bold text-iw-primary">
             <span aria-hidden="true">🔗</span> {t("badge")}
           </span>
-          <h1 className="mt-4 font-heading text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
+          <h1 className="mt-4 font-heading text-4xl font-bold leading-tight text-iw-ink md:text-5xl">
             {t("heading")}
           </h1>
-          <p className="mt-3 max-w-2xl font-body text-lg text-slate-500">
+          <p className="mt-3 max-w-2xl font-body text-lg text-iw-ink-muted">
             The companies AIVO uses to deliver the platform. We keep this list short on purpose.
             Updates are reflected here within ten business days of going live.
           </p>
-          <p className="mt-4 font-body text-sm text-slate-400">Last updated: {LAST_UPDATED}</p>
+          <p className="mt-4 font-body text-sm text-iw-ink-muted">Last updated: {LAST_UPDATED}</p>
         </div>
       </section>
 
@@ -135,70 +135,70 @@ export default async function SubprocessorsPage() {
         <section aria-labelledby="subprocessors-table-heading">
           <h2
             id="subprocessors-table-heading"
-            className="font-heading text-2xl font-bold text-slate-900"
+            className="font-heading text-2xl font-bold text-iw-ink"
           >
             {t("current_subprocessors")}
           </h2>
-          <p className="mt-1 font-body text-slate-600">
+          <p className="mt-1 font-body text-iw-ink-muted">
             Each row describes what the subprocessor does and what data category it may handle. None
             of our foundation-model subprocessors receive learner identifiers.
           </p>
 
-          <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200">
-            <table className="min-w-full divide-y divide-slate-200 text-left">
+          <div className="mt-6 overflow-x-auto rounded-iw-card border border-iw-border">
+            <table className="min-w-full divide-y divide-iw-border text-left">
               <caption className="sr-only">
                 Current AIVO subprocessors, their purpose, data category handled, region, and
                 status.
               </caption>
-              <thead className="bg-slate-50">
+              <thead className="bg-iw-raised">
                 <tr>
                   <th
                     scope="col"
-                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
+                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-iw-ink-muted"
                   >
                     {t("col_subprocessor")}
                   </th>
                   <th
                     scope="col"
-                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
+                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-iw-ink-muted"
                   >
                     {t("col_purpose")}
                   </th>
                   <th
                     scope="col"
-                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
+                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-iw-ink-muted"
                   >
                     {t("col_data_category")}
                   </th>
                   <th
                     scope="col"
-                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
+                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-iw-ink-muted"
                   >
                     {t("col_region")}
                   </th>
                   <th
                     scope="col"
-                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
+                    className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-iw-ink-muted"
                   >
                     {t("col_status")}
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
+              <tbody className="divide-y divide-iw-border bg-white">
                 {SUBPROCESSORS.map((s) => (
                   <tr key={s.name} className="align-top">
                     <th
                       scope="row"
-                      className="px-4 py-4 font-heading text-sm font-bold text-slate-900"
+                      className="px-4 py-4 font-heading text-sm font-bold text-iw-ink"
                     >
                       {s.name}
                     </th>
-                    <td className="px-4 py-4 font-body text-sm text-slate-700">{s.purpose}</td>
-                    <td className="px-4 py-4 font-body text-sm text-slate-700">{s.dataCategory}</td>
-                    <td className="px-4 py-4 font-body text-sm text-slate-700">{s.region}</td>
+                    <td className="px-4 py-4 font-body text-sm text-iw-ink">{s.purpose}</td>
+                    <td className="px-4 py-4 font-body text-sm text-iw-ink">{s.dataCategory}</td>
+                    <td className="px-4 py-4 font-body text-sm text-iw-ink">{s.region}</td>
                     <td className="px-4 py-4">
                       <span
-                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${STATUS_STYLES[s.status]}`}
+                        className={`inline-flex rounded-iw-chip px-2.5 py-1 text-xs font-bold ${STATUS_STYLES[s.status]}`}
                       >
                         {s.status}
                       </span>
@@ -212,16 +212,16 @@ export default async function SubprocessorsPage() {
 
         <section
           aria-labelledby="how-we-use-heading"
-          className="mt-12 space-y-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-6 md:p-8"
+          className="mt-12 space-y-3 rounded-iw-card border border-iw-border bg-iw-raised/60 p-6 md:p-8"
         >
-          <h2 id="how-we-use-heading" className="font-heading text-xl font-bold text-slate-900">
+          <h2 id="how-we-use-heading" className="font-heading text-xl font-bold text-iw-ink">
             {t("how_we_use_heading")}
           </h2>
-          <p className="font-body text-slate-700">
+          <p className="font-body text-iw-ink">
             Schools and districts can rely on this page for procurement review. If you need a signed
             DPA referencing this subprocessor list, write to compliance@aivolearning.com.
           </p>
-          <p className="font-body text-slate-700">
+          <p className="font-body text-iw-ink">
             When we add a new subprocessor, we update this page first. School and district admins
             receive a tenant-level notice in their admin console for changes that affect data
             category or region.
@@ -230,15 +230,15 @@ export default async function SubprocessorsPage() {
 
         <section
           aria-labelledby="changes-heading"
-          className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 md:p-8"
+          className="mt-8 rounded-iw-card border border-iw-border bg-white p-6 md:p-8"
         >
-          <h2 id="changes-heading" className="font-heading text-xl font-bold text-slate-900">
+          <h2 id="changes-heading" className="font-heading text-xl font-bold text-iw-ink">
             {t("reporting_heading")}
           </h2>
-          <p className="mt-2 font-body text-slate-700">
+          <p className="mt-2 font-body text-iw-ink">
             Subscribe to subprocessor change notifications by writing to{" "}
             <a
-              className="font-semibold text-purple-700 underline"
+              className="font-semibold text-iw-primary underline"
               href="mailto:compliance@aivolearning.com"
             >
               compliance@aivolearning.com
@@ -248,17 +248,17 @@ export default async function SubprocessorsPage() {
           </p>
         </section>
 
-        <div className="mt-12 rounded-3xl border border-purple-100 bg-purple-50/40 p-8">
-          <h3 className="font-heading text-xl font-bold text-slate-900">
+        <div className="mt-12 rounded-iw-card-lg border border-iw-purple-100 bg-iw-purple-100/40 p-8">
+          <h3 className="font-heading text-xl font-bold text-iw-ink">
             {t("questions_heading")}
           </h3>
-          <p className="mt-2 font-body text-slate-600">
+          <p className="mt-2 font-body text-iw-ink-muted">
             Contact our compliance team for a signed DPA, subprocessor exhibits, or procurement
             review.
           </p>
           <a
             href="mailto:compliance@aivolearning.com"
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-purple-600 px-6 py-3 font-bold text-white shadow-lg transition hover:bg-purple-700"
+            className="group mt-4 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-[var(--aivo-sensory-primary)] px-7 text-base font-semibold text-white shadow-[0_18px_40px_-12px_rgba(124,58,237,0.6)] transition hover:-translate-y-0.5 hover:brightness-110"
           >
             compliance@aivolearning.com
           </a>

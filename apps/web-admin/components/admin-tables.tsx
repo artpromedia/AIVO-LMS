@@ -5,13 +5,13 @@ import type {
 } from "@aivo/admin-api/types";
 import type {
   AdminComplianceControl,
-  AdminControlStatus,
   AdminEvidenceBundle,
 } from "@aivo/admin-api/compliance";
 import type { TenantInvoice } from "@aivo/admin-api/invoices";
 import { AdminCard, AdminKpiCard } from "@aivo/admin-ui";
 import type { TrialConversionReport } from "@aivo/admin-api/billing";
 import { formatBytes, formatDate, formatDateTime, formatPercent } from "@/components/admin-format";
+import { StatusPill } from "@/components/status-pill";
 
 function EmptyRow({ colSpan, label }: { colSpan: number; label: string }) {
   return (
@@ -54,19 +54,19 @@ export function InvoicesTable({ invoices }: { invoices: TenantInvoice[] }) {
               <tr key={invoice.id}>
                 <td className="font-bold">{invoice.number ?? invoice.id}</td>
                 <td>
-                  <span className="admin-status">{invoice.status}</span>
+                  <StatusPill status={invoice.status} />
                 </td>
-                <td>{formatMoney(invoice.amount, invoice.currency)}</td>
-                <td className="text-sm">{formatMoney(invoice.amountPaid, invoice.currency)}</td>
-                <td className="text-sm">{formatDateTime(invoice.date)}</td>
+                <td className="tabular-nums">{formatMoney(invoice.amount, invoice.currency)}</td>
+                <td className="text-sm tabular-nums">{formatMoney(invoice.amountPaid, invoice.currency)}</td>
+                <td className="text-sm tabular-nums">{formatDateTime(invoice.date)}</td>
                 <td className="text-sm">
                   {invoice.url ? (
-                    <a className="font-semibold text-blue-700" href={invoice.url}>
+                    <a className="font-semibold text-violet-700 hover:text-violet-800" href={invoice.url}>
                       View
                     </a>
                   ) : null}
                   {invoice.pdf ? (
-                    <a className="ml-3 font-semibold text-blue-700" href={invoice.pdf}>
+                    <a className="ml-3 font-semibold text-violet-700 hover:text-violet-800" href={invoice.pdf}>
                       PDF
                     </a>
                   ) : null}
@@ -120,11 +120,13 @@ export function BillingAccountsTable({ accounts }: { accounts: AdminBillingAccou
                 <td>{account.tenantTypeLabel}</td>
                 <td>{account.plan}</td>
                 <td>
-                  <span className="admin-status">{account.status}</span>
+                  <StatusPill status={account.status} />
                 </td>
-                <td className="text-sm">{account.paymentStatus ?? "—"}</td>
-                <td className="text-sm">{formatDate(account.currentPeriodEnd)}</td>
-                <td className="text-sm">{formatDate(account.createdAt)}</td>
+                <td className="text-sm">
+                  {account.paymentStatus ? <StatusPill status={account.paymentStatus} /> : "—"}
+                </td>
+                <td className="text-sm tabular-nums">{formatDate(account.currentPeriodEnd)}</td>
+                <td className="text-sm tabular-nums">{formatDate(account.createdAt)}</td>
               </tr>
             ))}
             {accounts.length === 0 ? <EmptyRow colSpan={7} label="No billing accounts found." /> : null}
@@ -134,13 +136,6 @@ export function BillingAccountsTable({ accounts }: { accounts: AdminBillingAccou
     </AdminCard>
   );
 }
-
-const CONTROL_TONE: Record<AdminControlStatus, string> = {
-  pass: "text-emerald-700",
-  warn: "text-amber-700",
-  fail: "text-red-700",
-  unknown: "text-slate-500",
-};
 
 export function ComplianceControlsTable({ controls }: { controls: AdminComplianceControl[] }) {
   return (
@@ -161,10 +156,12 @@ export function ComplianceControlsTable({ controls }: { controls: AdminComplianc
               <tr key={control.id}>
                 <td className="font-bold">{control.label}</td>
                 <td>{control.category}</td>
-                <td className={`font-bold uppercase ${CONTROL_TONE[control.status]}`}>{control.status}</td>
+                <td>
+                  <StatusPill status={control.status} />
+                </td>
                 <td className="text-sm">
                   {control.runbook ? (
-                    <a className="font-semibold text-blue-700" href={control.runbook}>
+                    <a className="font-semibold text-violet-700 hover:text-violet-800" href={control.runbook}>
                       {control.evidence || "Runbook"}
                     </a>
                   ) : (
@@ -264,7 +261,7 @@ export function UsersTable({ users }: { users: AdminUserSummary[] }) {
             {users.map((user) => (
               <tr key={user.id}>
                 <td className="font-bold">
-                  <a className="text-blue-700" href={`/platform/users/${user.id}`}>
+                  <a className="text-violet-700 hover:text-violet-800" href={`/platform/users/${user.id}`}>
                     {user.name}
                   </a>
                   <span className="block text-sm font-normal text-slate-500">{user.email ?? "—"}</span>

@@ -10,6 +10,7 @@ import {
 } from "@aivo/admin-api/dsar";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 const DSAR_ROLES = ["platform_admin", "district_admin"] as const;
@@ -41,11 +42,11 @@ async function rejectAction(formData: FormData) {
   redirect("/platform/compliance/dsar?notice=Request%20rejected.");
 }
 
-const SLA_TONE: Record<string, string> = {
-  on_track: "text-emerald-700",
-  due_soon: "text-amber-700",
-  overdue: "text-red-700",
-  met: "text-slate-500",
+const SLA_TONE: Record<string, StatusTone> = {
+  on_track: "positive",
+  due_soon: "warning",
+  overdue: "danger",
+  met: "neutral",
 };
 
 const TERMINAL: DsarStatus[] = ["fulfilled", "rejected"];
@@ -64,7 +65,6 @@ export default async function DsarQueuePage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Compliance"
       title="DSAR queue"
       description="Data subject access requests with statutory SLA timers, backed by data-governance-svc (Postgres)."
     >
@@ -119,7 +119,7 @@ export default async function DsarQueuePage({
               {requests.map((request) => (
                 <tr key={request.id}>
                   <td className="font-bold">
-                    <Link className="text-blue-700" href={`/platform/compliance/dsar/${request.id}`}>
+                    <Link className="text-violet-700" href={`/platform/compliance/dsar/${request.id}`}>
                       {request.subjectEmail ?? request.subjectId}
                     </Link>
                     {request.onBehalfOfMinor ? (
@@ -129,12 +129,12 @@ export default async function DsarQueuePage({
                   <td>{request.type}</td>
                   <td className="text-sm uppercase">{request.regulation}</td>
                   <td>
-                    <span className="admin-status">{request.status}</span>
+                    <StatusPill status={request.status} />
                   </td>
-                  <td className={`font-bold uppercase ${SLA_TONE[request.sla.state] ?? ""}`}>
-                    {request.sla.state.replace("_", " ")}
+                  <td>
+                    <StatusPill status={request.sla.state} tone={SLA_TONE[request.sla.state]} />
                   </td>
-                  <td className="text-sm">{formatDateTime(request.fulfillmentDueAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(request.fulfillmentDueAt)}</td>
                   <td>
                     {!TERMINAL.includes(request.status) ? (
                       <div className="flex items-center gap-2">

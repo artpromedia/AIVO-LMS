@@ -219,7 +219,7 @@ export function BrainReviewClient({
 
       {hasDraft ? (
         <Card variant="accent" className="mb-4 p-4">
-          <p role="status" className="text-sm text-aivo-ink">
+          <p role="status" className="text-sm text-iw-ink">
             {t("resume_note")}
           </p>
         </Card>
@@ -227,10 +227,10 @@ export function BrainReviewClient({
 
       {/* ── How {name} learns ─────────────────────────────────────── */}
       <section aria-labelledby="brain-review-how" className="mb-8">
-        <h2 id="brain-review-how" className="text-lg font-semibold text-aivo-ink">
+        <h2 id="brain-review-how" className="text-lg font-semibold text-iw-ink">
           {t("section_how_learns", { name: learnerName })}
         </h2>
-        <p className="mt-1 text-sm text-aivo-ink-soft">{t("section_how_learns_hint")}</p>
+        <p className="mt-1 text-sm text-iw-ink-muted">{t("section_how_learns_hint")}</p>
         <ul className="mt-3 space-y-3">
           {comfortRows.map((row) => {
             const label =
@@ -241,7 +241,7 @@ export function BrainReviewClient({
               <li key={row.field}>
                 <Card className="p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-aivo-ink">{label}</p>
+                    <p className="text-sm font-semibold text-iw-ink">{label}</p>
                     <span className="flex items-center gap-2">
                       {adjustedBadge(row.field)}
                       <Badge tone="neutral">{comfortLabel(row.current)}</Badge>
@@ -274,7 +274,7 @@ export function BrainReviewClient({
           })}
           <li>
             <Card className="p-4">
-              <p className="text-sm font-semibold text-aivo-ink">{t("modalities_label")}</p>
+              <p className="text-sm font-semibold text-iw-ink">{t("modalities_label")}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {modalities.map((m) => (
                   <Badge key={m} tone="primary">
@@ -289,10 +289,10 @@ export function BrainReviewClient({
 
       {/* ── Supports ──────────────────────────────────────────────── */}
       <section aria-labelledby="brain-review-supports" className="mb-8">
-        <h2 id="brain-review-supports" className="text-lg font-semibold text-aivo-ink">
+        <h2 id="brain-review-supports" className="text-lg font-semibold text-iw-ink">
           {t("section_supports")}
         </h2>
-        <p className="mt-1 text-sm text-aivo-ink-soft">
+        <p className="mt-1 text-sm text-iw-ink-muted">
           {t("section_supports_hint", { name: learnerName })}
         </p>
         <ul className="mt-3 space-y-3">
@@ -300,7 +300,7 @@ export function BrainReviewClient({
             <li key={row.field}>
               <Card className="p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-aivo-ink">{row.label}</p>
+                  <p className="text-sm font-semibold text-iw-ink">{row.label}</p>
                   <span className="flex items-center gap-2">
                     {adjustedBadge(row.field)}
                     {row.locked ? (
@@ -313,9 +313,9 @@ export function BrainReviewClient({
                     </Badge>
                   </span>
                 </div>
-                <p className="mt-2 text-sm text-aivo-ink-soft">{row.reasoning}</p>
+                <p className="mt-2 text-sm text-iw-ink-muted">{row.reasoning}</p>
                 {row.locked ? (
-                  <p className="mt-3 flex items-start gap-2 rounded-iw-card bg-iw-accent-soft p-3 text-sm text-aivo-ink">
+                  <p className="mt-3 flex items-start gap-2 rounded-iw-card bg-iw-accent-soft p-3 text-sm text-iw-ink">
                     <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                     {t("locked_by_therapist", { name: learnerName })}
                   </p>
@@ -353,19 +353,19 @@ export function BrainReviewClient({
 
       {/* ── Tutors ────────────────────────────────────────────────── */}
       <section aria-labelledby="brain-review-tutors" className="mb-8">
-        <h2 id="brain-review-tutors" className="text-lg font-semibold text-aivo-ink">
+        <h2 id="brain-review-tutors" className="text-lg font-semibold text-iw-ink">
           {t("section_tutors", { name: learnerName })}
         </h2>
-        <p className="mt-1 text-sm text-aivo-ink-soft">{t("section_tutors_hint")}</p>
+        <p className="mt-1 text-sm text-iw-ink-muted">{t("section_tutors_hint")}</p>
         <ul className="mt-3 space-y-3">
           {tutorRows.map((row) => (
             <li key={row.field}>
               <Card className="p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-aivo-ink">{row.name}</p>
+                  <p className="text-sm font-semibold text-iw-ink">{row.name}</p>
                   {adjustedBadge(row.field)}
                 </div>
-                <p className="mt-2 text-sm text-aivo-ink-soft">{row.reasoning}</p>
+                <p className="mt-2 text-sm text-iw-ink-muted">{row.reasoning}</p>
                 <div className="mt-3">{rowActions(row.field, false)}</div>
                 {openEditors.has(row.field)
                   ? editorShell(
@@ -394,11 +394,11 @@ export function BrainReviewClient({
       <div className="sticky bottom-0 z-10 -mx-2 px-2 pb-2">
         <Card variant="elevated" className="flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="min-w-0">
-            <p aria-live="polite" className="text-sm font-medium text-aivo-ink">
+            <p aria-live="polite" className="text-sm font-medium text-iw-ink">
               {count > 0 ? t("adjustments_count", { count }) : t("no_adjustments")}
             </p>
             {saveState.error ? (
-              <p role="alert" className="mt-1 text-sm text-aivo-danger">
+              <p role="alert" className="mt-1 text-sm text-iw-error">
                 {saveState.error === "locked" ? t("save_error_locked") : t("save_error")}
               </p>
             ) : null}

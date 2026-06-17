@@ -18,7 +18,7 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        "flex flex-col items-center justify-center rounded-[var(--radius-card)] border border-aivo-border bg-aivo-surface p-8 text-center",
+        "flex flex-col items-center justify-center rounded-[var(--radius-card)] border border-iw-border bg-iw-card p-8 text-center",
         className,
       )}
     >

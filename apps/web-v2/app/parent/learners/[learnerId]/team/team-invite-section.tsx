@@ -33,17 +33,17 @@ const ROLE_META: Record<TeamRole, { label: string; icon: React.ReactNode; accent
   teacher: {
     label: "Teacher",
     icon: <GraduationCap className="h-4 w-4" />,
-    accent: "bg-sky-50 text-sky-700 border-sky-200",
+    accent: "bg-iw-accent-soft text-iw-teal-700 border-iw-accent",
   },
   caregiver: {
     label: "Caregiver",
     icon: <HeartHandshake className="h-4 w-4" />,
-    accent: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    accent: "bg-iw-success-subtle text-iw-success-strong border-iw-success",
   },
   therapist: {
     label: "Therapist",
     icon: <Brain className="h-4 w-4" />,
-    accent: "bg-violet-50 text-violet-700 border-violet-200",
+    accent: "bg-iw-purple-100 text-iw-primary border-iw-purple-200",
   },
 };
 
@@ -76,7 +76,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
                 >
                   {meta.icon} {meta.label}
                 </span>
-                <span className="text-xs font-medium text-aivo-ink-soft">
+                <span className="text-xs font-medium text-iw-ink-muted">
                   {seat.used}/{seat.max}
                 </span>
               </div>
@@ -102,7 +102,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
             type="button"
             onClick={() => setOpenRole(null)}
             aria-label={t("cancel_invite")}
-            className="absolute right-3 top-3 text-aivo-ink-soft hover:text-aivo-ink"
+            className="absolute right-3 top-3 text-iw-ink-muted hover:text-iw-ink"
           >
             <X className="h-4 w-4" />
           </button>
@@ -115,7 +115,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
             <div>
               <label
                 htmlFor="invite-email"
-                className="mb-1 block text-xs font-medium text-aivo-ink"
+                className="mb-1 block text-xs font-medium text-iw-ink"
               >
                 {t("email_address")}
               </label>
@@ -125,7 +125,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
               <div>
                 <label
                   htmlFor="invite-relationship"
-                  className="mb-1 block text-xs font-medium text-aivo-ink"
+                  className="mb-1 block text-xs font-medium text-iw-ink"
                 >
                   {t("relationship_optional")}
                 </label>
@@ -142,7 +142,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
                 <div>
                   <label
                     htmlFor="invite-specialty"
-                    className="mb-1 block text-xs font-medium text-aivo-ink"
+                    className="mb-1 block text-xs font-medium text-iw-ink"
                   >
                     {t("specialty_optional")}
                   </label>
@@ -156,7 +156,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
                 <div>
                   <label
                     htmlFor="invite-credentials"
-                    className="mb-1 block text-xs font-medium text-aivo-ink"
+                    className="mb-1 block text-xs font-medium text-iw-ink"
                   >
                     {t("credentials_optional")}
                   </label>
@@ -172,7 +172,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
             {state.error ? (
               <p
                 role="alert"
-                className="rounded-md bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700"
+                className="rounded-md bg-iw-error-subtle px-2 py-1 text-xs font-medium text-iw-error-strong"
               >
                 {state.error}
               </p>
@@ -222,14 +222,14 @@ function PendingInviteList({
   return (
     <Card className="p-4">
       <h3 className="mb-2 text-sm font-semibold">{t("care_team_invites")}</h3>
-      <ul className="divide-y divide-aivo-border">
+      <ul className="divide-y divide-iw-border">
         {rows.map(({ role, record }) => {
           const meta = ROLE_META[role];
           return (
             <li key={record.id} className="flex items-center justify-between gap-3 py-2">
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{record.email}</p>
-                <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-aivo-ink-soft">
+                <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-iw-ink-muted">
                   <span
                     className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${meta.accent}`}
                   >
@@ -256,7 +256,7 @@ function PendingInviteList({
                   variant="outline"
                   size="sm"
                   disabled={revoking}
-                  className="text-rose-700"
+                  className="text-iw-error-strong"
                 >
                   {t("revoke")}
                 </Button>

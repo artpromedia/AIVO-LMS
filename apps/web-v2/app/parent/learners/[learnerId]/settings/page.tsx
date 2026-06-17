@@ -111,12 +111,12 @@ export default async function LearnerSettingsPage({
         description="Update name, language, supports, and accessibility defaults."
       />
       {sp.error === "invalid" ? (
-        <div className="mb-4 rounded-md border border-aivo-danger bg-aivo-danger/5 px-3 py-2 text-sm text-aivo-danger">
+        <div className="mb-4 rounded-md border border-iw-error bg-iw-error/5 px-3 py-2 text-sm text-iw-error">
           {t("error_invalid")}
         </div>
       ) : null}
       {sp.error === "confirm" ? (
-        <div className="mb-4 rounded-md border border-aivo-danger bg-aivo-danger/5 px-3 py-2 text-sm text-aivo-danger">
+        <div className="mb-4 rounded-md border border-iw-error bg-iw-error/5 px-3 py-2 text-sm text-iw-error">
           {t("error_confirm")}
         </div>
       ) : null}
@@ -189,7 +189,7 @@ export default async function LearnerSettingsPage({
               context={{ ageRange: learner.ageRange, gradeBand: learner.gradeBand }}
             />
           </div>
-          <fieldset className="sm:col-span-2 rounded-lg border border-aivo-border p-4">
+          <fieldset className="sm:col-span-2 rounded-lg border border-iw-border p-4">
             <legend className="px-2 text-sm font-medium">{t("accessibility_defaults")}</legend>
             <div className="grid gap-2 sm:grid-cols-2">
               {(
@@ -206,7 +206,7 @@ export default async function LearnerSettingsPage({
                     type="checkbox"
                     name={name}
                     defaultChecked={learner.accessibilityDefaults[key]}
-                    className="h-4 w-4 rounded border-aivo-border"
+                    className="h-4 w-4 rounded border-iw-border"
                   />
                   {label}
                 </label>
@@ -234,7 +234,7 @@ export default async function LearnerSettingsPage({
         title={t("danger_zone")}
         description="Removing a learner deletes their profile and assessment data."
       />
-      <Card className="max-w-2xl border-aivo-danger/40 p-6">
+      <Card className="max-w-2xl border-iw-error/40 p-6">
         <form action={deleteAction} className="flex flex-col gap-3">
           <input type="hidden" name="learnerId" value={learner.id} />
           <Label htmlFor="confirm">{t("delete_confirm_label")}</Label>

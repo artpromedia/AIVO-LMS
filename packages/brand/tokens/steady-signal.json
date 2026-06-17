@@ -1,0 +1,244 @@
+{
+  "steadySignal": {
+    "$description": "Steady Signal is AIVO's neurodiverse-first design language. This file is the single editable source for web CSS variables and React Native theme resolution. Palette is the calmer, more personal AIVO direction: soft lavender canvas, deep plum ink, and an AIVO violet signal.",
+    "foundation": {
+      "color": {
+        "canvas": "#F7F5FF",
+        "surface": "#FFFFFF",
+        "surfaceRaised": "#F1ECFE",
+        "ink": "#241B3D",
+        "inkMuted": "#6A6188",
+        "line": "#E5DEF6",
+        "lineStrong": "#BBAEE0",
+        "signal": "#7C3AED",
+        "signalHover": "#6D28D9",
+        "signalSoft": "#EDE7FE",
+        "signalOn": "#FFFFFF",
+        "beacon": "#B45309",
+        "beaconSoft": "#FDEBC8",
+        "positive": "#15803D",
+        "positiveSoft": "#DCFCE7",
+        "danger": "#B91C1C",
+        "dangerSoft": "#FEE2E2",
+        "focus": "#7C3AED"
+      },
+      "typography": {
+        "family": {
+          "display": "'Inter', ui-sans-serif, system-ui, sans-serif",
+          "body": "'Inter', ui-sans-serif, system-ui, sans-serif",
+          "reading": "'Atkinson Hyperlegible', 'Inter', ui-sans-serif, system-ui, sans-serif",
+          "mono": "'JetBrains Mono', ui-monospace, monospace"
+        },
+        "weight": {
+          "regular": 400,
+          "medium": 500,
+          "semibold": 600,
+          "bold": 700
+        },
+        "leading": {
+          "display": 1.04,
+          "heading": 1.18,
+          "body": 1.6,
+          "reading": 1.7
+        }
+      },
+      "space": {
+        "1": "4px",
+        "2": "8px",
+        "3": "12px",
+        "4": "16px",
+        "5": "20px",
+        "6": "24px",
+        "8": "32px",
+        "10": "40px",
+        "12": "48px",
+        "16": "64px",
+        "20": "80px"
+      },
+      "shape": {
+        "control": "12px",
+        "surface": "18px",
+        "region": "24px",
+        "pill": "9999px",
+        "notch": "16px",
+        "line": "2px"
+      },
+      "elevation": {
+        "rest": "0 1px 2px rgba(60,40,120,0.06), 0 8px 24px rgba(60,40,120,0.08)",
+        "raised": "0 2px 4px rgba(60,40,120,0.08), 0 16px 40px rgba(60,40,120,0.12)",
+        "focus": "0 0 0 4px rgba(124,58,237,0.28)"
+      },
+      "motion": {
+        "durationInstant": "0ms",
+        "durationFast": "120ms",
+        "durationBase": "200ms",
+        "durationSlow": "360ms",
+        "easeStandard": "cubic-bezier(0.2, 0, 0, 1)",
+        "easeEnter": "cubic-bezier(0, 0, 0, 1)"
+      },
+      "layout": {
+        "phone": "0px",
+        "tabletPortrait": "600px",
+        "tabletLandscape": "840px",
+        "desktop": "1200px",
+        "readingMax": "720px",
+        "workspaceMax": "1280px"
+      },
+      "sound": {
+        "confirm": "single-soft-tone",
+        "complete": "three-note-rising",
+        "attention": "none",
+        "ambient": "explicit-opt-in"
+      }
+    },
+    "modes": {
+      "appearance": {
+        "light": {
+          "canvas": "#F7F5FF",
+          "surface": "#FFFFFF",
+          "surfaceRaised": "#F1ECFE",
+          "ink": "#241B3D",
+          "inkMuted": "#6A6188",
+          "line": "#E5DEF6",
+          "lineStrong": "#BBAEE0",
+          "signal": "#7C3AED",
+          "signalHover": "#6D28D9",
+          "signalSoft": "#EDE7FE",
+          "signalOn": "#FFFFFF",
+          "beacon": "#B45309",
+          "beaconSoft": "#FDEBC8",
+          "positive": "#15803D",
+          "positiveSoft": "#DCFCE7",
+          "danger": "#B91C1C",
+          "dangerSoft": "#FEE2E2",
+          "focus": "#7C3AED"
+        },
+        "dark": {
+          "canvas": "#15111F",
+          "surface": "#1E1830",
+          "surfaceRaised": "#281F40",
+          "ink": "#F4F1FB",
+          "inkMuted": "#BDB4D6",
+          "line": "#3A3052",
+          "lineStrong": "#6E6090",
+          "signal": "#A78BFA",
+          "signalHover": "#C4B5FD",
+          "signalSoft": "#2E2348",
+          "signalOn": "#15111F",
+          "beacon": "#FBBF24",
+          "beaconSoft": "#43320F",
+          "positive": "#4ADE80",
+          "positiveSoft": "#14331F",
+          "danger": "#FB7185",
+          "dangerSoft": "#3F1D24",
+          "focus": "#A78BFA"
+        },
+        "high-contrast": {
+          "canvas": "#000000",
+          "surface": "#000000",
+          "surfaceRaised": "#111111",
+          "ink": "#FFFFFF",
+          "inkMuted": "#FFFFFF",
+          "line": "#FFFFFF",
+          "lineStrong": "#FFFFFF",
+          "signal": "#E9D5FF",
+          "signalHover": "#FFFFFF",
+          "signalSoft": "#000000",
+          "signalOn": "#000000",
+          "beacon": "#FFFF00",
+          "beaconSoft": "#000000",
+          "positive": "#00FF88",
+          "positiveSoft": "#000000",
+          "danger": "#FF8080",
+          "dangerSoft": "#000000",
+          "focus": "#FFFF00"
+        }
+      },
+      "sensory": {
+        "calm": {
+          "motionScale": 0,
+          "soundScale": 0,
+          "decorationScale": 0,
+          "elevationScale": 0,
+          "signalWidth": "4px"
+        },
+        "standard": {
+          "motionScale": 1,
+          "soundScale": 0.45,
+          "decorationScale": 1,
+          "elevationScale": 1,
+          "signalWidth": "6px"
+        }
+      },
+      "age": {
+        "early": {
+          "minTouchTarget": "64px",
+          "typeScale": 1.12,
+          "gapScale": 1.2,
+          "contentDensity": 0.72,
+          "contrastTarget": "AAA"
+        },
+        "middle": {
+          "minTouchTarget": "56px",
+          "typeScale": 1,
+          "gapScale": 1,
+          "contentDensity": 1,
+          "contrastTarget": "AA"
+        },
+        "older": {
+          "minTouchTarget": "48px",
+          "typeScale": 0.96,
+          "gapScale": 0.88,
+          "contentDensity": 1.2,
+          "contrastTarget": "AA"
+        }
+      },
+      "communication": {
+        "symbol-first": {
+          "symbolScale": 1.35,
+          "textScale": 0.9,
+          "promptLength": "short",
+          "aacDock": "persistent"
+        },
+        "supported-text": {
+          "symbolScale": 1,
+          "textScale": 1,
+          "promptLength": "guided",
+          "aacDock": "available"
+        },
+        "text-first": {
+          "symbolScale": 0.8,
+          "textScale": 1,
+          "promptLength": "full",
+          "aacDock": "on-demand"
+        }
+      },
+      "role": {
+        "learner": {
+          "accent": "#7C3AED",
+          "accentSoft": "#EDE7FE",
+          "accentOn": "#FFFFFF",
+          "registerDensity": 0.82
+        },
+        "care": {
+          "accent": "#0F766E",
+          "accentSoft": "#CCFBF1",
+          "accentOn": "#FFFFFF",
+          "registerDensity": 1
+        },
+        "professional": {
+          "accent": "#4338CA",
+          "accentSoft": "#E0E7FF",
+          "accentOn": "#FFFFFF",
+          "registerDensity": 1.2
+        },
+        "marketing": {
+          "accent": "#7C3AED",
+          "accentSoft": "#EDE7FE",
+          "accentOn": "#FFFFFF",
+          "registerDensity": 0.9
+        }
+      }
+    }
+  }
+}

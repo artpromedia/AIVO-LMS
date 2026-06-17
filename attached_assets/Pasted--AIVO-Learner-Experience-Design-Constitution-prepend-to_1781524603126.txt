@@ -1,0 +1,307 @@
+# AIVO Learner Experience Design Constitution (prepend to every learner-page prompt)
+
+You are building/elevating AIVO's learner-facing experience in `apps/web-v2` (Next 15, React 19,
+Tailwind v4, Radix, pixi.js) and `apps/mobile` (Expo / React Native). The user is a **neurodiverse
+K–12 learner**. You are *elevating a real system, not greenfielding* (`learner-experience/
+DESIGN-DIRECTION.md`): tokens, theming, sensory plumbing, and engagement data already exist. Build
+on `@aivo/stage-ui`, `@aivo/learner-ui`, `@aivo/mobile-ui`, `@aivo/brand` (+ the `--lx-*` learner
+token layer). Match the reference Stage screenshot.
+
+North star: a learner should *want to come back tomorrow* — through delight, character, and progress
+they can feel, never overload or compulsion. Build "a world with a host," not "a dashboard with
+numbers." Bar = Duolingo / Khan Academy Kids, original IP, plus a **Calm mode they don't have**. If
+a screen reads as "a dashboard," it isn't done.
+
+Three non-negotiables on every screen:
+1. **Neurodiverse-first is load-bearing** — honor My Workspace (Mood, Spacing, Font, Sound) and
+   "breaks are good"; every delight element obeys them.
+2. **Accessibility never regresses** — WCAG AA contrast (text uses `-ink` token variants; raw chroma
+   is decorative-only ≥3:1), full keyboard nav, visible focus, `SkipLink`, `LiveRegion` SR
+   announcements. A playful palette is no excuse for low contrast.
+3. **No dark patterns** — grace on streaks; no FOMO, shame, countdowns, or loot-box mechanics.
+
+Mandatory behaviors:
+- **One primary action per screen** (`PrimarySlot`); progressive disclosure.
+- **Audio-first** — read-aloud / Play-sound always present; TTS via the contract (6 voices, speed
+  0.5–1.5).
+- **Functioning-level adaptation** (`FlVariantProvider`, `FL_PROFILES`) — density + choice count
+  scale from STANDARD (full, ≤5) to PRE_SYMBOLIC (single, ≤2); never exceed the learner's
+  `maxChoices`.
+- **Sensory + Mood** — `data-sensory-mode` (standard/calm/high-contrast → motionScale 1/0.5/0) and
+  Mood (Calm/Balanced/Energizing → `--lx-motion` 0.45/1/1.2). Calm genuinely turns the dial down;
+  keep contrast a separate toggle (don't let "Energizing" kill motion). Respect
+  `prefers-reduced-motion`; PRE_SYMBOLIC = no motion.
+- **AAC + switch access** — touch/switch/eye-gaze/head-pointer with scan/dwell timing
+  (`@aivo/accessibility-contract`, `@aivo/aac-bridge`, mobile SwitchScanOverlay); every custom
+  gesture has a one-tap alternative.
+- **Breaks** — a calm, non-punitive break affordance (`BreakCloud`) per the learner's break
+  interval; never gate or shame.
+- **Age tiers** (`TIER_THEMES` / `gradeToTier`) — dignified for older kids, gentle for younger.
+- **Theming** via `data-*` attributes + `@aivo/brand` tokens + `--lx-*`; no raw hex; never fork the
+  pipeline. Web (CSS/Tailwind) and mobile (RN) render from the same contract.
+- **Original IP** — host/mascot + tutor characters are expressive but obey every sensory setting;
+  upgrade the crude placeholder art.
+
+For each page: don't jump to code. First return (a) the screen-state map (incl. empty/loading/error/
+celebration and the PRE_SYMBOLIC variant), (b) the interaction + audio/AAC spec, (c) the visual
+direction in tokens. Preview in `app/design-system/*` (dev-only). Pause for approval.
+# Prompt — Baseline assessment (the "Discovery Adventure")
+Inherits: the Learner Experience Design Constitution.
+
+Pages (web): `/learner/baseline/why`, `/intro`, `/readiness`, `/subjects`, `/[baselineId]` (adaptive
+run), completion → parent handoff (`/parent/learners/[id]/baseline/pending|summary`, `brain-review`).
+Mobile: `(learner)/baseline/index`, `/run`, `(learner)/adventure`.
+
+Goal: an immersive, emotionally safe, adaptive baseline that builds the LearningProfile (modality,
+frustration tolerance, ability) WITHOUT feeling like a test.
+
+Unique focus:
+- Item selection (SE-stop, 1-PL) is backend (`@aivo/adaptive-baseline`); render each item as a Stage
+  beat. Multi-modal items (visual/auditory/kinesthetic/reading).
+- **No scores, grades, or failure states shown to the child** — ever. No "wrong"; gentle move-on.
+- Affect-aware: on frustration/disengagement signals, offer a break or modality switch.
+- why/intro/readiness explain it in kid terms (and give parents context); chapters include break
+  activities; strengths-based throughout.
+- End = celebration + a quiet, truthful, strengths-first handoff to the parent for brain approval —
+  no deficit framing or pseudo-grade-gaps.
+Reuse: `@aivo/stage-ui`, `@aivo/learner-ui`, `@aivo/adaptive-baseline`, baseline BFF
+(start/answer/complete).
+DoD-delta: zero child-facing scores/failure; frustration → break/modality; fully playable at
+PRE_SYMBOLIC (single choice + symbol/AAC); audio-first; parent handoff strengths-first.
+# Prompt — Learner entry & onboarding
+Inherits: the Learner Experience Design Constitution.
+
+Pages (web): `/learner/select` (picker + PIN), `/onboarding/learner/new`.
+Mobile: `(auth)/learner-login`, `(auth)/pin`, `(onboarding)/learner/new`.
+
+Goal: a warm, low-anxiety way for a child to enter their world, plus a gentle first-run.
+
+Unique focus:
+- Avatar/character-based learner picker; large, audio-supported, error-forgiving PIN entry (no scary
+  "wrong password" framing).
+- Never expose other learners' data; bind the selected learner correctly (per the RBAC/onboarding
+  audit). Don't surface sensitive auth errors.
+- First-run sets tone + captures light prefs (Mood/Sound); defer heavy setup to the parent.
+Reuse: `@aivo/learner-ui` (LearnerShell, LearnerButton, PrimarySlot), `@aivo/nav`.
+DoD-delta: keyboard + switch + audio entry; forgiving errors; zero cross-learner data leakage;
+PRE_SYMBOLIC-friendly.
+# Prompt — Learner home hub
+Inherits: the Learner Experience Design Constitution.
+
+Pages: `/learner/home`; mobile `(learner)/index`.
+
+Goal: the warm hub with a host — "what do you want to do today?" — one clear next action, not a
+metrics dashboard.
+
+Unique focus:
+- Host/tutor greeting by name (with audio); Today's plan as a single primary CTA (`PrimarySlot` →
+  resume/start).
+- Progress you can *feel* (a visual path, not bare numbers); gentle XP/streak with grace.
+- Fast reach to Calm + My Workspace. Density scales by functioning level.
+- No streak-pressure, no FOMO.
+Reuse: `@aivo/learner-ui` (LearnerShell, PrimarySlot, TabsRail, Celebration), `TIER_THEMES`,
+engagement data.
+DoD-delta: exactly one primary action; reads as "a world," not a dashboard; audio greeting;
+FL/sensory honored.
+# Prompt — The Stage (lesson player) — CORE, matches the reference screenshot
+Inherits: the Learner Experience Design Constitution.
+
+Pages: `/learner/lesson-runs/[lessonRunId]`; mobile `(learner)/stage/[sessionId]`
+(fixtures: `/learner/lesson-player-fixture`, `-smoke`).
+
+Goal: the full-screen, beat-based learning surface from the reference — audio-first, one question,
+big forgiving choices, host coaching, breaks, celebration.
+
+Unique focus:
+- Beat flow (e.g., Listen → Choose → Check) on `ProgressPath`; prominent Play-sound with replay
+  ("Again").
+- `ResponseZone` renders ≤ FL `maxChoices` large answer cards; multiple response types (choice, AAC,
+  voice, draw).
+- "MY WORDS" support rail = Help/hint, Again/replay, I-know/self-pace; one Tip; encouraging
+  `TutorCharacter` host.
+- `StageBreakCloud` ("Take a break") per break interval; `CelebrationOverlay` on success; gentle
+  retry on miss (no shame).
+- Back/Next + step dots; gentle points. **No countdowns/timers.** `LiveRegion` announces each beat.
+Reuse: `@aivo/stage-ui` (StageLayout, StageContent, BeatPreview, ResponseZone, ProgressPath,
+CelebrationOverlay, TutorCharacter, StageBreakCloud, PlayfulPrimitives), `@aivo/stage-runtime`,
+lesson-run BFF (start/step/complete/retry), `@aivo/aac-bridge`.
+DoD-delta: matches the reference; audio-first; ≤maxChoices; switch/AAC playable end-to-end; no
+timers/shame; celebration + gentle retry; SR announces beats; renders at every FL incl.
+PRE_SYMBOLIC (single symbol, no motion).
+# Prompt — Content discovery (worlds, quests, missions, library)
+Inherits: the Learner Experience Design Constitution.
+
+Pages: `/learner/subjects` + `/[subjectId]`, `/learner/quests` + `/[worldId]` +
+`/chapters/[chapterId]`, `/learner/missions`, `/learner/library`; mobile equivalents + `challenges`.
+
+Goal: navigable tutor "worlds" and quest maps that motivate calmly ("calm motivation, not loot
+boxes").
+
+Unique focus:
+- Per-tutor **worlds** (not just accent swaps), each led by its named tutor; quest/chapter maps that
+  show progress as a journey; subject tiles; missions = today's small goals; library = revisit.
+- Choice count + density scale by FL; locked content explained kindly; no pay-to-win/FOMO.
+- Audio label on every tile.
+Reuse: `@aivo/learner-ui` (LearnerCard, TabsRail), `@aivo/brand` TUTORS + `tutor-themes`
+(AA accents via `data-tutor`), quests BFF.
+DoD-delta: calm motivation; FL-scaled choices; AA per-tutor accents; audio-labeled; zero dark
+patterns.
+# Prompt — Homework & tutor conversation
+Inherits: the Learner Experience Design Constitution.
+
+Pages: `/learner/homework` + `/[sessionId]`, `/learner/tutor`; mobile `(learner)/homework`,
+`/tutor/[tutorSlug]`.
+
+Goal: a turn-based, supportive tutor/homework helper that scaffolds (an executive-function
+partner) — never just hands over answers.
+
+Unique focus:
+- Conversational turns with the named tutor (audio in/out; AAC/voice input); hints before answers.
+- Step-by-step EF breakdowns (micro-plans); frustration-aware pacing + break offers.
+- Image/handwriting/math input where relevant. Chunk size scales by FL. Patient, strengths-based;
+  no shame on errors.
+Reuse: `@aivo/stage-ui` TutorCharacter, `@aivo/tutor-runtime` / `tutor-sdk` /
+`tutor-surface-protocol`, homework BFF (message/complete), `@aivo/aac-bridge`.
+DoD-delta: audio + AAC turns; hints-before-answers; EF breakdown; break offers; FL-chunked;
+SR-friendly transcript.
+# Prompt — Progress, rewards & the learner's brain
+Inherits: the Learner Experience Design Constitution.
+
+Pages: `/learner/progress`, `/learner/rewards`, `/learner/brain-clone/[learnerId]`; mobile `badges`,
+`gamification`, `shop`, `leaderboard`, `challenges`.
+
+Goal: progress a child can feel and be proud of, plus an age-appropriate, strengths-first "my brain"
+view — celebration without compulsion.
+
+Unique focus:
+- Visual mastery/journey (not spreadsheets); badges/stickers/XP celebrated but grace-based.
+- The learner brain-clone view is strengths-first and kid-legible — never deficit/grade-gap framing.
+- **Leaderboard/shop need care:** no FOMO/shame/pay-to-win — prefer opt-in or cooperative framing
+  (flag as a product decision before building).
+- Celebration obeys Mood/motion (sparkles off in Calm, reduced-motion respected).
+Reuse: `@aivo/learner-ui` (Celebration, StickerBook), `@aivo/brand` assets, progress/mastery/
+engagement BFF.
+DoD-delta: no deficit framing; celebration scales with Mood/motion; no FOMO/compulsion; AA; audio.
+# Prompt — Calm, breaks & My Workspace (the neurodiverse controls)
+Inherits: the Learner Experience Design Constitution.
+
+Pages: `/learner/calm`, `/learner/settings`, `/learner/settings/accessibility`,
+`/learner/settings/audio`; mobile `(learner)/calm`, `accessibility`, `audio`, `settings`
+(+ the workspace rail).
+
+Goal: make self-regulation and accessibility first-class, child-operable features — the soul of the
+product.
+
+Unique focus:
+- Calm space = a genuine sensory-regulation break (breathing / quiet / low-stim), reachable
+  anywhere, never punitive.
+- My Workspace rail exposes Mood / Spacing / Font / Sound — **wire Spacing & Sound (currently
+  inert)** so all four persist and take effect live.
+- Accessibility settings map to the `AccessibilityProfile` (reducedMotion, highContrast, largeText,
+  dyslexiaFriendlyFont, visualSupports, audioFirst, AAC method + scan/dwell, TTS voice + speed,
+  break interval); child-friendly controls with audio + live preview; parent-managed where
+  appropriate.
+- Honor the Mood-vs-contrast decoupling decision.
+Reuse: `@aivo/learner-ui` (BreakCloud, SensoryProvider/useSensoryContext, FlVariantProvider),
+`@aivo/accessibility-contract` (+ `./schema`), `@aivo/aac-bridge`, accessibility/audio BFF.
+DoD-delta: all four Workspace controls live + persisted; Calm reachable everywhere; profile
+round-trips web↔mobile via the contract; the controls themselves are AA + switch/audio operable.
+The spine running through all eight: one primary action, audio-first, functioning-level adaptation down to PRE_SYMBOLIC, sensory/Mood honored, AAC/switch playable, breaks celebrated, zero dark patterns, AA never regresses — and every prompt builds on the real stage-ui / learner-ui / accessibility-contract rather than reinventing them.
+
+Want me to save these to sprint-prompts/learner/ (one file per page type) on claude/trusting-hamilton-0q6uwy, expand the Stage prompt into a full per-beat / per-response-type / per-functioning-level spec, or scaffold the app/design-system/* preview pages so the team can see each surface before building?
+
+The learner experience from when they engage with aivo {baseline assessment to learning (stage)} should be  the same so the prompt development should start from there
+
+Right — the baseline and the Stage should be one continuous experience, not two surfaces a child has to re-learn. The baseline is just the first Stage session. Let me verify how unified they are in code today, so the foundational prompt is precise about what to share.
+
+
+Ran 2 commands
+That instinct is exactly right, and the code proves why it matters: the shared Stage engine already exists and the lesson player already runs on it — but the baseline doesn't. That's the seam that makes "assessment" feel different from "learning."
+
+What I found:
+
+@aivo/stage-ui exposes a content-agnostic contract — Beat, InteractionType, SessionState, SensoryProfile, FunctioningLevel — plus the UI (StageLayout, ResponseZone, ProgressPath, TutorCharacter, StageBreakCloud, CelebrationOverlay). @aivo/stage-runtime adds SessionMachine, useSessionFlow, useTTS, useSpeechInput. Mobile has MobileStageRuntime.
+The lesson player uses it (lesson-runs/[lessonRunId]/player/* imports @aivo/stage-runtime + @aivo/stage-ui).
+The baseline does not — grep for any @aivo/stage* import under apps/web-v2/app/learner/baseline (and mobile baseline/run) returns nothing. It renders a separate UI.
+So the foundational move isn't "make baseline look like the Stage" — it's converge the baseline onto the one Stage the lessons already use. Development starts there. Restructured set, led by that foundation:
+
+Add one clause to the Constitution: The Stage is the single shared learner surface. Baseline, lessons, homework, and quests are all Stage sessions that differ only by content source and policy — never by look, feel, host, layout, or controls.
+
+# FOUNDATION PROMPT — The Unified Stage (build this FIRST; every learner session renders through it)
+Inherits: the Learner Experience Design Constitution + the "single shared surface" clause.
+
+Grounding / mandate:
+- The shared Stage engine exists: `@aivo/stage-ui` (the `Beat` / `InteractionType` / `SessionState` /
+  `SensoryProfile` contract + StageLayout, StageContent, BeatPreview, ResponseZone, ProgressPath,
+  TutorCharacter, StageBreakCloud, CelebrationOverlay) and `@aivo/stage-runtime` (`SessionMachine`,
+  `useSessionFlow`, sensory adapters, `useTTS`, `useSpeechInput`, `voiceMatch`); mobile via
+  `MobileStageRuntime`.
+- The **lesson player already runs on it** (`apps/web-v2/app/learner/lesson-runs/[lessonRunId]/
+  player/*`). The **baseline does NOT** (`/learner/baseline/*`, mobile `(learner)/baseline/run` use a
+  separate UI). **Removing that seam is the whole job.**
+
+Goal: harden ONE Stage that renders every learner session identically, so a child's path from first
+engagement (baseline) into daily learning is literally the same surface — same host, beats, My Words
+rail, breaks, celebration, and controls. The child never crosses a "now it's a test / now it's
+learning" boundary.
+
+Deliverables:
+1. **The Stage shell** (the reference screenshot) — `StageLayout`: header (subject·level, points,
+   profile), left `ProgressPath` (the beats, e.g. Listen → Choose → Check), center `StageContent`
+   (one prompt + audio-first Play-sound + `ResponseZone`), right "My Words" rail (Help/hint,
+   Again/replay, I-know/self-pace), host `TutorCharacter`, `StageBreakCloud` ("Take a break"), footer
+   Back/Next + step dots.
+2. **The Beat model** — formalize `Beat` + `InteractionType` as the atomic unit and the response set
+   every session draws from: single/multi choice (≤ FL `maxChoices`), audio-match, voice
+   (`useSpeechInput` / `voiceMatch`), draw/handwriting, sequence/order, symbol/AAC select. Each beat
+   = prompt + audio + interaction + feedback.
+3. **The session contract** — a `kind` (`baseline` | `lesson` | `homework` | `quest`) plus a
+   content/policy adapter interface (next-beat, accept-answer, on-affect, on-complete) so any source
+   plugs in WITHOUT touching the UI. `SessionMachine` / `useSessionFlow` drive transitions
+   (advance / remediate / say / end_early).
+4. **Cross-cutting behaviors wired once, inherited by all sessions:** audio-first TTS (contract
+   voices/speed), AAC + switch (touch/switch/eye-gaze/head-pointer + scan/dwell via
+   `@aivo/aac-bridge`), FL adaptation (density + maxChoices via `FlVariantProvider`), sensory + Mood
+   (motionScale / `--lx-motion`, reduced-motion, PRE_SYMBOLIC = no motion), breaks per interval,
+   `LiveRegion` beat announcements, gentle no-shame retry, Mood-aware celebration.
+5. **Convergence task** — migrate the baseline run (web `/learner/baseline/[baselineId]`, mobile
+   `(learner)/baseline/run`) onto this exact Stage. After this, baseline and lessons share ONE
+   renderer.
+
+Definition of done:
+- Baseline and lesson sessions render through the SAME `StageLayout` / `MobileStageRuntime` — verified
+  no separate baseline UI remains.
+- One Beat/InteractionType set powers both; switching `kind` changes only content + policy, never
+  layout/host/controls.
+- Audio-first, AAC/switch, FL (incl. PRE_SYMBOLIC), sensory/Mood, breaks, and LiveRegion live in one
+  place and apply to every session kind.
+- Matches the reference screenshot at STANDARD; degrades correctly to PRE_SYMBOLIC; no
+  timers/countdowns; no shame.
+
+First response: the Beat/InteractionType catalogue + the session-adapter interface + the Stage state
+map (incl. PRE_SYMBOLIC and the baseline-vs-lesson policy diffs). Pause for approval.
+# SESSION ADAPTERS — thin policy/content layers over the one Stage (build after the Foundation)
+Inherits: the Foundation. Each adapter changes content + policy only; the Stage UI is identical.
+
+## A — Baseline (the "Discovery Adventure") — the FIRST session every learner sees
+- Content: `@aivo/adaptive-baseline` (SE-stop, 1-PL; modality-varied items). Policy: **no
+  scores/grades/fail ever shown to the child**; affect-aware (frustration/disengagement → break or
+  modality switch); chaptered with break activities; builds the LearningProfile; ends with a quiet,
+  strengths-first handoff to the parent (no deficit / grade-gap framing).
+- The pre-Stage framing screens (`/learner/baseline/why|intro|readiness|subjects`, mobile
+  `(learner)/adventure`) set expectations in kid terms using the SAME tokens + host, so entry into the
+  Stage is seamless.
+- DoD: baseline is visibly the same Stage as lessons; zero child-facing scores; frustration relief;
+  PRE_SYMBOLIC playable; truthful parent handoff.
+
+## B — Lesson / learning
+- Content: curriculum lesson-runs. Policy: mastery + gentle retry; agent transitions stay off by
+  default (per audit). Already on the Stage — align it to the hardened Foundation. BFF: lesson-runs
+  start/step/complete/retry.
+- DoD: indistinguishable in look/feel from the baseline Stage; honest agent state.
+
+## C — Homework / tutor
+- Content: turn-based tutor (`@aivo/tutor-runtime` / `tutor-sdk`). Policy: conversational beats over
+  the same shell; hints-before-answers; EF breakdowns; image/handwriting/math input. BFF: homework
+  message/complete.
+- DoD: same host + controls as the Stage; audio/AAC turns; EF scaffolding.

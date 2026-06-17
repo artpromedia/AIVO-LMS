@@ -14,6 +14,7 @@ import {
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
@@ -53,11 +54,11 @@ async function statusAction(formData: FormData) {
   redirect("/platform/security/vulnerabilities?notice=Finding%20updated.");
 }
 
-const SEV_TONE: Record<VulnSeverity, string> = {
-  low: "text-slate-500",
-  medium: "text-blue-700",
-  high: "text-amber-700",
-  critical: "text-red-700",
+const SEV_TONE: Record<VulnSeverity, StatusTone> = {
+  low: "neutral",
+  medium: "info",
+  high: "warning",
+  critical: "danger",
 };
 
 const OPEN_STATUSES: VulnStatus[] = ["open", "triaged"];
@@ -77,7 +78,6 @@ export default async function SecurityVulnerabilitiesPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Security"
       title="Vulnerabilities"
       description="Vulnerability findings from scans, pen tests, and reports, persisted in admin-svc (Postgres)."
       action={
@@ -145,15 +145,15 @@ export default async function SecurityVulnerabilitiesPage({
                 <tr key={finding.id}>
                   <td className="font-bold">{finding.title}</td>
                   <td className="font-mono text-xs">{finding.cveId ?? "—"}</td>
-                  <td className={`font-bold uppercase ${SEV_TONE[finding.severity]}`}>
-                    {finding.severity}
+                  <td>
+                    <StatusPill status={finding.severity} tone={SEV_TONE[finding.severity]} />
                   </td>
                   <td className="text-sm">{finding.source.replace("_", " ")}</td>
                   <td className="text-sm">{finding.affectedComponent || "—"}</td>
                   <td>
-                    <span className="admin-status">{finding.status}</span>
+                    <StatusPill status={finding.status} />
                   </td>
-                  <td className="text-sm">{formatDateTime(finding.discoveredAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(finding.discoveredAt)}</td>
                   <td>
                     <form action={statusAction} className="flex items-center gap-2">
                       <input name="id" type="hidden" value={finding.id} />

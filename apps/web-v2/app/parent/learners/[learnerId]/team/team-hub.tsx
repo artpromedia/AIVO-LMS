@@ -44,17 +44,17 @@ const ROLE_META: Record<
   teacher: {
     labelKey: "role_teacher",
     icon: <GraduationCap className="h-4 w-4" aria-hidden="true" />,
-    accent: "bg-sky-50 text-sky-700 border-sky-200",
+    accent: "bg-iw-accent-soft text-iw-teal-700 border-iw-accent",
   },
   caregiver: {
     labelKey: "role_caregiver",
     icon: <HeartHandshake className="h-4 w-4" aria-hidden="true" />,
-    accent: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    accent: "bg-iw-success-subtle text-iw-success-strong border-iw-success",
   },
   therapist: {
     labelKey: "role_therapist",
     icon: <Brain className="h-4 w-4" aria-hidden="true" />,
-    accent: "bg-violet-50 text-violet-700 border-violet-200",
+    accent: "bg-iw-purple-100 text-iw-primary border-iw-purple-200",
   },
 };
 
@@ -151,13 +151,13 @@ function MemberCard({
         {stageBadge}
       </div>
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-aivo-ink">
+        <p className="truncate text-sm font-medium text-iw-ink">
           {member.displayName || member.email}
         </p>
         {member.displayName ? (
-          <p className="truncate text-xs text-aivo-ink-soft">{member.email}</p>
+          <p className="truncate text-xs text-iw-ink-muted">{member.email}</p>
         ) : null}
-        <p className="mt-1 text-xs text-aivo-ink-soft">{stageLine}</p>
+        <p className="mt-1 text-xs text-iw-ink-muted">{stageLine}</p>
       </div>
       <div className="mt-auto flex flex-wrap gap-2 pt-1">
         {/* Remind: only meaningful while they haven't joined. */}
@@ -206,17 +206,17 @@ function RemindButton({
       </form>
       {/* Kind, specific feedback — never a bare failure. */}
       {state.status === "sent" ? (
-        <p className="text-xs font-medium text-emerald-700" role="status">
+        <p className="text-xs font-medium text-iw-success-strong" role="status">
           {t("remind_sent_detail")}
         </p>
       ) : null}
       {state.status === "rate_limited" ? (
-        <p className="text-xs text-aivo-ink-soft" role="status">
+        <p className="text-xs text-iw-ink-muted" role="status">
           {t("remind_rate_limited", { minutes: Math.ceil(state.retryAfterSeconds / 60) })}
         </p>
       ) : null}
       {state.status === "error" ? (
-        <p className="text-xs text-rose-700" role="alert">
+        <p className="text-xs text-iw-error-strong" role="alert">
           {state.message}
         </p>
       ) : null}
@@ -241,7 +241,7 @@ function RemoveButton({
         type="button"
         variant="ghost"
         size="sm"
-        className="text-rose-700"
+        className="text-iw-error-strong"
         onClick={() => setConfirming(true)}
       >
         {t("remove")}
@@ -251,11 +251,11 @@ function RemoveButton({
 
   return (
     <div
-      className="flex flex-col gap-1 rounded-md border border-rose-200 bg-rose-50 p-2"
+      className="flex flex-col gap-1 rounded-md border border-iw-error bg-iw-error-subtle p-2"
       role="group"
       aria-label={t("remove_confirm_title")}
     >
-      <p className="text-xs font-medium text-aivo-ink">{t("remove_confirm_title")}</p>
+      <p className="text-xs font-medium text-iw-ink">{t("remove_confirm_title")}</p>
       <div className="flex gap-2">
         <Button
           type="button"
@@ -274,7 +274,7 @@ function RemoveButton({
             startTransition(() => revokeTeamMemberAction(formData));
           }}
         >
-          <Button type="submit" size="sm" className="bg-rose-600 text-white" disabled={pending}>
+          <Button type="submit" size="sm" className="bg-iw-error text-white" disabled={pending}>
             {pending ? t("remove_removing") : t("remove_confirm")}
           </Button>
         </form>

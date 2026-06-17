@@ -28,45 +28,45 @@ export default async function DemoPage() {
     >
       <section
         aria-labelledby="demo-form-heading"
-        className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
+        className="rounded-iw-card-lg border border-iw-border bg-white p-6 shadow-soft-1 md:p-8"
       >
-        <h2 id="demo-form-heading" className="font-heading text-2xl font-bold text-slate-900">
+        <h2 id="demo-form-heading" className="font-heading text-2xl font-bold text-iw-ink">
           {t("form_heading")}
         </h2>
-        <p className="mt-1 mb-6 font-body text-slate-600">{t("form_subheading")}</p>
+        <p className="mt-1 mb-6 font-body text-iw-ink-muted">{t("form_subheading")}</p>
         <DemoRequestForm />
       </section>
 
       <section
         aria-labelledby="demo-what-happens-heading"
-        className="mt-10 rounded-3xl border border-slate-200 bg-slate-50/60 p-6 md:p-8"
+        className="mt-10 rounded-iw-card-lg border border-iw-border bg-iw-raised/60 p-6 md:p-8"
       >
         <h2
           id="demo-what-happens-heading"
-          className="font-heading text-xl font-bold text-slate-900"
+          className="font-heading text-xl font-bold text-iw-ink"
         >
           {t("what_happens_next")}
         </h2>
         <ol className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-purple-700">
+          <li className="rounded-iw-card border border-iw-border bg-white p-5">
+            <span className="font-heading text-sm font-bold text-iw-primary">
               {t("step1_label")}
             </span>
-            <p className="mt-1 font-body text-slate-700">
+            <p className="mt-1 font-body text-iw-ink">
               A team member emails to confirm your goals and pick a time.
             </p>
           </li>
-          <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-purple-700">
+          <li className="rounded-iw-card border border-iw-border bg-white p-5">
+            <span className="font-heading text-sm font-bold text-iw-primary">
               {t("step2_label")}
             </span>
-            <p className="mt-1 font-body text-slate-700">{t("step2_body")}</p>
+            <p className="mt-1 font-body text-iw-ink">{t("step2_body")}</p>
           </li>
-          <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-purple-700">
+          <li className="rounded-iw-card border border-iw-border bg-white p-5">
+            <span className="font-heading text-sm font-bold text-iw-primary">
               {t("step3_label")}
             </span>
-            <p className="mt-1 font-body text-slate-700">{t("step3_body")}</p>
+            <p className="mt-1 font-body text-iw-ink">{t("step3_body")}</p>
           </li>
         </ol>
       </section>

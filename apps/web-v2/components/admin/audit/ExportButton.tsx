@@ -34,7 +34,7 @@ export function ExportButton({ filter }: { filter: AuditFilterValue }) {
       </Button>
       {open ? (
         <div
-          className="absolute right-0 z-10 mt-1 w-36 rounded-md border border-aivo-border bg-aivo-surface p-1 shadow-md"
+          className="absolute right-0 z-10 mt-1 w-36 rounded-md border border-iw-border bg-iw-card p-1 shadow-soft-3"
           role="menu"
         >
           {(["csv", "json", "ndjson"] as const).map((fmt) => (
@@ -43,7 +43,7 @@ export function ExportButton({ filter }: { filter: AuditFilterValue }) {
               role="menuitem"
               href={href(fmt)}
               download
-              className="block rounded px-2 py-1 text-sm hover:bg-aivo-surface-2"
+              className="block rounded px-2 py-1 text-sm hover:bg-iw-raised"
               onClick={() => setOpen(false)}
             >
               {t("export_as", { format: fmt.toUpperCase() })}

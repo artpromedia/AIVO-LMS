@@ -145,8 +145,10 @@ export default function DesignSystemPage() {
               { href: "/design-system/learner-dashboard", label: "Learner dashboard" },
               { href: "/design-system/learner-home", label: "Learner home (legacy)" },
               { href: "/design-system/tutor", label: "Tutor" },
+              { href: "/design-system/stage", label: "Stage" },
               { href: "/design-system/assessment", label: "Assessment" },
               { href: "/design-system/baseline", label: "Baseline" },
+              { href: "/design-system/discovery", label: "Discovery Adventure" },
               { href: "/design-system/states", label: "States" },
               { href: "/design-system/shell", label: "Shell" },
             ].map((item) => (

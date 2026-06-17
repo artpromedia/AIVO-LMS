@@ -49,8 +49,8 @@ export default async function Page({ params }: { params: Promise<{ learnerId: st
         description={t("description")}
       />
       {ageGate?.requiresParentConsent ? (
-        <Card className="p-4 mb-4 bg-amber-50 border-amber-200">
-          <p className="text-sm text-amber-900">{t("coppa_notice")}</p>
+        <Card className="p-4 mb-4 bg-iw-consent-pending-subtle border-iw-consent-pending">
+          <p className="text-sm text-iw-consent-pending">{t("coppa_notice")}</p>
         </Card>
       ) : null}
       <Card className="p-0 divide-y">
@@ -68,10 +68,10 @@ export default async function Page({ params }: { params: Promise<{ learnerId: st
                     <Badge tone="neutral">{t("not_accepted")}</Badge>
                   )}
                 </div>
-                <p className="text-sm text-aivo-ink-soft mt-1">
+                <p className="text-sm text-iw-ink-muted mt-1">
                   {version?.summary ?? "No description available."}
                 </p>
-                <p className="text-xs text-aivo-ink-soft mt-1">Version {version?.version ?? "—"}</p>
+                <p className="text-xs text-iw-ink-muted mt-1">Version {version?.version ?? "—"}</p>
               </div>
               <ConsentToggle consentType={type} accepted={Boolean(active)} learnerId={learnerId} />
             </div>

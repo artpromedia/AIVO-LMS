@@ -153,6 +153,10 @@ export function registerShopRoutes(
       equipped: boolean;
     };
 
+    if (!requireSelfOrRole(claims, learnerId, "PARENT", "PLATFORM_ADMIN")) {
+      return reply.status(403).send({ error: "Forbidden" });
+    }
+
     const [inv] = await db
       .select()
       .from(avatarInventory)

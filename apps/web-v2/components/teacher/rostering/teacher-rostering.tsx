@@ -143,7 +143,7 @@ export function TeacherRostering() {
           </div>
         ) : loadError ? (
           <div className="rounded-iw-card-lg border border-iw-border bg-iw-card p-6">
-            <p className="text-sm text-aivo-danger">{t("error_load")}</p>
+            <p className="text-sm text-iw-error">{t("error_load")}</p>
             <Button
               type="button"
               variant="outline"
@@ -227,7 +227,7 @@ function ConnectorCard({
           </div>
           <div className="mt-1 flex items-center gap-1.5 text-sm text-iw-ink-muted">
             {tone === "success" ? (
-              <CheckCircle2 className="h-4 w-4 text-aivo-success" aria-hidden="true" />
+              <CheckCircle2 className="h-4 w-4 text-iw-success" aria-hidden="true" />
             ) : (
               <AlertTriangle
                 className="h-4 w-4 text-[var(--aivo-status-warning)]"
@@ -398,7 +398,7 @@ function ConnectDialog({
             <p className="mt-1 text-xs text-iw-ink-muted">{t("hint_help")}</p>
           </div>
 
-          {error ? <p className="text-sm text-aivo-danger">{error}</p> : null}
+          {error ? <p className="text-sm text-iw-error">{error}</p> : null}
 
           <div className="flex justify-end gap-2">
             <DialogClose asChild>

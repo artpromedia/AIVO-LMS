@@ -42,7 +42,7 @@ const SERVICE_DEFS: Array<{
     name: "assessment-svc",
     envKey: "ASSESSMENT_SVC_URL",
     healthPath: "/health",
-    devDefault: "http://localhost:3003",
+    devDefault: "http://localhost:3012",
   },
   {
     name: "ai-svc",

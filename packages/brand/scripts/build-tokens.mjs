@@ -18,6 +18,7 @@ const sourceFiles = [
   "tokens/modes/age-modes.json",
   "tokens/modes/themes.json",
   "tokens/modes/sensory.json",
+  "tokens/steady-signal.json",
 ];
 
 const mergeDeep = (target, source) => {
@@ -126,6 +127,44 @@ const sensoryRootDefaults = tokens.modes.sensory?.standard
   ? cssBlock(":root", flatten({ sensory: tokens.modes.sensory.standard }))
   : "";
 
+const steadySignal = tokens.steadySignal;
+const clone = (value) => JSON.parse(JSON.stringify(value));
+const compose = (...parts) => parts.reduce((acc, part) => mergeDeep(acc, clone(part)), {});
+const steadySignalRootDefaults = steadySignal
+  ? cssBlock(
+      ":root",
+      flatten({
+        ss: compose(
+          steadySignal.foundation,
+          steadySignal.modes.appearance.light,
+          steadySignal.modes.sensory.standard,
+          steadySignal.modes.age.middle,
+          steadySignal.modes.communication["supported-text"],
+          steadySignal.modes.role.learner,
+        ),
+      }),
+    )
+  : "";
+const steadySignalAxisVars = steadySignal
+  ? [
+      ...Object.entries(steadySignal.modes.appearance).map(([name, values]) =>
+        cssBlock(`[data-ss-appearance="${name}"]`, flatten({ ss: values })),
+      ),
+      ...Object.entries(steadySignal.modes.sensory).map(([name, values]) =>
+        cssBlock(`[data-ss-sensory="${name}"]`, flatten({ ss: values })),
+      ),
+      ...Object.entries(steadySignal.modes.age).map(([name, values]) =>
+        cssBlock(`[data-ss-age="${name}"]`, flatten({ ss: values })),
+      ),
+      ...Object.entries(steadySignal.modes.communication).map(([name, values]) =>
+        cssBlock(`[data-ss-communication="${name}"]`, flatten({ ss: values })),
+      ),
+      ...Object.entries(steadySignal.modes.role).map(([name, values]) =>
+        cssBlock(`[data-ss-role="${name}"]`, flatten({ ss: values })),
+      ),
+    ]
+  : [];
+
 fs.mkdirSync(path.join(distDir, "css"), { recursive: true });
 fs.mkdirSync(path.join(distDir, "ts"), { recursive: true });
 fs.mkdirSync(path.join(distDir, "json"), { recursive: true });
@@ -135,9 +174,11 @@ const css = [
   ":root { color-scheme: light; }",
   cssBlock(":root", baseVars),
   sensoryRootDefaults,
+  steadySignalRootDefaults,
   ...themeVars,
   ...ageVars,
   ...sensoryVars,
+  ...steadySignalAxisVars,
   // Named motion keyframes. Each named animation is duration- and easing-token-driven.
   `@keyframes aivo-ai-thinking { 0% { opacity: 0.45; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } 100% { opacity: 0.45; transform: scale(1); } }`,
   `@keyframes aivo-lesson-reveal { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }`,
@@ -157,7 +198,13 @@ const css = [
   .filter(Boolean)
   .join("\n\n");
 
-const ts = `export const playfulCalmTokens = ${JSON.stringify(tokens, null, 2)} as const;\nexport type PlayfulCalmTokens = typeof playfulCalmTokens;\n`;
+const ts = `export const brandTokens = ${JSON.stringify(tokens, null, 2)} as const;
+/** @deprecated Use brandTokens or the Steady Signal resolver. */
+export const playfulCalmTokens = brandTokens;
+export type BrandTokens = typeof brandTokens;
+/** @deprecated Use BrandTokens. */
+export type PlayfulCalmTokens = BrandTokens;
+`;
 
 // IMPORTANT — keep var names in sync with what the CSS layer actually
 // emits.
@@ -255,10 +302,18 @@ const preset = `module.exports = {
           // mode-scoped status overrides). The brand-scale status
           // palette is intentional here; the semantic feedback palette
           // (--aivo-semantic-color-feedback-X) reads differently.
-          success: "var(--aivo-color-status-success)",
-          warning: "var(--aivo-color-status-warning)",
-          error:   "var(--aivo-color-status-error)",
-          info:    "var(--aivo-color-status-info)",
+          success:          "var(--aivo-color-status-success)",
+          "success-subtle": "var(--aivo-color-status-success-subtle)",
+          "success-strong": "var(--aivo-color-status-success-strong)",
+          warning:          "var(--aivo-color-status-warning)",
+          "warning-subtle": "var(--aivo-color-status-warning-subtle)",
+          "warning-strong": "var(--aivo-color-status-warning-strong)",
+          error:            "var(--aivo-color-status-error)",
+          "error-subtle":   "var(--aivo-color-status-error-subtle)",
+          "error-strong":   "var(--aivo-color-status-error-strong)",
+          info:             "var(--aivo-color-status-info)",
+          "info-subtle":    "var(--aivo-color-status-info-subtle)",
+          "info-strong":    "var(--aivo-color-status-info-strong)",
           // Domain status (each has subtle / default / strong / on)
           mastery: {
             "emerging-subtle":   "var(--aivo-domain-mastery-emerging-subtle)",
@@ -404,7 +459,7 @@ fs.writeFileSync(path.join(distDir, "ts", "tokens.ts"), ts);
 fs.writeFileSync(path.join(distDir, "json", "tokens.json"), JSON.stringify(tokens, null, 2));
 fs.writeFileSync(path.join(distDir, "tailwind", "preset.cjs"), preset);
 
-console.log("Playful Calm tokens built.");
+console.log("Brand tokens built.");
 
 // ── Sprint B7 — generated TypeScript from the tier-themes token source ──
 // tokens/modes/tier-themes.json is the ONLY place a designer edits the
@@ -479,3 +534,85 @@ export const TIER_THEME_DATA: Record<AgeTierId, TierThemeData> = ${JSON.stringif
 `,
 );
 console.log("Tier-theme TypeScript generated from tokens/modes/tier-themes.json.");
+
+fs.writeFileSync(
+  path.join(generatedDir, "steady-signal.ts"),
+  `// GENERATED by scripts/build-tokens.mjs from tokens/steady-signal.json.
+// DO NOT EDIT - change the JSON token source instead.
+
+export const STEADY_SIGNAL_DATA = ${JSON.stringify(steadySignal, null, 2)} as const;
+`,
+);
+console.log("Steady Signal TypeScript generated from tokens/steady-signal.json.");
+
+// ── Admin console palette — single source for apps/web-admin chart series ──
+// tokens/semantic/admin.json is the ONLY place these values are edited; this
+// emits BOTH the typed ADMIN_CHART_PALETTE module (consumed by
+// @aivo/admin-ui chart tones) and dist/css/admin-tokens.css (imported by
+// apps/web-admin/app/globals.css as the --admin-chart-* / --admin-login-sidebar
+// custom properties), so the admin palette cannot drift from brand.
+const adminTokens = JSON.parse(
+  fs.readFileSync(path.join(root, "tokens/semantic/admin.json"), "utf8"),
+);
+const adminChart = adminTokens.adminChart;
+const adminSurface = adminTokens.adminSurface;
+const adminStatus = adminTokens.adminStatus;
+
+fs.writeFileSync(
+  path.join(generatedDir, "admin-chart.ts"),
+  `// GENERATED by scripts/build-tokens.mjs from tokens/semantic/admin.json.
+// DO NOT EDIT — change the JSON token source instead.
+
+export const ADMIN_CHART_PALETTE = {
+  series: [
+    ${["1", "2", "3", "4", "5"].map((n) => JSON.stringify(adminChart[n])).join(",\n    ")},
+  ],
+  grid: ${JSON.stringify(adminChart.grid)},
+  axis: ${JSON.stringify(adminChart.axis)},
+  ink: ${JSON.stringify(adminChart.ink)},
+} as const;
+
+export const ADMIN_SURFACE = {
+  loginSidebar: ${JSON.stringify(adminSurface.loginSidebar)},
+  primary: ${JSON.stringify(adminSurface.primary)},
+  primaryStrong: ${JSON.stringify(adminSurface.primaryStrong)},
+  primaryFg: ${JSON.stringify(adminSurface.primaryFg)},
+} as const;
+
+export const ADMIN_STATUS = {
+  positive: { bg: ${JSON.stringify(adminStatus.positiveBg)}, fg: ${JSON.stringify(adminStatus.positiveFg)} },
+  warning: { bg: ${JSON.stringify(adminStatus.warningBg)}, fg: ${JSON.stringify(adminStatus.warningFg)} },
+  danger: { bg: ${JSON.stringify(adminStatus.dangerBg)}, fg: ${JSON.stringify(adminStatus.dangerFg)} },
+  neutral: { bg: ${JSON.stringify(adminStatus.neutralBg)}, fg: ${JSON.stringify(adminStatus.neutralFg)} },
+  info: { bg: ${JSON.stringify(adminStatus.infoBg)}, fg: ${JSON.stringify(adminStatus.infoFg)} },
+} as const;
+`,
+);
+
+const adminCss = `:root {
+  --admin-chart-1: ${adminChart["1"]};
+  --admin-chart-2: ${adminChart["2"]};
+  --admin-chart-3: ${adminChart["3"]};
+  --admin-chart-4: ${adminChart["4"]};
+  --admin-chart-5: ${adminChart["5"]};
+  --admin-chart-grid: ${adminChart.grid};
+  --admin-chart-axis: ${adminChart.axis};
+  --admin-chart-ink: ${adminChart.ink};
+  --admin-login-sidebar: ${adminSurface.loginSidebar};
+  --admin-primary: ${adminSurface.primary};
+  --admin-primary-strong: ${adminSurface.primaryStrong};
+  --admin-primary-fg: ${adminSurface.primaryFg};
+  --admin-status-positive-bg: ${adminStatus.positiveBg};
+  --admin-status-positive-fg: ${adminStatus.positiveFg};
+  --admin-status-warning-bg: ${adminStatus.warningBg};
+  --admin-status-warning-fg: ${adminStatus.warningFg};
+  --admin-status-danger-bg: ${adminStatus.dangerBg};
+  --admin-status-danger-fg: ${adminStatus.dangerFg};
+  --admin-status-neutral-bg: ${adminStatus.neutralBg};
+  --admin-status-neutral-fg: ${adminStatus.neutralFg};
+  --admin-status-info-bg: ${adminStatus.infoBg};
+  --admin-status-info-fg: ${adminStatus.infoFg};
+}
+`;
+fs.writeFileSync(path.join(distDir, "css", "admin-tokens.css"), adminCss);
+console.log("Admin console tokens generated from tokens/semantic/admin.json.");

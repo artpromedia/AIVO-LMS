@@ -25,6 +25,7 @@ import {
   UploadCloud,
   Bell,
   Wind,
+  MessageSquare,
 } from "lucide-react";
 import { Permission } from "@aivo/security";
 import type { RoleNavItem } from "@/components/layout/role-nav";
@@ -35,8 +36,11 @@ import { sessionHasPermission } from "@/lib/auth/permissions";
 export const PARENT_NAV: RoleNavItem[] = [
   { href: "/parent/home", label: "Home", icon: <Home className="h-4 w-4" /> },
   { href: "/parent/learners", label: "Learners", icon: <Users className="h-4 w-4" /> },
-  { href: "/parent/schedule", label: "Schedule", icon: <Calendar className="h-4 w-4" /> },
+  { href: "/parent/sessions", label: "Sessions", icon: <Sparkles className="h-4 w-4" /> },
+  { href: "/parent/calendar", label: "Calendar", icon: <Calendar className="h-4 w-4" /> },
+  { href: "/messages", label: "Messages", icon: <MessageSquare className="h-4 w-4" /> },
   { href: "/parent/reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
+  { href: "/parent/resources", label: "Resources", icon: <BookOpen className="h-4 w-4" /> },
   { href: "/parent/privacy", label: "Privacy", icon: <ShieldCheck className="h-4 w-4" /> },
   { href: "/notifications", label: "Notifications", icon: <Bell className="h-4 w-4" /> },
   { href: "/parent/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },

@@ -20,6 +20,24 @@ LANGUAGE_NAMES: dict[str, str] = {
 
 DEFAULT_LOCALE = "en"
 
+# English language name → base locale code. Reverse of LANGUAGE_NAMES plus a few
+# common aliases so a stored preference like "Spanish" or "Mandarin" (the
+# learner record persists free-text language NAMES, not always BCP-47 codes)
+# resolves to the right code.
+_LANGUAGE_NAME_TO_LOCALE: dict[str, str] = {
+    name.lower(): code for code, name in LANGUAGE_NAMES.items()
+}
+_LANGUAGE_NAME_TO_LOCALE.update(
+    {
+        "chinese": "zh",
+        "mandarin": "zh",
+        "simplified chinese": "zh",
+        "brazilian portuguese": "pt",
+        "portuguese (brazil)": "pt",
+        "castilian": "es",
+    }
+)
+
 
 def _normalize_locale(locale: str | None) -> str:
     """Normalise a locale string ("es-MX", "ES", " fr_CA ") to a base
@@ -29,6 +47,62 @@ def _normalize_locale(locale: str | None) -> str:
         return DEFAULT_LOCALE
     base = str(locale).strip().lower().replace("_", "-").split("-")[0]
     return base if base in LANGUAGE_NAMES else DEFAULT_LOCALE
+
+
+def _resolve_locale_opt(value: str | None) -> str | None:
+    """Resolve a BCP-47 locale code ("es-MX") OR an English language name
+    ("Spanish", "Chinese (Simplified)") to a base code in LANGUAGE_NAMES, or
+    None when the value is empty/unrecognised. Unlike _resolve_locale this does
+    NOT swallow unknown input as English — callers that have a fallback (a
+    stored language profile) need to know the value didn't resolve."""
+    if not value:
+        return None
+    raw = str(value).strip().lower()
+    if raw in _LANGUAGE_NAME_TO_LOCALE:
+        return _LANGUAGE_NAME_TO_LOCALE[raw]
+    base = raw.replace("_", "-").split("-")[0]
+    return base if base in LANGUAGE_NAMES else None
+
+
+def _resolve_locale(value: str | None) -> str:
+    """Resolve a BCP-47 locale code ("es-MX") OR an English language name
+    ("Spanish", "Chinese (Simplified)") to a base code in LANGUAGE_NAMES.
+    Falls back to DEFAULT_LOCALE for empty/unknown inputs. This is the
+    profile-aware sibling of _normalize_locale: the learner's stored
+    instruction language may be a human-readable name, not a code."""
+    return _resolve_locale_opt(value) or DEFAULT_LOCALE
+
+
+def _effective_locale(explicit: str | None, brain_context: dict) -> str:
+    """The locale the tutor should actually respond in. An explicit caller
+    locale (UI override) wins, BUT only when it resolves to a real language —
+    a non-empty typo must not silently revert a learner to English and
+    suppress their stored instruction language. Falls back to the learner's
+    stored language_profile, then DEFAULT_LOCALE."""
+    return (
+        _resolve_locale_opt(explicit)
+        or _resolve_locale_opt(_locale_from_language_profile(brain_context))
+        or DEFAULT_LOCALE
+    )
+
+
+def _locale_from_language_profile(brain_context: dict) -> str | None:
+    """Pull the learner's stored instruction language out of brain_context's
+    language_profile (as returned by brain-svc /context). Prefers the
+    explicit instruction language, then primary, then a Lingua dominant
+    language. Returns None when nothing is set."""
+    profile = brain_context.get("language_profile") if brain_context else None
+    if not isinstance(profile, dict):
+        return None
+    for key in (
+        "preferred_instruction_language",
+        "primary_language",
+        "dominant_language",
+    ):
+        value = profile.get(key)
+        if value:
+            return str(value)
+    return None
 
 
 def _build_language_directive(locale: str) -> str:
@@ -88,7 +162,11 @@ def build_tutor_system_prompt(
     persona = TUTOR_PERSONAS.get(tutor_sku, {})
     adaptation = FUNCTIONING_LEVEL_ADAPTATIONS.get(functioning_level, FUNCTIONING_LEVEL_ADAPTATIONS["STANDARD"])
 
-    normalized_locale = _normalize_locale(locale)
+    # An explicit (valid) locale (UI override) wins; otherwise honour the
+    # learner's stored instruction language from brain_context so a child
+    # enrolled in Spanish gets Spanish lessons even when the caller passes no
+    # locale (or an unrecognised one).
+    normalized_locale = _effective_locale(locale, brain_context)
 
     layer1 = persona.get("system_prompt", "You are a helpful AI tutor.")
 

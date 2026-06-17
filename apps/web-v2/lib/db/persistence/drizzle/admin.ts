@@ -6,8 +6,20 @@
  * code so the behaviour is byte-for-byte equivalent.
  */
 import { and, eq } from "drizzle-orm";
-import { webSchools, webClassrooms, webEnrollments, webTeacherAssignments } from "@aivo/db";
-import type { Classroom, Enrollment, School, TeacherAssignment } from "@/lib/db/types";
+import {
+  webSchools,
+  webClassrooms,
+  webEnrollments,
+  webTeacherAssignments,
+  webCalendarEvents,
+} from "@aivo/db";
+import type {
+  CalendarEvent,
+  Classroom,
+  Enrollment,
+  School,
+  TeacherAssignment,
+} from "@/lib/db/types";
 import type { AdminStore } from "../types";
 import { getDb } from "./client";
 
@@ -158,5 +170,38 @@ export const drizzleAdmin: AdminStore = {
       )
       .returning({ id: webTeacherAssignments.id });
     return deleted.length > 0;
+  },
+
+  async listCalendarEventsForTeacher(teacherUserId, tenantId, opts) {
+    const rows = await getDb()
+      .select()
+      .from(webCalendarEvents)
+      .where(
+        and(
+          eq(webCalendarEvents.tenantId, tenantId),
+          eq(webCalendarEvents.teacherUserId, teacherUserId),
+        ),
+      );
+    let arr = rows.map((r) => r.data as CalendarEvent);
+    if (opts?.fromIso) arr = arr.filter((e) => e.date >= opts.fromIso!);
+    arr = arr.sort((a, b) => a.date.localeCompare(b.date));
+    return opts?.limit ? arr.slice(0, opts.limit) : arr;
+  },
+
+  async upsertCalendarEvent(event) {
+    const db = getDb();
+    await db
+      .insert(webCalendarEvents)
+      .values({
+        id: event.id,
+        tenantId: event.tenantId,
+        teacherUserId: event.teacherUserId,
+        data: event,
+      })
+      .onConflictDoUpdate({
+        target: webCalendarEvents.id,
+        set: { tenantId: event.tenantId, teacherUserId: event.teacherUserId, data: event },
+      });
+    return event;
   },
 };

@@ -95,7 +95,7 @@ export function PlatformRollupTable({ rows }: { rows: RollupRow[] }) {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-aivo-surface-2 text-left">
+            <thead className="bg-iw-raised text-left">
               <tr>
                 <Th label="District" k="districtName" />
                 <Th label="Plan" k="plan" />

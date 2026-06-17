@@ -16,7 +16,7 @@ const VARIANT_CLASS: Record<ToastRecord["variant"], string> = {
   default: "border-iw-border bg-white",
   success:
     "border-[var(--aivo-domain-completion-complete-default)]/40 bg-[var(--aivo-domain-completion-complete-subtle)]",
-  danger: "border-iw-danger/40 bg-iw-danger/10",
+  danger: "border-iw-error/40 bg-iw-error/10",
 };
 
 /**

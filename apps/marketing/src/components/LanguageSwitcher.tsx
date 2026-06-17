@@ -22,7 +22,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className={`flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition text-sm font-medium text-slate-700 ${
+        className={`flex items-center gap-1.5 rounded-lg border border-iw-border bg-white hover:bg-iw-raised transition text-sm font-medium text-iw-ink ${
           compact ? "px-2 py-1.5" : "px-3 py-2"
         }`}
         aria-label="Change language"
@@ -33,7 +33,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
           <span>{localeNames[locale]}</span>
         )}
         <svg
-          className="w-3 h-3 text-slate-400"
+          className="w-3 h-3 text-iw-ink-muted"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -43,7 +43,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl border border-slate-200 shadow-lg z-50 py-1 max-h-72 overflow-y-auto">
+        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-iw-card border border-iw-border shadow-soft-3 z-50 py-1 max-h-72 overflow-y-auto">
           {locales.map((l) => (
             <button
               key={l}
@@ -51,15 +51,15 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
                 setLocale(l as Locale);
                 setOpen(false);
               }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-slate-50 transition ${
-                l === locale ? "bg-purple-50 text-purple-700 font-semibold" : "text-slate-700"
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-iw-raised transition ${
+                l === locale ? "bg-iw-purple-100 text-iw-primary font-semibold" : "text-iw-ink"
               }`}
             >
               <span className="w-6 text-xs font-semibold uppercase opacity-60">{l}</span>
               <span>{localeNames[l]}</span>
               {l === locale && (
                 <svg
-                  className="w-4 h-4 ml-auto text-purple-600"
+                  className="w-4 h-4 ml-auto text-iw-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

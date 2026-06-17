@@ -42,7 +42,7 @@ export function AuditTable({
             tabIndex={0}
             role="button"
             aria-label={t("open_detail", { action: e.action })}
-            className="cursor-pointer border-t border-aivo-border hover:bg-aivo-surface-2 focus:bg-aivo-surface-2 focus:outline-none"
+            className="cursor-pointer border-t border-iw-border hover:bg-iw-raised focus:bg-iw-raised focus:outline-none"
             onClick={() => onSelect(e)}
             onKeyDown={(ev) => {
               if (ev.key === "Enter" || ev.key === " ") {

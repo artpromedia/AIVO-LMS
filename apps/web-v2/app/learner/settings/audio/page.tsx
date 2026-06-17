@@ -21,7 +21,7 @@ export default async function Page() {
         user={{ displayName: session.displayName, email: session.email }}
       >
         <PageHeader title={t("no_learner_title")} />
-        <Card className="p-[var(--aivo-density-card-pad)] text-aivo-muted">
+        <Card className="p-[var(--aivo-density-card-pad)] text-iw-ink-muted">
           {t("no_learner_body")}
         </Card>
       </AppShell>

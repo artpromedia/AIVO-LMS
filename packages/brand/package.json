@@ -19,6 +19,7 @@
       "default": "./dist/index.js"
     },
     "./tokens.css": "./dist/css/tokens.css",
+    "./admin-tokens.css": "./dist/css/admin-tokens.css",
     "./tokens.json": "./dist/json/tokens.json",
     "./tailwind-preset": "./dist/tailwind/preset.cjs"
   },

@@ -58,7 +58,7 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
         </label>
         <select
           id="scope"
-          className="mt-1 w-full rounded border border-aivo-border bg-aivo-surface-1 p-2"
+          className="mt-1 w-full rounded border border-iw-border bg-iw-card p-2"
           value={scope}
           onChange={(e) => setScope(e.target.value as Scope)}
         >
@@ -75,7 +75,7 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
           </label>
           <select
             id="learner"
-            className="mt-1 w-full rounded border border-aivo-border bg-aivo-surface-1 p-2"
+            className="mt-1 w-full rounded border border-iw-border bg-iw-card p-2"
             value={learnerId}
             onChange={(e) => setLearnerId(e.target.value)}
             required
@@ -96,7 +96,7 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
         </label>
         <textarea
           id="notes"
-          className="mt-1 w-full rounded border border-aivo-border bg-aivo-surface-1 p-2"
+          className="mt-1 w-full rounded border border-iw-border bg-iw-card p-2"
           rows={3}
           maxLength={2000}
           value={notes}
@@ -113,14 +113,14 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
         <input
           id="confirm"
           type="text"
-          className="mt-1 w-full rounded border border-aivo-border bg-aivo-surface-1 p-2"
+          className="mt-1 w-full rounded border border-iw-border bg-iw-card p-2"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           autoComplete="off"
         />
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-iw-error-strong">{error}</p>}
       <Button type="submit" disabled={busy || confirm !== "DELETE"}>
         {busy ? "Submitting…" : "Request deletion"}
       </Button>

@@ -82,25 +82,25 @@ export default function CareersPage() {
       accentColor={MARKETING_ACCENTS.emeraldDeep}
     >
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-8">
           {t("why_work_heading")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {PERKS.map((perk) => (
             <div
               key={perk.title}
-              className="bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-md transition"
+              className="bg-white rounded-iw-card border border-iw-border p-6 hover:shadow-soft-3 transition"
             >
               <div className="text-3xl mb-3">{perk.icon}</div>
-              <h3 className="text-lg font-heading font-bold text-slate-900 mb-2">{perk.title}</h3>
-              <p className="text-sm text-slate-500 font-body leading-relaxed">{perk.description}</p>
+              <h3 className="text-lg font-heading font-bold text-iw-ink mb-2">{perk.title}</h3>
+              <p className="text-sm text-iw-ink-muted font-body leading-relaxed">{perk.description}</p>
             </div>
           ))}
         </div>
       </section>
 
       <section>
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-8">
           {t("open_positions_heading")}
         </h2>
         <div className="space-y-8">
@@ -108,26 +108,26 @@ export default function CareersPage() {
             <div key={dept.name}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dept.color }} />
-                <h3 className="text-lg font-heading font-bold text-slate-900">{dept.name}</h3>
-                <span className="text-sm text-slate-400 font-body">({dept.roles.length} open)</span>
+                <h3 className="text-lg font-heading font-bold text-iw-ink">{dept.name}</h3>
+                <span className="text-sm text-iw-ink-muted font-body">({dept.roles.length} open)</span>
               </div>
               <div className="space-y-3">
                 {dept.roles.map((role) => (
                   <div
                     key={role.title}
-                    className="bg-white rounded-xl border border-slate-100 p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:shadow-md transition hover:border-slate-200"
+                    className="bg-white rounded-iw-card border border-iw-border p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:shadow-soft-3 transition hover:border-iw-border"
                   >
                     <div>
-                      <h4 className="font-heading font-bold text-slate-900">{role.title}</h4>
+                      <h4 className="font-heading font-bold text-iw-ink">{role.title}</h4>
                       <div className="flex items-center gap-3 mt-1">
-                        <span className="text-sm text-slate-400 font-body">{role.type}</span>
-                        <span className="text-slate-200">|</span>
-                        <span className="text-sm text-slate-400 font-body">{role.location}</span>
+                        <span className="text-sm text-iw-ink-muted font-body">{role.type}</span>
+                        <span className="text-iw-border">|</span>
+                        <span className="text-sm text-iw-ink-muted font-body">{role.location}</span>
                       </div>
                     </div>
                     <a
                       href={`mailto:careers@aivolearning.com?subject=Application: ${role.title}`}
-                      className="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-white transition hover:opacity-90 flex-shrink-0"
+                      className="inline-flex items-center px-5 py-2 rounded-iw-control text-sm font-bold text-white transition hover:opacity-90 flex-shrink-0"
                       style={{ backgroundColor: dept.color }}
                     >
                       {t("apply_now")}
@@ -140,17 +140,17 @@ export default function CareersPage() {
         </div>
       </section>
 
-      <div className="mt-16 p-8 rounded-3xl bg-emerald-50 border border-emerald-100 text-center">
-        <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">
+      <div className="mt-16 p-8 rounded-iw-card-lg bg-iw-teal-50 border border-iw-teal-100 text-center">
+        <h3 className="text-xl font-heading font-bold text-iw-ink mb-2">
           {t("no_role_heading")}
         </h3>
-        <p className="text-slate-600 font-body mb-6">
+        <p className="text-iw-ink-muted font-body mb-6">
           We are always interested in hearing from talented people passionate about education and
           technology.
         </p>
         <a
           href="mailto:careers@aivolearning.com?subject=General Application"
-          className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition shadow-lg"
+          className="inline-flex items-center gap-2 px-8 py-3 rounded-iw-control bg-iw-teal-600 text-white font-bold hover:bg-iw-teal-700 transition shadow-soft-3"
         >
           {t("send_general_application")}
         </a>

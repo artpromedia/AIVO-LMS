@@ -17,7 +17,7 @@ import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { useAuth } from "@/hooks/useAuth";
 import { isBiometricUnlockArmed, getBiometricSupport } from "@/lib/biometric";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Button } from "@/components/ui";
@@ -238,7 +238,7 @@ export default function LoginScreen() {
                 loginMode === "learner" ? { backgroundColor: palette.primary } : null,
               ]}
             >
-              <Text style={[styles.modeText, { color: loginMode === "learner" ? "#ffffff" : palette.inkMuted }]}>Learner — PIN only</Text>
+              <Text style={[styles.modeText, { color: loginMode === "learner" ? colors.white : palette.inkMuted }]}>Learner — PIN only</Text>
             </Pressable>
             <Pressable
               accessibilityRole="button"
@@ -248,7 +248,7 @@ export default function LoginScreen() {
                 loginMode === "adult" ? { backgroundColor: palette.primary } : null,
               ]}
             >
-              <Text style={[styles.modeText, { color: loginMode === "adult" ? "#ffffff" : palette.inkMuted }]}>All other users</Text>
+              <Text style={[styles.modeText, { color: loginMode === "adult" ? colors.white : palette.inkMuted }]}>All other users</Text>
             </Pressable>
           </View>
 
@@ -371,7 +371,7 @@ export default function LoginScreen() {
                 value={coppaConsent}
                 onValueChange={setCoppaConsent}
                 trackColor={{ false: palette.border, true: palette.accentSoft }}
-                thumbColor={coppaConsent ? palette.primary : "#f4f3f4"}
+                thumbColor={coppaConsent ? palette.primary : colors.background}
               />
               <Text style={[styles.switchLabel, { color: palette.inkMuted }]}>
                 {t("auth.coppaConsent")}
@@ -382,7 +382,7 @@ export default function LoginScreen() {
                 value={termsAccepted}
                 onValueChange={setTermsAccepted}
                 trackColor={{ false: palette.border, true: palette.accentSoft }}
-                thumbColor={termsAccepted ? palette.primary : "#f4f3f4"}
+                thumbColor={termsAccepted ? palette.primary : colors.background}
               />
               <Text style={[styles.switchLabel, { color: palette.inkMuted }]}>
                 {t("auth.termsConsent")}
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   errorText: {
-    color: "#dc2626",
+    color: colors.error,
     fontSize: 13,
     fontFamily: fontFamilies.bodySemiBold,
     textAlign: "center",

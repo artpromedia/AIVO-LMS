@@ -14,6 +14,8 @@ import {
   getIdentityBearer,
   setLearnerPinViaIdentity,
 } from "@/lib/bff/identity-learners";
+import { provisionAndLink } from "@/lib/bff/learner-unification";
+import { getLearner } from "@/lib/db/repos";
 import { advanceOnboarding } from "@/lib/onboarding-state";
 import {
   isValidPin,
@@ -84,7 +86,32 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     // working without standing up the service stack.
     const bearer = await getIdentityBearer();
     if (isIdentitySvcEnabled() && bearer) {
-      const r = await setLearnerPinViaIdentity(bearer, learnerId, pin);
+      // Cross-platform unification (Task #34): identity-svc keys learners by
+      // its own UUID, not the web `lrn_*` id. Resolve (or backfill) the link
+      // so the PIN lands on the canonical learner instead of 404-ing.
+      const profile = await getLearner(learnerId, auth.session.tenantId);
+      const linked = profile
+        ? await provisionAndLink(bearer, profile, auth.session.tenantId, {
+            parentUserId: auth.session.userId,
+          })
+        : null;
+      const identityLearnerId = linked?.identityLearnerId;
+      if (!identityLearnerId) {
+        // identity-svc is the canonical PIN store the mobile pin-login flow
+        // verifies. When the service is enabled and we have a bearer but cannot
+        // resolve/provision the canonical learner, we must NOT write to the
+        // in-memory store and report success — that would tell the parent the
+        // PIN is set while mobile login keeps failing (a silent cross-platform
+        // desync). Surface a retriable upstream error instead. The in-memory
+        // path below is reserved for dev/mock mode (identity-svc disabled or no
+        // bearer).
+        return upstreamFail(
+          requestId,
+          502,
+          "could not resolve the learner in identity-svc; please retry",
+        );
+      }
+      const r = await setLearnerPinViaIdentity(bearer, identityLearnerId, pin);
       if (!r.ok) return upstreamFail(requestId, r.status, r.error);
       await advanceOnboarding(learnerId, auth.session.tenantId, "pin_created", auth.session.userId, { via: "identity-svc" });
       audit(auth.session, "learner.pin.set", requestId, {

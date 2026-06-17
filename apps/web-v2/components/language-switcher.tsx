@@ -78,7 +78,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
       {open ? (
         <ul
           role="listbox"
-          className="absolute right-0 z-50 mt-2 max-h-80 w-52 overflow-auto rounded-2xl border border-iw-border bg-iw-bg p-1 shadow-soft-2"
+          className="absolute right-0 z-50 mt-2 max-h-80 w-52 overflow-auto rounded-iw-card border border-iw-border bg-iw-bg p-1 shadow-soft-2"
         >
           {locales.map((locale) => {
             const isActive = locale === current;
@@ -89,7 +89,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
                   role="option"
                   aria-selected={isActive}
                   onClick={() => selectLocale(locale)}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium transition ${
+                  className={`flex w-full items-center gap-3 rounded-iw-control px-3 py-2 text-left text-sm font-medium transition ${
                     isActive
                       ? "bg-iw-warm-soft text-iw-ink"
                       : "text-iw-ink-muted hover:bg-iw-warm-soft hover:text-iw-ink"

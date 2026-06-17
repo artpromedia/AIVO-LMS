@@ -10,21 +10,21 @@ const BRAIN_FEATURES = [
 ];
 
 const METRICS = [
-  { labelKey: "metric_math" as const, value: 78, color: "bg-violet-500" },
-  { labelKey: "metric_reading" as const, value: 64, color: "bg-emerald-500" },
-  { labelKey: "metric_sensory" as const, value: 92, color: "bg-amber-500" },
-  { labelKey: "metric_social" as const, value: 71, color: "bg-pink-500" },
+  { labelKey: "metric_math" as const, value: 78, color: "bg-iw-purple-500" },
+  { labelKey: "metric_reading" as const, value: 64, color: "bg-iw-success" },
+  { labelKey: "metric_sensory" as const, value: 92, color: "bg-iw-warm" },
+  { labelKey: "metric_social" as const, value: 71, color: "bg-iw-primary" },
 ];
 
 export function BrainClone() {
   const t = useTranslations("marketing.brain_clone");
 
   return (
-    <section className="py-24 bg-gradient-to-br from-primary via-purple-700 to-primary-dark relative overflow-hidden text-white">
+    <section className="py-24 bg-gradient-to-br from-primary via-iw-purple-700 to-primary-dark relative overflow-hidden text-white">
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-10 right-20 w-64 h-64 bg-amber-400 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
+        <div className="absolute top-10 right-20 w-64 h-64 bg-iw-warm rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
         <div
-          className="absolute bottom-10 left-20 w-72 h-72 bg-cyan-400 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          className="absolute bottom-10 left-20 w-72 h-72 bg-iw-accent rounded-full blur-3xl animate-blob motion-reduce:animate-none"
           style={{ animationDelay: "6s" }}
         />
       </div>
@@ -42,7 +42,7 @@ export function BrainClone() {
           <div className="grid sm:grid-cols-2 gap-4 pt-2">
             {BRAIN_FEATURES.map((f) => (
               <div key={f.titleKey} className="flex gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-iw-control bg-white/15 backdrop-blur flex items-center justify-center shrink-0">
                   <f.Icon className="w-5 h-5" aria-hidden="true" />
                 </div>
                 <div>
@@ -55,29 +55,29 @@ export function BrainClone() {
         </div>
 
         <div className="relative">
-          <div className="bg-white rounded-3xl p-8 shadow-2xl text-slate-900 animate-float-slow motion-reduce:animate-none">
+          <div className="bg-white rounded-iw-card-lg p-8 shadow-soft-5 text-iw-ink animate-float-slow motion-reduce:animate-none">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white">
+              <div className="w-12 h-12 rounded-iw-control bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white">
                 <Brain className="w-6 h-6" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <p className="text-xs font-bold text-iw-ink-muted uppercase tracking-wider">
                   {t("demo_label")}
                 </p>
                 <p className="font-heading font-bold text-lg">{t("demo_name")}</p>
               </div>
-              <span className="ml-auto inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs">
+              <span className="ml-auto inline-flex items-center px-3 py-1 rounded-iw-chip bg-iw-success-subtle text-iw-success-strong font-bold text-xs">
                 {t("demo_live")}
               </span>
             </div>
             <div className="space-y-4">
               {METRICS.map((m) => (
                 <div key={m.labelKey}>
-                  <div className="flex justify-between text-sm font-bold text-slate-700 mb-1.5">
+                  <div className="flex justify-between text-sm font-bold text-iw-ink mb-1.5">
                     <span>{t(m.labelKey)}</span>
                     <span>{m.value}%</span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="h-2 rounded-full bg-iw-raised overflow-hidden">
                     <div
                       className={`h-full ${m.color} rounded-full`}
                       style={{ width: `${m.value}%` }}
@@ -86,9 +86,9 @@ export function BrainClone() {
                 </div>
               ))}
             </div>
-            <div className="mt-6 pt-5 border-t border-slate-100 flex items-center gap-3 text-sm">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse motion-reduce:animate-none" />
-              <span className="font-bold text-slate-700">{t("demo_status")}</span>
+            <div className="mt-6 pt-5 border-t border-iw-border flex items-center gap-3 text-sm">
+              <div className="w-2 h-2 rounded-full bg-iw-success animate-pulse motion-reduce:animate-none" />
+              <span className="font-bold text-iw-ink">{t("demo_status")}</span>
             </div>
           </div>
         </div>

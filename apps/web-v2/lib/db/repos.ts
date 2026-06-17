@@ -5805,6 +5805,7 @@ export async function summarizeAudioUsage(tenantId?: string): Promise<{
 // ===== Sprint 29: Rostering / SIS / Sync / Notifications =====
 
 import type {
+  CalendarEvent,
   Classroom,
   Course,
   DigestSchedule,
@@ -5878,6 +5879,32 @@ export async function updateClassroom(
 
 export async function listEnrollments(classroomId: string): Promise<Enrollment[]> {
   return getPersistence().admin.listEnrollmentsForClassroom(classroomId);
+}
+
+/** Sprint A4: teacher personal-calendar events, ascending by date. */
+export async function listCalendarEventsForTeacher(
+  teacherUserId: string,
+  tenantId: string,
+  opts?: { fromIso?: string; limit?: number },
+): Promise<CalendarEvent[]> {
+  return getPersistence().admin.listCalendarEventsForTeacher(teacherUserId, tenantId, opts);
+}
+
+export async function upsertCalendarEvent(
+  input: Omit<CalendarEvent, "id" | "createdAt"> & { id?: string; createdAt?: string },
+): Promise<CalendarEvent> {
+  const rec: CalendarEvent = {
+    id: input.id ?? newId("cal"),
+    createdAt: input.createdAt ?? nowIso(),
+    tenantId: input.tenantId,
+    teacherUserId: input.teacherUserId,
+    title: input.title,
+    subtitle: input.subtitle,
+    type: input.type,
+    date: input.date,
+    timeLabel: input.timeLabel,
+  };
+  return getPersistence().admin.upsertCalendarEvent(rec);
 }
 
 export async function createEnrollment(

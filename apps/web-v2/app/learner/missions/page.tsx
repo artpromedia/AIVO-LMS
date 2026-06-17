@@ -51,7 +51,7 @@ export default async function Page() {
         {assignments.map((a) => (
           <Card key={a.id} className="p-4">
             <p className="font-medium">{a.title}</p>
-            <p className="text-sm text-aivo-ink-soft">
+            <p className="text-sm text-iw-ink-muted">
               {t("from_teacher", {
                 subject: subjectMap.get(a.subjectId)?.name ?? t("subject_fallback"),
               })}
@@ -63,11 +63,11 @@ export default async function Page() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t("lesson_in_progress")}</p>
-                <p className="text-sm text-aivo-ink-soft">{tc("source", { source: r.source })}</p>
+                <p className="text-sm text-iw-ink-muted">{tc("source", { source: r.source })}</p>
               </div>
               <Link
                 href={`/learner/lesson-runs/${r.id}`}
-                className="text-xs font-medium text-aivo-primary hover:underline"
+                className="text-xs font-medium text-iw-primary hover:underline"
               >
                 {t("continue")}
               </Link>
@@ -82,7 +82,7 @@ export default async function Page() {
             action={
               <Link
                 href="/learner/home"
-                className="text-sm font-medium text-aivo-primary hover:underline"
+                className="text-sm font-medium text-iw-primary hover:underline"
               >
                 {t("go_today")}
               </Link>

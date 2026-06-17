@@ -95,7 +95,7 @@ export default function DevicePermissionsPage() {
                 {submitting ? t("saving") : t("continue")}
               </button>
               {error ? (
-                <p role="alert" className="text-xs text-aivo-danger text-center">
+                <p role="alert" className="text-xs text-iw-error text-center">
                   {error}
                 </p>
               ) : null}

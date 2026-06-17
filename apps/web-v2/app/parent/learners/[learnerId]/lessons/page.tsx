@@ -58,7 +58,7 @@ export default async function ParentLessonsPage({
         }
       />
       {summaries.length === 0 ? (
-        <Card className="p-6 text-aivo-ink-soft">
+        <Card className="p-6 text-iw-ink-muted">
           No completed lessons yet. Recaps will appear here as {learner.displayName} finishes
           lessons.
         </Card>
@@ -72,7 +72,7 @@ export default async function ParentLessonsPage({
               <Card key={s.id} className="p-[var(--aivo-density-card-pad)]">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <p className="text-xs uppercase text-aivo-ink-soft">
+                    <p className="text-xs uppercase text-iw-ink-muted">
                       {subject?.name ?? "Learning"} · {skill?.name ?? "Skill"}
                     </p>
                     <p className="font-semibold">{s.headline}</p>
@@ -84,21 +84,21 @@ export default async function ParentLessonsPage({
                 </div>
                 <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
                   <div>
-                    <dt className="text-aivo-ink-soft">{t("worked_on")}</dt>
+                    <dt className="text-iw-ink-muted">{t("worked_on")}</dt>
                     <dd>{s.highlights.whatWorkedOn}</dd>
                   </div>
                   <div>
-                    <dt className="text-aivo-ink-soft">{t("went_well")}</dt>
+                    <dt className="text-iw-ink-muted">{t("went_well")}</dt>
                     <dd>{s.highlights.wentWell}</dd>
                   </div>
                   {s.highlights.neededHelp && (
                     <div>
-                      <dt className="text-aivo-ink-soft">{t("needed_help")}</dt>
+                      <dt className="text-iw-ink-muted">{t("needed_help")}</dt>
                       <dd>{s.highlights.neededHelp}</dd>
                     </div>
                   )}
                   <div>
-                    <dt className="text-aivo-ink-soft">{t("up_next")}</dt>
+                    <dt className="text-iw-ink-muted">{t("up_next")}</dt>
                     <dd>{s.highlights.recommendedNext}</dd>
                   </div>
                 </dl>
@@ -114,15 +114,15 @@ export default async function ParentLessonsPage({
                 {s.tutorNote ? (
                   <div
                     data-testid="tutor-note"
-                    className="mt-3 rounded-md bg-aivo-primary-soft p-3 text-sm"
+                    className="mt-3 rounded-md bg-iw-accent-soft p-3 text-sm"
                   >
-                    <p className="text-xs font-medium uppercase text-aivo-ink-soft">
+                    <p className="text-xs font-medium uppercase text-iw-ink-muted">
                       {t("tutor_note")}
                     </p>
                     <p className="mt-1">{s.tutorNote}</p>
                   </div>
                 ) : null}
-                <p className="mt-3 text-xs text-aivo-ink-soft">
+                <p className="mt-3 text-xs text-iw-ink-muted">
                   {new Date(s.createdAt).toLocaleString()}
                 </p>
               </Card>

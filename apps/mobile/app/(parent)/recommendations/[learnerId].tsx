@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 16, fontWeight: "700", flexShrink: 1 },
   muted: { color: colors.textSecondary, fontSize: 14 },
   proposed: { fontSize: 14, fontWeight: "600", marginTop: spacing.xs },
-  error: { color: "#b91c1c", fontSize: 14 },
+  error: { color: colors.error, fontSize: 14 },
   inlineRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: colors.border,
     borderRadius: radius.sm ?? 8,
     paddingHorizontal: spacing.sm,
     paddingVertical: 6,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   buttonGhost: { backgroundColor: "transparent" },
   buttonDisabled: { opacity: 0.5 },
-  buttonLabel: { color: "#fff", fontWeight: "700" },
+  buttonLabel: { color: colors.white, fontWeight: "700" },
   buttonLabelAlt: { color: colors.primary },
   historyTitle: { fontWeight: "700", marginBottom: spacing.xs },
   historyRow: {

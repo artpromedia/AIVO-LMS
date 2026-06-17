@@ -35,7 +35,7 @@ const buttonVariants = cva(
         soft: "bg-iw-accent-soft text-iw-ink hover:opacity-90",
         // Destructive — uses the semantic danger token from the base preset
         // (still token-driven, no raw hex).
-        danger: "bg-aivo-danger text-aivo-primary-fg hover:opacity-90",
+        danger: "bg-iw-error text-iw-primary-fg hover:opacity-90",
       },
       size: {
         sm: "h-9 px-4 text-xs",

@@ -31,10 +31,6 @@ args = "Web App"
 task = "workflow.run"
 args = "Marketing Site"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Mockup Sandbox"
-
 [[workflows.workflow]]
 name = "Brain Service"
 author = "agent"
@@ -81,20 +77,7 @@ outputType = "console"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "bash scripts/start-marketing.sh"
-waitForPort = 5173
-
-[[workflows.workflow]]
-name = "Mockup Sandbox"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-isCanvasWorkflow = true
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd artifacts/mockup-sandbox && PORT=8000 BASE_PATH=/mockup-canvas/ exec ./node_modules/.bin/vite --config vite.config.ts --host 0.0.0.0 --port 8000"
-waitForPort = 8000
+waitForPort = 3003
 
 [[ports]]
 localPort = 3001
@@ -227,4 +210,4 @@ build = ["bash", "-c", "rm -rf node_modules && pnpm install --frozen-lockfile --
 
 [postMerge]
 path = "scripts/post-merge.sh"
-timeoutMs = 1500000
+timeoutMs = 1800000

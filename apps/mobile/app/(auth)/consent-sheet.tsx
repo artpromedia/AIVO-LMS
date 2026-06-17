@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   ctaLabel: {
     fontFamily: fontFamilies.bodyBold,
     fontSize: 16,
-    color: "#ffffff",
+    color: colors.white,
   },
   cancelBtn: { alignItems: "center", paddingVertical: spacing.md },
   cancelLabel: {

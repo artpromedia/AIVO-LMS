@@ -42,7 +42,7 @@ const FAQ_INDEXES = [1, 2, 3, 4, 5] as const;
 
 const CHECK = (
   <svg
-    className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600"
+    className="mt-0.5 h-4 w-4 flex-shrink-0 text-iw-success"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -68,26 +68,26 @@ export default async function PricingPage() {
       }}
     >
       <section aria-labelledby="family-pricing-heading">
-        <h2 id="family-pricing-heading" className="font-heading text-2xl font-bold text-slate-900">
+        <h2 id="family-pricing-heading" className="font-heading text-2xl font-bold text-iw-ink">
           {t("for_families")}
         </h2>
-        <p className="mt-1 font-body text-slate-600">{t("family_disclaimer")}</p>
+        <p className="mt-1 font-body text-iw-ink-muted">{t("family_disclaimer")}</p>
         <div className="mt-6 grid grid-cols-1 gap-5 sm:max-w-md">
-          <article className="relative flex flex-col rounded-3xl border border-purple-300 bg-gradient-to-b from-purple-50 to-white p-6 shadow-sm">
-            <span className="absolute -top-3 left-6 rounded-full bg-purple-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
+          <article className="relative flex flex-col rounded-iw-card-lg border border-iw-purple-300 bg-gradient-to-b from-iw-purple-50 to-white p-6 shadow-soft-1">
+            <span className="absolute -top-3 left-6 rounded-iw-chip bg-iw-primary px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
               {t("family_badge")}
             </span>
-            <h3 className="font-heading text-xl font-bold text-slate-900">{t("family_name")}</h3>
-            <p className="mt-1 font-body text-sm text-slate-600">{t("family_desc")}</p>
+            <h3 className="font-heading text-xl font-bold text-iw-ink">{t("family_name")}</h3>
+            <p className="mt-1 font-body text-sm text-iw-ink-muted">{t("family_desc")}</p>
             <div className="mt-4">
-              <span className="font-heading text-3xl font-bold text-slate-900">
+              <span className="font-heading text-3xl font-bold text-iw-ink">
                 {t("family_price")}
               </span>
-              <span className="ml-1 text-sm text-slate-500">{t("family_cadence")}</span>
+              <span className="ml-1 text-sm text-iw-ink-muted">{t("family_cadence")}</span>
             </div>
             <ul className="mt-4 flex-1 space-y-2">
               {FAMILY_FEATURE_KEYS.map((k) => (
-                <li key={k} className="flex items-start gap-2 text-sm font-body text-slate-700">
+                <li key={k} className="flex items-start gap-2 text-sm font-body text-iw-ink">
                   {CHECK}
                   <span>{t(k)}</span>
                 </li>
@@ -95,7 +95,7 @@ export default async function PricingPage() {
             </ul>
             <Link
               href={`${WEB_APP_URL}/signup?plan=family`}
-              className="mt-6 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-purple-600 px-5 py-2.5 font-bold text-white shadow-sm transition hover:from-primary-dark hover:to-purple-700"
+              className="mt-6 inline-flex items-center justify-center rounded-iw-control bg-gradient-to-r from-primary to-iw-purple-600 px-5 py-2.5 font-bold text-white shadow-soft-1 transition hover:from-primary-dark hover:to-iw-purple-700"
             >
               {t("family_cta")}
             </Link>
@@ -104,17 +104,17 @@ export default async function PricingPage() {
       </section>
 
       <section aria-labelledby="institutional-heading" className="mt-14">
-        <h2 id="institutional-heading" className="font-heading text-2xl font-bold text-slate-900">
+        <h2 id="institutional-heading" className="font-heading text-2xl font-bold text-iw-ink">
           {t("for_schools")}
         </h2>
-        <p className="mt-1 font-body text-slate-600">{t("institutional_intro")}</p>
+        <p className="mt-1 font-body text-iw-ink-muted">{t("institutional_intro")}</p>
         <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
-          <article className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="font-heading text-xl font-bold text-slate-900">{t("school_name")}</h3>
-            <p className="mt-1 font-body text-sm text-slate-600">{t("school_desc")}</p>
+          <article className="flex flex-col rounded-iw-card-lg border border-iw-border bg-white p-6 shadow-soft-1">
+            <h3 className="font-heading text-xl font-bold text-iw-ink">{t("school_name")}</h3>
+            <p className="mt-1 font-body text-sm text-iw-ink-muted">{t("school_desc")}</p>
             <ul className="mt-4 flex-1 space-y-2">
               {SCHOOL_FEATURE_KEYS.map((k) => (
-                <li key={k} className="flex items-start gap-2 text-sm font-body text-slate-700">
+                <li key={k} className="flex items-start gap-2 text-sm font-body text-iw-ink">
                   {CHECK}
                   <span>{t(k)}</span>
                 </li>
@@ -122,17 +122,17 @@ export default async function PricingPage() {
             </ul>
             <Link
               href="/demo"
-              className="mt-6 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-purple-600 px-5 py-2.5 font-bold text-white shadow-sm transition hover:from-primary-dark hover:to-purple-700"
+              className="mt-6 inline-flex items-center justify-center rounded-iw-control bg-gradient-to-r from-primary to-iw-purple-600 px-5 py-2.5 font-bold text-white shadow-soft-1 transition hover:from-primary-dark hover:to-iw-purple-700"
             >
               {t("school_cta")}
             </Link>
           </article>
-          <article className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="font-heading text-xl font-bold text-slate-900">{t("district_name")}</h3>
-            <p className="mt-1 font-body text-sm text-slate-600">{t("district_desc")}</p>
+          <article className="flex flex-col rounded-iw-card-lg border border-iw-border bg-white p-6 shadow-soft-1">
+            <h3 className="font-heading text-xl font-bold text-iw-ink">{t("district_name")}</h3>
+            <p className="mt-1 font-body text-sm text-iw-ink-muted">{t("district_desc")}</p>
             <ul className="mt-4 flex-1 space-y-2">
               {DISTRICT_FEATURE_KEYS.map((k) => (
-                <li key={k} className="flex items-start gap-2 text-sm font-body text-slate-700">
+                <li key={k} className="flex items-start gap-2 text-sm font-body text-iw-ink">
                   {CHECK}
                   <span>{t(k)}</span>
                 </li>
@@ -140,7 +140,7 @@ export default async function PricingPage() {
             </ul>
             <Link
               href="/demo"
-              className="mt-6 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-purple-600 px-5 py-2.5 font-bold text-white shadow-sm transition hover:from-primary-dark hover:to-purple-700"
+              className="mt-6 inline-flex items-center justify-center rounded-iw-control bg-gradient-to-r from-primary to-iw-purple-600 px-5 py-2.5 font-bold text-white shadow-soft-1 transition hover:from-primary-dark hover:to-iw-purple-700"
             >
               {t("district_cta")}
             </Link>
@@ -149,14 +149,14 @@ export default async function PricingPage() {
       </section>
 
       <section aria-labelledby="pricing-faq-heading" className="mt-14">
-        <h2 id="pricing-faq-heading" className="font-heading text-2xl font-bold text-slate-900">
+        <h2 id="pricing-faq-heading" className="font-heading text-2xl font-bold text-iw-ink">
           {t("pricing_faq_heading")}
         </h2>
         <dl className="mt-5 space-y-4">
           {FAQ_INDEXES.map((i) => (
-            <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5">
-              <dt className="font-heading text-base font-bold text-slate-900">{t(`faq_${i}_q`)}</dt>
-              <dd className="mt-1 font-body text-slate-700">{t(`faq_${i}_a`)}</dd>
+            <div key={i} className="rounded-iw-card border border-iw-border bg-white p-5">
+              <dt className="font-heading text-base font-bold text-iw-ink">{t(`faq_${i}_q`)}</dt>
+              <dd className="mt-1 font-body text-iw-ink">{t(`faq_${i}_a`)}</dd>
             </div>
           ))}
         </dl>

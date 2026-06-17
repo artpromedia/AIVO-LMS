@@ -54,8 +54,8 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
     if (!preview.ok) {
       return (
         <Shell heading={t("accept_heading")}>
-          <Card className="border-rose-200 bg-rose-50 p-4">
-            <p className="text-sm text-aivo-ink">{preview.error}</p>
+          <Card className="border-iw-error bg-iw-error-subtle p-4">
+            <p className="text-sm text-iw-ink">{preview.error}</p>
           </Card>
           <Link href="https://admin.aivolearning.com/login" className="block w-full">
             <Button className="w-full">Go to sign in</Button>
@@ -92,11 +92,11 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
     const redirect = `/accept-invite${qs ? `?${qs}` : ""}`;
     return (
       <Shell heading={t("accept_heading")}>
-        <p className="text-center text-sm text-aivo-ink-soft">
+        <p className="text-center text-sm text-iw-ink-muted">
           {invitedEmail ? (
             <>
               You&apos;ve been invited to join a learning team for{" "}
-              <strong className="text-aivo-ink">{invitedEmail}</strong>.
+              <strong className="text-iw-ink">{invitedEmail}</strong>.
             </>
           ) : (
             <>{t("invited_to_join")}</>
@@ -125,8 +125,8 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
   if (invitedEmail && session.email.toLowerCase() !== invitedEmail) {
     return (
       <Shell heading={t("accept_heading")}>
-        <Card className="border-rose-200 bg-rose-50 p-4">
-          <p className="text-sm text-aivo-ink">
+        <Card className="border-iw-error bg-iw-error-subtle p-4">
+          <p className="text-sm text-iw-ink">
             {t("signed_in_as")} <strong>{session.email}</strong>, but this invitation is for{" "}
             <strong>{invitedEmail}</strong>. Sign out and sign in with the invited address.
           </p>
@@ -159,10 +159,10 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
 
 function Shell({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-aivo-surface-soft p-6">
+    <main className="flex min-h-screen items-center justify-center bg-iw-raised p-6">
       <Card className="w-full max-w-md space-y-5 p-8">
         <div
-          className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-aivo-accent/10 text-aivo-accent"
+          className="mx-auto flex h-14 w-14 items-center justify-center rounded-iw-control bg-iw-warm/10 text-iw-warm"
           aria-hidden="true"
         >
           <Mail className="h-7 w-7" />

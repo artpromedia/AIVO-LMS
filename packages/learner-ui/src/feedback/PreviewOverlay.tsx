@@ -39,7 +39,7 @@ export function PreviewOverlay({
       style={{ transitionDuration: "var(--learner-motion-ms, 300ms)" }}
     >
       <div
-        className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center"
+        className="bg-white rounded-iw-card-lg shadow-soft-5 p-8 max-w-sm w-full mx-4 text-center"
         role="alert"
       >
         {icon && (
@@ -47,17 +47,17 @@ export function PreviewOverlay({
             {icon}
           </div>
         )}
-        <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Coming up</p>
-        <h3 className="text-xl font-heading font-bold mb-2" style={{ color: accentColor }}>
+        <p className="text-sm font-bold text-iw-ink-muted uppercase tracking-wider mb-1">Coming up</p>
+        <h3 className="text-xl font-iw-display font-bold mb-2" style={{ color: accentColor }}>
           {title}
         </h3>
-        {description && <p className="text-slate-500 text-sm mb-4">{description}</p>}
+        {description && <p className="text-iw-ink-muted text-sm mb-4">{description}</p>}
         <button
           onClick={() => {
             setInteracted(true);
             onReady();
           }}
-          className="px-8 py-3 rounded-2xl text-white font-heading font-bold text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2"
+          className="px-8 py-3 rounded-iw-control text-white font-iw-display font-bold text-lg shadow-soft-3 hover:shadow-soft-5 hover:scale-[1.02] active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2"
           style={{
             background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
             minHeight: "var(--learner-hit-target, 48px)",
@@ -68,7 +68,7 @@ export function PreviewOverlay({
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="mt-3 text-sm text-slate-400 hover:text-slate-600 font-bold transition-colors"
+            className="mt-3 text-sm text-iw-ink-muted hover:text-iw-ink-muted font-bold transition-colors"
           >
             Skip
           </button>

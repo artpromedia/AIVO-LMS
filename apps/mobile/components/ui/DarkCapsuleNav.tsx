@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     height: 72,
     paddingHorizontal: 8,
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOpacity: 0.25,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },

@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   },
   chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   chipText: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.text },
-  chipTextActive: { color: "#fff" },
+  chipTextActive: { color: colors.white },
   tabsRow: {
     flexDirection: "row",
     backgroundColor: colors.surface,
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
   tabBtn: { flex: 1, paddingVertical: 10, borderRadius: radius.md, alignItems: "center" },
   tabBtnActive: { backgroundColor: colors.primary },
   tabText: { fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
-  tabTextActive: { color: "#fff" },
+  tabTextActive: { color: colors.white },
   sessionCard: { marginBottom: spacing.sm },
   sessionHeader: {
     flexDirection: "row",

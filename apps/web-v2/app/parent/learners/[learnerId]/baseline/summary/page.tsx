@@ -149,13 +149,18 @@ export default async function BaselineSummaryPage({
                 </InsightChip>
               </header>
               <p className="text-xs text-iw-text-muted">
-                Answered {s.answered}
-                {s.correct > 0 ? <> · {s.correct} on the first try</> : null}
+                Explored {s.answered}
+                {s.correct > 0 ? (
+                  <>
+                    {" "}
+                    · {s.correct} answered with confidence
+                  </>
+                ) : null}
               </p>
               <div
                 className="relative h-1.5 rounded-full bg-[var(--aivo-color-surface-sunken)] overflow-hidden"
                 role="img"
-                aria-label={`${s.subjectName} accuracy ${Math.round(s.accuracy * 100)} percent`}
+                aria-label={`${s.subjectName} starting point: ${Math.round(s.accuracy * 100)} percent confident`}
               >
                 <span
                   className="absolute inset-y-0 left-0 rounded-full bg-[var(--aivo-sensory-primary)]"

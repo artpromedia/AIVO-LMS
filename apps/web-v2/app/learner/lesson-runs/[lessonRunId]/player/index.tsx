@@ -31,6 +31,7 @@ import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/layout/page-header";
 import { AudioControlBar, FocusMode } from "@/components/playful-calm";
 import { InLessonTutorPanel } from "@/components/learner/in-lesson-tutor-panel";
+import { AivoCompanion } from "@/components/learner/art/aivo-companion";
 import type { FunctioningLevel } from "@aivo/stage-ui";
 import type { TutorKey } from "@aivo/brand";
 import type { LessonAgentConfig } from "@/lib/learner/agent-directives";
@@ -191,7 +192,7 @@ export function LessonPlayer({
             presentation.tutorThemed ? "bg-[color:var(--tutor-accent)]" : undefined
           }
         />
-        <p className="mt-1 text-xs text-aivo-ink-soft" aria-live="polite">
+        <p className="mt-1 text-xs text-iw-ink-muted" aria-live="polite">
           {t("step_of", { current: stepIdx + 1, total: beats.length })}
         </p>
       </div>
@@ -278,12 +279,20 @@ export function LessonPlayer({
             )}
           </div>
           {machine.completeError ? (
-            <p role="alert" className="mt-3 text-sm text-red-600">
+            <p role="alert" className="mt-3 text-sm text-iw-error-strong">
               {machine.completeError}
             </p>
           ) : null}
         </Card>
       </FocusMode>
+
+      {/* AIVO companion — the shared brand robot, present through the whole
+          session. Decorative + non-interactive; hidden on narrow screens so
+          it never crowds the stage content. */}
+      <AivoCompanion
+        motionOff={presentation.motionOff}
+        className="fixed bottom-4 right-4 z-30 hidden lg:block"
+      />
     </AccessibilityShell>
   );
 }

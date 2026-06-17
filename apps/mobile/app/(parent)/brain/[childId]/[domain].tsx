@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: radius.full,
   },
-  markerText: { fontSize: 12, fontFamily: "Nunito-Bold", color: "#FFF" },
+  markerText: { fontSize: 12, fontFamily: "Nunito-Bold", color: colors.white },
   ladderFooter: { alignItems: "center" },
   sectionTitle: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.text },
   accCard: {

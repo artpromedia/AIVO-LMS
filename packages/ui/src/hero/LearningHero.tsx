@@ -96,8 +96,8 @@ const TONE_MAP = {
   teal: "from-[var(--aivo-color-aivoTeal-100,#ccfbf1)] to-[var(--aivo-color-aivoTeal-700,#0f766e)] text-[var(--aivo-color-aivoTeal-700,#0f766e)]",
   purple:
     "from-[var(--aivo-color-aivoPurple-100,#ede9fe)] to-[var(--aivo-sensory-primary,#7c3aed)] text-[var(--aivo-sensory-primary,#7c3aed)]",
-  amber: "from-amber-100 to-amber-500 text-amber-800",
-  rose: "from-rose-100 to-rose-500 text-rose-800",
+  amber: "from-iw-warning-subtle to-iw-warning text-iw-warning-strong",
+  rose: "from-iw-error-subtle to-iw-error text-iw-error-strong",
 } as const;
 
 function SubjectBlock({

@@ -59,7 +59,7 @@ export function InLessonTutorPanel({
     <section
       data-testid="in-lesson-tutor-panel"
       aria-label={t("tutor_panel_label", { name: tutor.name })}
-      className="mb-4 rounded-lg border border-aivo-border bg-aivo-surface p-3"
+      className="mb-4 rounded-lg border border-iw-border bg-iw-card p-3"
     >
       <div className="flex items-start gap-3">
         <span
@@ -70,23 +70,23 @@ export function InLessonTutorPanel({
           {tutor.icon}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium text-aivo-ink-soft">
+          <p className="text-xs font-medium text-iw-ink-muted">
             {t("tutor_panel_watching", { name: tutor.name })}
           </p>
           <div aria-live="polite">
             {thinking ? (
               <p
                 data-testid="tutor-panel-thinking"
-                className={`mt-1 text-sm text-aivo-ink-soft ${reducedMotion ? "" : "animate-pulse"}`}
+                className={`mt-1 text-sm text-iw-ink-muted ${reducedMotion ? "" : "animate-pulse"}`}
               >
                 {t("tutor_panel_thinking")}
               </p>
             ) : message ? (
-              <p data-testid="tutor-panel-message" className="mt-1 text-sm text-aivo-ink">
+              <p data-testid="tutor-panel-message" className="mt-1 text-sm text-iw-ink">
                 {message}
               </p>
             ) : !hasContent ? (
-              <p className="mt-1 text-sm text-aivo-ink-soft">{t("tutor_panel_idle")}</p>
+              <p className="mt-1 text-sm text-iw-ink-muted">{t("tutor_panel_idle")}</p>
             ) : null}
           </div>
 
@@ -95,7 +95,7 @@ export function InLessonTutorPanel({
               data-testid="tutor-panel-break-offer"
               className="mt-2 flex flex-wrap items-center gap-2"
             >
-              <p className="text-sm text-aivo-ink">{t("tutor_panel_break_offer")}</p>
+              <p className="text-sm text-iw-ink">{t("tutor_panel_break_offer")}</p>
               <Button size="sm" onClick={onAcceptBreak}>
                 {t("tutor_panel_break_yes")}
               </Button>
@@ -110,7 +110,7 @@ export function InLessonTutorPanel({
               data-testid="tutor-panel-end-early"
               className="mt-2 flex flex-wrap items-center gap-2"
             >
-              <p className="text-sm text-aivo-ink">{t("tutor_panel_end_early")}</p>
+              <p className="text-sm text-iw-ink">{t("tutor_panel_end_early")}</p>
               <Button size="sm" onClick={onFinishEarly}>
                 {t("tutor_panel_finish_now")}
               </Button>

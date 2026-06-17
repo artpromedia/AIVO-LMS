@@ -65,31 +65,31 @@ export function FunctioningLevels() {
 
   return (
     <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-purple-50/30 to-white pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-iw-purple-50/30 to-white pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-6 md:px-8 relative z-10">
         <div className="text-center mb-16">
-          <p className="text-sm font-bold text-primary uppercase tracking-widest mb-3">
+          <p className="text-sm font-bold text-iw-primary uppercase tracking-widest mb-3">
             {t("label")}
           </p>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-heading font-bold text-iw-ink mb-4">
             {t("title")}
           </h2>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto font-body">{t("subtitle")}</p>
+          <p className="text-lg text-iw-ink-muted max-w-2xl mx-auto font-body">{t("subtitle")}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {LEVELS.map((lvl) => (
             <div
               key={lvl.level}
-              className="group relative bg-white rounded-3xl border border-slate-100 p-6 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden"
+              className="group relative bg-white rounded-iw-card-lg border border-iw-border p-6 hover:shadow-soft-5 hover:-translate-y-2 transition-all duration-300 overflow-hidden"
             >
               <div
                 className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${lvl.bg} opacity-60 group-hover:opacity-100 transition-opacity`}
               />
               <div className="text-center mb-4">
                 <div
-                  className={`w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br ${lvl.bg} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform`}
+                  className={`w-14 h-14 mx-auto rounded-iw-control bg-gradient-to-br ${lvl.bg} flex items-center justify-center text-2xl shadow-soft-3 group-hover:scale-110 transition-transform`}
                 >
                   {lvl.icon}
                 </div>
@@ -101,17 +101,17 @@ export function FunctioningLevels() {
                 >
                   {t("level_label", { level: lvl.level })}
                 </p>
-                <h3 className="text-lg font-heading font-bold text-slate-900 mb-2">
+                <h3 className="text-lg font-heading font-bold text-iw-ink mb-2">
                   {t(lvl.nameKey)}
                 </h3>
-                <p className="text-sm text-slate-500 font-body mb-4 leading-relaxed">
+                <p className="text-sm text-iw-ink-muted font-body mb-4 leading-relaxed">
                   {t(lvl.descKey)}
                 </p>
                 <ul className="space-y-1.5">
                   {[lvl.f1, lvl.f2, lvl.f3].map((fKey) => (
                     <li
                       key={fKey}
-                      className="text-xs text-slate-500 font-body flex items-center gap-1.5 justify-center"
+                      className="text-xs text-iw-ink-muted font-body flex items-center gap-1.5 justify-center"
                     >
                       <span
                         className="w-1 h-1 rounded-full flex-shrink-0"

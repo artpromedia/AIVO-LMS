@@ -50,7 +50,7 @@ export const SelectContent = React.forwardRef<
       position={position}
       sideOffset={6}
       className={cn(
-        "z-50 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-iw-control border border-iw-border bg-iw-raised text-iw-ink shadow-lg",
+        "z-50 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-iw-control border border-iw-border bg-iw-raised text-iw-ink shadow-soft-3",
         className,
       )}
       {...props}

@@ -75,19 +75,19 @@ export default async function Page() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <div
-                className="h-7 w-7 rounded-full bg-gradient-to-br from-purple-600 to-blue-600"
+                className="h-7 w-7 rounded-iw-chip bg-iw-primary"
                 aria-hidden
               />
-              <p className="text-sm font-bold text-slate-900">Atlas</p>
+              <p className="text-sm font-bold text-iw-ink">Atlas</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm text-slate-700">
+            <div className="rounded-iw-card border border-iw-border bg-iw-raised/60 p-3 text-sm text-iw-ink">
               {t("count_by_3s_prompt")}
             </div>
             <div className="grid grid-cols-2 gap-2">
               {["5", "6", "7", "9"].map((w) => (
                 <div
                   key={w}
-                  className="rounded-lg border-2 border-slate-200 bg-white py-2 text-center text-sm font-body text-slate-700"
+                  className="rounded-lg border-2 border-iw-border bg-white py-2 text-center text-sm font-body text-iw-ink"
                 >
                   {w}
                 </div>
@@ -111,10 +111,10 @@ export default async function Page() {
         mockupTitle="Hint · Tier 2"
         mockup={
           <div className="space-y-3">
-            <div className="rounded-xl bg-purple-50 p-3 text-sm text-slate-700 border border-purple-100">
+            <div className="rounded-iw-card bg-iw-purple-100 p-3 text-sm text-iw-ink border border-iw-purple-100">
               {t("hint_counting_fingers")}
             </div>
-            <div className="flex justify-between text-xs text-slate-500">
+            <div className="flex justify-between text-xs text-iw-ink-muted">
               <span>🔊 Read this aloud</span>
               <span>{t("need_another_hint")}</span>
             </div>
@@ -141,7 +141,7 @@ export default async function Page() {
               timer pressure, no scolding, no “you lost your streak.” The LessonRun pauses cleanly
               and resumes where the learner left off.
             </p>
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-iw-ink-muted">
               Break Mode can be auto-triggered by the learner's profile, suggested by AIVO when
               signals call for it, or chosen by the learner at any time.
             </p>
@@ -170,10 +170,10 @@ export default async function Page() {
             ].map((r) => (
               <div
                 key={r.l}
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-2.5 text-xs"
+                className="flex items-center justify-between rounded-lg border border-iw-border bg-white p-2.5 text-xs"
               >
-                <span className="font-semibold text-slate-900">{r.l}</span>
-                <span className="text-slate-500">{r.s}</span>
+                <span className="font-semibold text-iw-ink">{r.l}</span>
+                <span className="text-iw-ink-muted">{r.s}</span>
               </div>
             ))}
           </div>
@@ -194,10 +194,10 @@ export default async function Page() {
         mockupTitle="Parent summary · This week"
         mockup={
           <div className="space-y-3">
-            <h3 className="font-heading text-base font-bold text-slate-900">
+            <h3 className="font-heading text-base font-bold text-iw-ink">
               {t("maya_strong_week")}
             </h3>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-iw-ink-muted">
               5 of 5 missions completed. Skip-counting clicked.
             </p>
             <div className="space-y-2">
@@ -206,7 +206,7 @@ export default async function Page() {
                 "Reading · used read-aloud 12 min",
                 "Took 1 break · returned to finish",
               ].map((r) => (
-                <div key={r} className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">
+                <div key={r} className="rounded-lg bg-iw-raised p-2 text-xs text-iw-ink">
                   {r}
                 </div>
               ))}

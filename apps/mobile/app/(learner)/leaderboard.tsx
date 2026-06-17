@@ -6,8 +6,10 @@ import { router } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useLeaderboard } from "@/hooks/useEngagement";
-import { AivoCard } from "@aivo/mobile-ui";
+import { SEMANTIC } from "@aivo/brand";
+import { Card } from "@/components/ui";
 import { colors, spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 
 type Scope = "global" | "class" | "school";
 
@@ -75,18 +77,18 @@ export default function LearnerLeaderboardScreen() {
       </View>
 
       {isLoading ? (
-        <AivoCard>
+        <Card>
           <Text style={styles.empty}>{t("common.loading")}</Text>
-        </AivoCard>
+        </Card>
       ) : entries.length === 0 ? (
-        <AivoCard style={styles.emptyCard}>
+        <Card style={styles.emptyCard}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="trophy" size={28} color="#F59E0B" />
+            <Ionicons name="trophy" size={28} color={colors.warning} />
           </View>
           <Text style={styles.empty}>{t("learnerLeaderboard.empty")}</Text>
-        </AivoCard>
+        </Card>
       ) : (
-        <AivoCard style={{ padding: 0 }}>
+        <Card style={{ padding: 0 }}>
           {entries.map((entry, idx) => {
             const isMe = entry.learnerId === user?.id;
             const medalIcon = idx < 3 ? MEDAL_ICONS[idx] : null;
@@ -124,7 +126,7 @@ export default function LearnerLeaderboardScreen() {
               </View>
             );
           })}
-        </AivoCard>
+        </Card>
       )}
     </ScrollView>
   );
@@ -138,10 +140,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: spacing.sm,
   },
-  title: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  title: { fontSize: 22, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   subtitle: {
     fontSize: 13,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.textSecondary,
     textAlign: "center",
     marginBottom: spacing.md,
@@ -155,22 +157,22 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.card,
   },
-  scopePillActive: { backgroundColor: "#F59E0B", borderColor: "#F59E0B" },
-  scopeLabel: { fontSize: 13, fontFamily: "Nunito-Bold", color: colors.textSecondary },
-  scopeLabelActive: { color: "#FFFFFF" },
+  scopePillActive: { backgroundColor: colors.warning, borderColor: colors.warning },
+  scopeLabel: { fontSize: 13, fontFamily: fontFamilies.bodyBold, color: colors.textSecondary },
+  scopeLabelActive: { color: colors.white },
   emptyCard: { alignItems: "center", paddingVertical: spacing.lg },
   emptyIcon: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#FEF3C7",
+    backgroundColor: SEMANTIC.color.feedback.warningSurface,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: spacing.sm,
   },
   empty: {
     fontSize: 14,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.textSecondary,
     textAlign: "center",
     padding: spacing.md,
@@ -187,9 +189,9 @@ const styles = StyleSheet.create({
   rowLast: { borderBottomWidth: 0 },
   rowMe: { backgroundColor: colors.primary + "14" },
   rankCell: { width: 32, alignItems: "center", justifyContent: "center" },
-  rankText: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.textSecondary },
-  name: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
-  level: { fontSize: 11, fontFamily: "Nunito-SemiBold", color: colors.textSecondary, marginTop: 2 },
-  xp: { fontSize: 14, fontFamily: "Nunito-ExtraBold", color: colors.primary },
-  weekly: { fontSize: 11, fontFamily: "Nunito-Regular", color: colors.textSecondary, marginTop: 2 },
+  rankText: { fontSize: 16, fontFamily: fontFamilies.bodyBold, color: colors.textSecondary },
+  name: { fontSize: 14, fontFamily: fontFamilies.bodyBold, color: colors.text },
+  level: { fontSize: 11, fontFamily: fontFamilies.bodySemiBold, color: colors.textSecondary, marginTop: 2 },
+  xp: { fontSize: 14, fontFamily: fontFamilies.bodyExtraBold, color: colors.primary },
+  weekly: { fontSize: 11, fontFamily: fontFamilies.bodyRegular, color: colors.textSecondary, marginTop: 2 },
 });

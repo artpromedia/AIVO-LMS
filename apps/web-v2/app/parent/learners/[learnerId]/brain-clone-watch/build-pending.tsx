@@ -57,14 +57,14 @@ export function BrainBuildPending({
           <button
             type="submit"
             data-testid="brain-build-rebuild"
-            className="rounded-full bg-[var(--aivo-sensory-primary)] px-6 py-3 font-semibold text-white hover:opacity-90"
+            className="rounded-iw-control bg-[var(--aivo-sensory-primary)] px-6 py-3 font-semibold text-white hover:opacity-90"
           >
             {rebuildLabel}
           </button>
         </form>
         <Link
           href={`/parent/learners/${learnerId}`}
-          className="rounded-full border border-iw-border px-6 py-3 font-semibold text-iw-text-strong hover:bg-iw-hover"
+          className="rounded-iw-control border border-iw-border px-6 py-3 font-semibold text-iw-text-strong hover:bg-iw-hover"
         >
           {backLabel}
         </Link>

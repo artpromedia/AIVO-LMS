@@ -89,8 +89,8 @@ export function AccountForm({
         </select>
         <p className="mt-1 text-xs text-iw-ink-muted">{t("timezone_hint")}</p>
       </div>
-      {error ? <p className="text-sm text-aivo-danger">{error}</p> : null}
-      {saved ? <p className="text-sm text-aivo-success">{t("saved")}</p> : null}
+      {error ? <p className="text-sm text-iw-error">{error}</p> : null}
+      {saved ? <p className="text-sm text-iw-success">{t("saved")}</p> : null}
       <Button type="submit" disabled={pending || displayName.trim().length === 0}>
         {pending ? "Saving…" : "Save"}
       </Button>

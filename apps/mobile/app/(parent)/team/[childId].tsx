@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   roleBtnActive: { backgroundColor: colors.primary },
   roleBtnText: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
-  roleBtnTextActive: { color: "#FFF" },
+  roleBtnTextActive: { color: colors.white },
   input: {
     height: 48,
     borderWidth: 1.5,

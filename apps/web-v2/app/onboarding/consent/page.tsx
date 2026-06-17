@@ -134,7 +134,7 @@ export default function ConsentReviewPage() {
                 {submitting ? t("saving") : tc("continue")}
               </button>
               {error ? (
-                <p role="alert" className="text-xs text-aivo-danger text-center">
+                <p role="alert" className="text-xs text-iw-error text-center">
                   {error}
                 </p>
               ) : null}

@@ -60,6 +60,14 @@ export async function LandingPageLayout({
 }: LandingPageLayoutProps) {
   const sensoryMode = await getSensoryModeFromCookies();
 
+  // Shared pill CTAs — kept byte-for-byte in sync with the home page's
+  // heroPrimaryBtn / heroSecondaryBtn (apps/marketing/src/app/page.tsx) so
+  // every secondary marketing page wears the same soft purple-glow pills.
+  const ctaPrimary =
+    "group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-iw-control bg-[var(--aivo-sensory-primary)] px-7 text-base font-semibold text-white shadow-soft-3 transition hover:-translate-y-0.5 hover:brightness-110";
+  const ctaSecondary =
+    "group inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-iw-control border border-iw-border bg-white px-7 text-base font-semibold text-iw-ink shadow-soft-3 transition hover:-translate-y-0.5 hover:border-iw-border hover:bg-iw-raised";
+
   return (
     <div className="min-h-screen bg-[var(--aivo-color-surface-canvas)]">
       <JsonLd data={breadcrumbJsonLd(breadcrumbs)} />
@@ -81,32 +89,26 @@ export async function LandingPageLayout({
         <div className="max-w-4xl mx-auto px-6 md:px-8 relative z-10">
           <Breadcrumbs items={breadcrumbs} />
           <span
-            className="inline-block text-xs font-bold uppercase tracking-widest mb-4 px-3 py-1 rounded-full"
+            className="inline-block text-xs font-bold uppercase tracking-widest mb-4 px-3 py-1 rounded-iw-chip"
             style={{ color: badgeColor, backgroundColor: `${badgeColor}15` }}
           >
             {badge}
           </span>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-slate-900 mb-4 leading-tight">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-iw-ink mb-4 leading-tight">
             {title}
           </h1>
-          <p className="text-lg text-slate-600 font-body max-w-2xl mb-6 leading-relaxed">
+          <p className="text-lg text-iw-ink-muted font-body max-w-2xl mb-6 leading-relaxed">
             {subtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <a
-              href={primaryCtaHref}
-              className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[var(--aivo-sensory-primary)] text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-200 min-h-[44px]"
-            >
+            <a href={primaryCtaHref} className={ctaPrimary}>
               {primaryCtaLabel}
               <ArrowRight
                 className="w-4 h-4 group-hover:translate-x-1 transition-transform"
                 aria-hidden="true"
               />
             </a>
-            <Link
-              href={secondaryCtaHref}
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition min-h-[44px]"
-            >
+            <Link href={secondaryCtaHref} className={ctaSecondary}>
               {secondaryCtaLabel}
             </Link>
           </div>
@@ -115,27 +117,24 @@ export async function LandingPageLayout({
 
       <main className="max-w-4xl mx-auto px-6 md:px-8 py-12 md:py-16 prose-aivo">{children}</main>
 
-      <section className="bg-white/50 border-t border-slate-200/70">
+      <section className="bg-white/50 border-t border-iw-border/70">
         <div className="max-w-4xl mx-auto px-6 md:px-8 py-14 text-center">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 mb-3">
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-iw-ink mb-3">
             {finalCta?.title ?? "Ready to give every learner a tutor that actually adapts?"}
           </h2>
-          <p className="text-slate-600 font-body mb-6 max-w-2xl mx-auto">
+          <p className="text-iw-ink-muted font-body mb-6 max-w-2xl mx-auto">
             {finalCta?.body ??
               "Start free in under two minutes. No credit card. Cancel anytime. 30-day money-back guarantee on paid plans."}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href={finalCta?.primary.href ?? primaryCtaHref}
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[var(--aivo-sensory-primary)] text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-200 min-h-[44px]"
-            >
+            <a href={finalCta?.primary.href ?? primaryCtaHref} className={ctaPrimary}>
               {finalCta?.primary.label ?? primaryCtaLabel}
-              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              <ArrowRight
+                className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                aria-hidden="true"
+              />
             </a>
-            <Link
-              href={finalCta?.secondary.href ?? "/pricing"}
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition min-h-[44px]"
-            >
+            <Link href={finalCta?.secondary.href ?? "/pricing"} className={ctaSecondary}>
               {finalCta?.secondary.label ?? "See pricing"}
             </Link>
           </div>

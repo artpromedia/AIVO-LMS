@@ -6,6 +6,7 @@
  */
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { colors } from "@/constants/colors";
 import i18n from "@/lib/i18n";
 
 export function ConfigErrorScreen({ detail }: { detail: string }) {
@@ -25,10 +26,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.background,
     padding: 24,
   },
-  heading: { fontSize: 22, fontWeight: "700", textAlign: "center", color: "#1f2937" },
-  body: { fontSize: 15, textAlign: "center", color: "#4b5563", marginTop: 12, maxWidth: 340 },
-  detail: { fontSize: 12, textAlign: "center", color: "#9ca3af", marginTop: 16, maxWidth: 340 },
+  heading: { fontSize: 22, fontWeight: "700", textAlign: "center", color: colors.text },
+  body: { fontSize: 15, textAlign: "center", color: colors.textSecondary, marginTop: 12, maxWidth: 340 },
+  detail: { fontSize: 12, textAlign: "center", color: colors.textSecondary, marginTop: 16, maxWidth: 340 },
 });

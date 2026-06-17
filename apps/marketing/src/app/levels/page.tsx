@@ -41,19 +41,19 @@ export default async function LevelsIndex() {
           <Link
             key={level.slug}
             href={`/levels/${level.slug}`}
-            className="block rounded-3xl border border-slate-100 bg-white p-6 hover:border-purple-200 hover:shadow-lg transition"
+            className="block rounded-iw-card-lg border border-iw-border bg-white p-6 hover:border-iw-purple-200 hover:shadow-soft-3 transition"
           >
             <div className="flex items-start gap-4">
-              <span className="inline-flex w-12 h-12 rounded-2xl bg-purple-100 text-primary items-center justify-center font-heading font-bold text-xl shrink-0">
+              <span className="inline-flex w-12 h-12 rounded-iw-control bg-iw-purple-100 text-primary items-center justify-center font-heading font-bold text-xl shrink-0">
                 {level.level}
               </span>
               <div className="min-w-0 flex-1">
-                <h2 className="font-heading font-bold text-slate-900 text-xl">
+                <h2 className="font-heading font-bold text-iw-ink text-xl">
                   Level {level.level}: {level.name}
                 </h2>
-                <p className="text-slate-600 font-body mt-2 leading-relaxed">{level.short}</p>
+                <p className="text-iw-ink-muted font-body mt-2 leading-relaxed">{level.short}</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-slate-300 shrink-0 mt-2" aria-hidden="true" />
+              <ArrowRight className="w-5 h-5 text-iw-ink-muted shrink-0 mt-2" aria-hidden="true" />
             </div>
           </Link>
         ))}

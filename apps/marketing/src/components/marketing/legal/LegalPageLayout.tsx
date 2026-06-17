@@ -72,7 +72,7 @@ export async function LegalPageLayout({
         <div className="max-w-4xl mx-auto px-6 md:px-8 relative z-10">
           <div className="flex items-center gap-3 mb-6">
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-lg"
+              className="w-12 h-12 rounded-iw-control flex items-center justify-center text-2xl shadow-soft-3"
               style={{ backgroundColor: `${accentColor}15` }}
               aria-hidden="true"
             >
@@ -85,11 +85,11 @@ export async function LegalPageLayout({
               {badge}
             </span>
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-slate-900 mb-4 leading-tight">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-iw-ink mb-4 leading-tight">
             {title}
           </h1>
-          <p className="text-lg text-slate-600 font-body max-w-2xl">{subtitle}</p>
-          <p className="text-sm text-slate-500 font-body mt-4">Last updated: {lastUpdated}</p>
+          <p className="text-lg text-iw-ink-muted font-body max-w-2xl">{subtitle}</p>
+          <p className="text-sm text-iw-ink-muted font-body mt-4">Last updated: {lastUpdated}</p>
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export async function LegalPageLayout({
         <div className="space-y-10">
           {sections.map((section, i) => (
             <section key={section.title} className="scroll-mt-24" id={`section-${i + 1}`}>
-              <h2 className="font-heading text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+              <h2 className="font-heading text-2xl font-bold text-iw-ink mb-4 flex items-center gap-3">
                 <span
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white"
                   style={{ backgroundColor: accentColor }}
@@ -109,17 +109,17 @@ export async function LegalPageLayout({
               </h2>
               {Array.isArray(section.content) ? (
                 section.content.map((paragraph, pi) => (
-                  <p key={pi} className="text-slate-600 font-body leading-relaxed mb-4">
+                  <p key={pi} className="text-iw-ink-muted font-body leading-relaxed mb-4">
                     {paragraph}
                   </p>
                 ))
               ) : (
-                <p className="text-slate-600 font-body leading-relaxed mb-4">{section.content}</p>
+                <p className="text-iw-ink-muted font-body leading-relaxed mb-4">{section.content}</p>
               )}
               {section.list && (
                 <ul className="space-y-2 mt-4">
                   {section.list.map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-slate-600 font-body">
+                    <li key={item} className="flex items-start gap-3 text-iw-ink-muted font-body">
                       <svg
                         className="w-5 h-5 mt-0.5 flex-shrink-0"
                         style={{ color: accentColor }}
@@ -145,19 +145,19 @@ export async function LegalPageLayout({
         </div>
 
         <div
-          className="mt-16 p-8 rounded-3xl border"
+          className="mt-16 p-8 rounded-iw-card-lg border"
           style={{
             backgroundColor: `${accentColor}05`,
             borderColor: `${accentColor}20`,
           }}
         >
-          <h3 className="font-heading text-xl font-bold text-slate-900 mb-2">Questions?</h3>
-          <p className="text-slate-600 font-body mb-4">
+          <h3 className="font-heading text-xl font-bold text-iw-ink mb-2">Questions?</h3>
+          <p className="text-iw-ink-muted font-body mb-4">
             If you have any questions about this policy, please reach out to our team.
           </p>
           <a
             href={`mailto:${contactEmail}`}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-bold transition hover:opacity-90 shadow-lg"
+            className="group inline-flex min-h-[52px] items-center gap-2 rounded-iw-control px-7 text-base font-semibold text-white shadow-soft-3 transition hover:-translate-y-0.5 hover:brightness-110"
             style={{ backgroundColor: accentColor }}
           >
             <svg

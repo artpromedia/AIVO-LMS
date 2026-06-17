@@ -7,8 +7,10 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
-import { AivoCard } from "@aivo/mobile-ui";
+import { SEMANTIC } from "@aivo/brand";
+import { Card } from "@/components/ui";
 import { colors, spacing } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 
 interface QuestWorld {
   key: string;
@@ -38,12 +40,16 @@ const WORLD_ICONS: Record<string, string> = {
   pixel_code_forge: "💻",
 };
 
+// Per-world accent tints mapped onto the brand's stable visual-domain
+// anchors (math / reading / science / SEL) + the warning amber, so each
+// world keeps a distinct hue sourced from @aivo/brand rather than a
+// free-floating hex.
 const WORLD_TINTS: Record<string, string> = {
-  nova_number_galaxy: "#6366f1",
-  sage_story_kingdom: "#059669",
-  spark_science_lab: "#f59e0b",
-  chrono_time_tower: "#8b5cf6",
-  pixel_code_forge: "#3b82f6",
+  nova_number_galaxy: colors.visualMath,
+  sage_story_kingdom: colors.visualReading,
+  spark_science_lab: colors.visualScience,
+  chrono_time_tower: colors.visualSel,
+  pixel_code_forge: colors.warning,
 };
 
 export default function QuestsScreen() {
@@ -133,7 +139,7 @@ export default function QuestsScreen() {
               accessibilityRole="button"
               accessibilityLabel={`Open ${world.name}`}
             >
-              <AivoCard style={[styles.questCard, { borderLeftColor: tint, borderLeftWidth: 4 }]}>
+              <Card style={[styles.questCard, { borderLeftColor: tint, borderLeftWidth: 4 }]}>
                 <View style={styles.questRow}>
                   <View style={[styles.questIcon, { backgroundColor: tint + "20" }]}>
                     <Text style={{ fontSize: 28 }}>{WORLD_ICONS[world.key] ?? "🌟"}</Text>
@@ -158,7 +164,7 @@ export default function QuestsScreen() {
                   </View>
                   <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
                 </View>
-              </AivoCard>
+              </Card>
             </Pressable>
           );
         })}
@@ -169,11 +175,11 @@ export default function QuestsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
-  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
-  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  backText: { fontSize: 16, fontFamily: fontFamilies.bodySemiBold, color: colors.primary },
+  title: { fontSize: 24, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   subtitle: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginBottom: spacing.lg,
   },
@@ -187,10 +193,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 12,
   },
-  questName: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text },
+  questName: { fontSize: 16, fontFamily: fontFamilies.bodyBold, color: colors.text },
   questDomain: {
     fontSize: 12,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: 2,
   },
@@ -204,19 +210,19 @@ const styles = StyleSheet.create({
   chapterFill: { height: 6, borderRadius: 3 },
   chapterText: {
     fontSize: 11,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.textSecondary,
     marginTop: 2,
   },
   errorBlock: {
     marginTop: spacing.xl,
     padding: spacing.md,
-    backgroundColor: "#fee2e2",
+    backgroundColor: SEMANTIC.color.feedback.dangerSurface,
     borderRadius: 12,
   },
   errorText: {
-    color: "#991b1b",
-    fontFamily: "Nunito-SemiBold",
+    color: SEMANTIC.color.feedback.danger,
+    fontFamily: fontFamilies.bodySemiBold,
     fontSize: 14,
   },
 });

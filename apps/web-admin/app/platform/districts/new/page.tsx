@@ -47,7 +47,6 @@ export default async function NewDistrictPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform onboarding"
       title="Onboard a district"
       description="Create the district tenant and email a secure, single-use invitation to its first administrator."
       action={

@@ -210,6 +210,38 @@ describe("AgentOrchestrator.runTurn", () => {
     assert.equal(call.functioning_level, "STANDARD");
   });
 
+  it("forwards the learner's stored instruction language as locale to ai-svc", async () => {
+    const session = h.sessions.get(SESSION)!;
+    session.brainContext = {
+      ...(session.brainContext as Record<string, unknown>),
+      language_profile: {
+        preferred_instruction_language: "Spanish",
+        primary_language: "English",
+      },
+    };
+    h.setAiScript([{ kind: "action", action: { kind: "advance" }, usage: {} }]);
+    await turn(h);
+    assert.equal(h.aiCalls.length, 1);
+    assert.equal(h.aiCalls[0].locale, "Spanish");
+  });
+
+  it("falls back to primary_language when no preferred instruction language is set", async () => {
+    const session = h.sessions.get(SESSION)!;
+    session.brainContext = {
+      ...(session.brainContext as Record<string, unknown>),
+      language_profile: { primary_language: "French" },
+    };
+    h.setAiScript([{ kind: "action", action: { kind: "advance" }, usage: {} }]);
+    await turn(h);
+    assert.equal(h.aiCalls[0].locale, "French");
+  });
+
+  it("omits locale when the learner has no stored language profile", async () => {
+    h.setAiScript([{ kind: "action", action: { kind: "advance" }, usage: {} }]);
+    await turn(h);
+    assert.equal(h.aiCalls[0].locale, undefined);
+  });
+
   it("executes a tool roundtrip and feeds results back to the model", async () => {
     h.setAiScript([
       {

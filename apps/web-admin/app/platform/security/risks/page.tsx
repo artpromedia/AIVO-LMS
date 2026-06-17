@@ -13,6 +13,7 @@ import {
   updateSecurityRisk,
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
@@ -52,11 +53,11 @@ async function updateAction(formData: FormData) {
   redirect("/platform/security/risks?notice=Risk%20updated.");
 }
 
-const SEV_TONE: Record<RiskSeverity, string> = {
-  low: "text-slate-500",
-  medium: "text-blue-700",
-  high: "text-amber-700",
-  critical: "text-red-700",
+const SEV_TONE: Record<RiskSeverity, StatusTone> = {
+  low: "neutral",
+  medium: "info",
+  high: "warning",
+  critical: "danger",
 };
 
 export default async function SecurityRisksPage({
@@ -71,7 +72,6 @@ export default async function SecurityRisksPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Security"
       title="Risk register"
       description="Enterprise risk register with inherent/residual severity and treatment, persisted in admin-svc (Postgres)."
       action={
@@ -161,15 +161,15 @@ export default async function SecurityRisksPage({
                     ) : null}
                   </td>
                   <td className="text-sm">{risk.category.replace("_", " ")}</td>
-                  <td className={`font-bold uppercase ${SEV_TONE[risk.inherentSeverity]}`}>
-                    {risk.inherentSeverity}
+                  <td>
+                    <StatusPill status={risk.inherentSeverity} tone={SEV_TONE[risk.inherentSeverity]} />
                   </td>
-                  <td className={`font-bold uppercase ${SEV_TONE[risk.residualSeverity]}`}>
-                    {risk.residualSeverity}
+                  <td>
+                    <StatusPill status={risk.residualSeverity} tone={SEV_TONE[risk.residualSeverity]} />
                   </td>
                   <td className="text-sm">{risk.treatment}</td>
                   <td>
-                    <span className="admin-status">{risk.open ? "open" : "closed"}</span>
+                    <StatusPill status={risk.open ? "open" : "closed"} />
                   </td>
                   <td>
                     <form action={updateAction} className="flex items-center gap-2">

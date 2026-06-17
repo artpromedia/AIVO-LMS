@@ -7,6 +7,7 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/bff/rate-limit";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import {
   createHomeworkSession,
+  getLearner,
   listHomeworkSessionsForLearner,
   appendHomeworkMessage,
 } from "@/lib/db/repos";
@@ -113,12 +114,14 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       attachment,
     });
     // Seed turn-0 tutor reply so the learner sees something to react to.
+    const learner = await getLearner(learnerId, session!.tenantId);
     const opener = await generateGuidedReply({
       topic,
       subjectId,
       turn: 0,
       learnerId,
       tenantId: session!.tenantId,
+      primaryLanguage: learner?.primaryLanguage ?? null,
     });
     const withOpener = await appendHomeworkMessage(created.id, session!.tenantId, {
       role: "tutor",

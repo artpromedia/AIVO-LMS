@@ -12,6 +12,7 @@ import {
 } from "@aivo/admin-api/security";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 import { actionError } from "@/lib/action-errors";
 
 async function createAction(formData: FormData) {
@@ -51,10 +52,10 @@ async function updateAction(formData: FormData) {
   redirect("/platform/security/vendors?notice=Vendor%20updated.");
 }
 
-const TIER_TONE: Record<VendorRiskTier, string> = {
-  tier1: "text-red-700",
-  tier2: "text-amber-700",
-  tier3: "text-slate-500",
+const TIER_TONE: Record<VendorRiskTier, StatusTone> = {
+  tier1: "danger",
+  tier2: "warning",
+  tier3: "neutral",
 };
 
 export default async function SecurityVendorsPage({
@@ -70,7 +71,6 @@ export default async function SecurityVendorsPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Security"
       title="Vendor register"
       description="Third-party vendor risk management — data residency, DPA status, and tier, persisted in admin-svc (Postgres)."
       action={
@@ -143,13 +143,13 @@ export default async function SecurityVendorsPage({
                   <td className="text-sm">{vendor.dataResidency || "—"}</td>
                   <td className="text-sm">{vendor.processesLearnerData ? "yes" : "no"}</td>
                   <td className="text-sm">{vendor.dpaSigned ? "signed" : "—"}</td>
-                  <td className={`font-bold uppercase ${TIER_TONE[vendor.riskTier]}`}>
-                    {vendor.riskTier}
+                  <td>
+                    <StatusPill status={vendor.riskTier} tone={TIER_TONE[vendor.riskTier]} />
                   </td>
                   <td>
-                    <span className="admin-status">{vendor.approved ? "approved" : "pending"}</span>
+                    <StatusPill status={vendor.approved ? "approved" : "pending"} />
                   </td>
-                  <td className="text-sm">{formatDateTime(vendor.lastReviewedAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(vendor.lastReviewedAt)}</td>
                   <td>
                     <form action={updateAction} className="flex items-center gap-2">
                       <input name="id" type="hidden" value={vendor.id} />

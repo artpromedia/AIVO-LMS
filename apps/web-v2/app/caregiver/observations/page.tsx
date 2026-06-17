@@ -116,7 +116,7 @@ export default async function CaregiverObservationsPage() {
 
       <SectionHeader title={`${t("section_your_observations")} (${authored.length})`} />
       {authored.length === 0 ? (
-        <p className="text-sm text-aivo-ink-soft">{t("no_observations_yet")}</p>
+        <p className="text-sm text-iw-ink-muted">{t("no_observations_yet")}</p>
       ) : (
         <ul className="flex flex-col gap-3">
           {authored.map((obs) => {
@@ -165,11 +165,11 @@ export default async function CaregiverObservationsPage() {
                   <div>
                     <p className="text-sm font-semibold">
                       {learner?.displayName ?? "Learner"} ·{" "}
-                      <span className="text-aivo-ink-soft">
+                      <span className="text-iw-ink-muted">
                         {subjectName.get(run.subjectId) ?? "Subject"}
                       </span>
                     </p>
-                    <p className="mt-0.5 text-xs text-aivo-ink-soft">
+                    <p className="mt-0.5 text-xs text-iw-ink-muted">
                       {skillName.get(run.skillId) ?? "Skill"} · {formatWhen(run.createdAt)}
                     </p>
                   </div>

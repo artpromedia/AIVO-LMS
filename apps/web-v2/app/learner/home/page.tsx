@@ -342,7 +342,7 @@ export default async function LearnerHome({
 
           {/* Progress you can feel — animated XP within the level + streak (grace, never shame) */}
           <section
-            className="grid gap-4 sm:grid-cols-[1.6fr_1fr] rounded-3xl bg-white border border-iw-border/60"
+            className="grid gap-4 sm:grid-cols-[1.6fr_1fr] rounded-iw-card-lg bg-white border border-iw-border/60"
             style={{ padding: "calc(1.25rem * var(--lx-density, 1))" }}
             aria-label={t("stat_level", { level: levelNumber })}
           >
@@ -493,7 +493,7 @@ export default async function LearnerHome({
                     <Link
                       href={`/parent/learners/${learnerId}/brain-clone-watch`}
                       data-testid="learner-primary-cta"
-                      className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
+                      className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-iw-card text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
                     >
                       {t("blocked_parent_cta")}
                     </Link>
@@ -502,7 +502,7 @@ export default async function LearnerHome({
                   <Link
                     href="/learner/calm"
                     data-testid="learner-primary-cta"
-                    className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
+                    className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-iw-card text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
                   >
                     {t("blocked_cta_calm")}
                   </Link>
@@ -518,7 +518,7 @@ export default async function LearnerHome({
               <Link
                 href={blocker === "no_baseline" ? "/learner/baseline" : "/learner/home"}
                 data-testid="learner-primary-cta"
-                className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
+                className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-iw-card text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
               >
                 {blocker === "no_baseline" ? t("setup_cta_baseline") : t("setup_cta_refresh")}
               </Link>
@@ -592,7 +592,7 @@ export default async function LearnerHome({
               ) : (
                 <Link
                   href="/learner/calm"
-                  className="block rounded-3xl focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="block rounded-iw-card-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
                 >
                   <MessageCard
                     from="break"

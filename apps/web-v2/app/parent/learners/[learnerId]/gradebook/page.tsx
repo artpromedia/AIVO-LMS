@@ -104,7 +104,7 @@ export default async function ParentGradebookPage({
           action={
             <Link
               href={`/parent/learners/${learner.id}/assessment`}
-              className="text-aivo-accent underline underline-offset-4"
+              className="text-iw-warm underline underline-offset-4"
             >
               {t("start_baseline")}
             </Link>
@@ -116,19 +116,19 @@ export default async function ParentGradebookPage({
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {subjectRows.map((r) => (
               <Card key={r.subject!.id} className="p-[var(--aivo-density-card-pad)]">
-                <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+                <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
                   {r.subject!.name}
                 </p>
                 <p className="mt-1 font-display text-2xl font-semibold">
                   {Math.round(r.average * 100)}%
                 </p>
-                <div className="mt-2 h-2 w-full rounded-full bg-aivo-border">
+                <div className="mt-2 h-2 w-full rounded-full bg-iw-border">
                   <div
-                    className="h-2 rounded-full bg-aivo-accent"
+                    className="h-2 rounded-full bg-iw-warm"
                     style={{ width: `${Math.round(r.average * 100)}%` }}
                   />
                 </div>
-                <p className="mt-2 text-xs text-aivo-ink-soft">
+                <p className="mt-2 text-xs text-iw-ink-muted">
                   {r.skillCount} skill{r.skillCount === 1 ? "" : "s"} tracked
                 </p>
               </Card>
@@ -139,7 +139,7 @@ export default async function ParentGradebookPage({
           <Card className="overflow-hidden p-0">
             <div className="max-h-[480px] overflow-y-auto">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-aivo-surface-soft text-xs uppercase tracking-wide text-aivo-ink-soft">
+                <thead className="sticky top-0 bg-iw-raised text-xs uppercase tracking-wide text-iw-ink-muted">
                   <tr>
                     <th className="px-4 py-2 text-left">Skill</th>
                     <th className="px-4 py-2 text-left">{t("col_subject")}</th>
@@ -157,10 +157,10 @@ export default async function ParentGradebookPage({
                       return (
                         <tr
                           key={`${sm.learnerId}-${sm.skillId}`}
-                          className="border-t border-aivo-border"
+                          className="border-t border-iw-border"
                         >
                           <td className="px-4 py-2 font-medium">{skill?.name ?? sm.skillId}</td>
-                          <td className="px-4 py-2 text-aivo-ink-soft">{subject?.name ?? "—"}</td>
+                          <td className="px-4 py-2 text-iw-ink-muted">{subject?.name ?? "—"}</td>
                           <td className="px-4 py-2">
                             <Badge tone={LEVEL_TONE[sm.level]}>{LEVEL_LABEL[sm.level]}</Badge>
                           </td>
@@ -183,12 +183,12 @@ export default async function ParentGradebookPage({
       <SectionHeader title={t("recent_sessions")} />
       {lessonRuns.length === 0 ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-sm text-aivo-ink-soft">{t("no_sessions")}</p>
+          <p className="text-sm text-iw-ink-muted">{t("no_sessions")}</p>
         </Card>
       ) : (
         <Card className="overflow-hidden p-0">
           <table className="w-full text-sm">
-            <thead className="bg-aivo-surface-soft text-xs uppercase tracking-wide text-aivo-ink-soft">
+            <thead className="bg-iw-raised text-xs uppercase tracking-wide text-iw-ink-muted">
               <tr>
                 <th className="px-4 py-2 text-left">{t("col_started")}</th>
                 <th className="px-4 py-2 text-left">{t("col_subject")}</th>
@@ -198,14 +198,14 @@ export default async function ParentGradebookPage({
             </thead>
             <tbody>
               {lessonRuns.map((run) => (
-                <tr key={run.id} className="border-t border-aivo-border">
+                <tr key={run.id} className="border-t border-iw-border">
                   <td className="px-4 py-2 font-mono text-xs">
                     {new Date(run.startedAt ?? run.createdAt).toLocaleString()}
                   </td>
                   <td className="px-4 py-2">
                     {subjectsById.get(run.subjectId)?.name ?? run.subjectId}
                   </td>
-                  <td className="px-4 py-2 text-aivo-ink-soft">{run.source}</td>
+                  <td className="px-4 py-2 text-iw-ink-muted">{run.source}</td>
                   <td className="px-4 py-2">
                     <Badge
                       tone={

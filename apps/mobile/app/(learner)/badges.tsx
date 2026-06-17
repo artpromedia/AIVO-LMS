@@ -6,8 +6,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useEngagement } from "@/hooks/useEngagement";
-import { AivoCard, EmptyState } from "@aivo/mobile-ui";
+import { EmptyState } from "@aivo/mobile-ui";
+import { Card } from "@/components/ui";
 import { colors, spacing } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, gridColumns, pickBySizeClass } from "@/src/design/responsive";
 
@@ -105,7 +107,7 @@ export default function BadgesScreen() {
         ) : (
           <View style={[styles.grid, { gap: CARD_GAP }]}>
             {engagement.badges.map((badge) => (
-              <AivoCard key={badge.id} style={[styles.badgeCard, { width: cardWidth }]}>
+              <Card key={badge.id} style={[styles.badgeCard, { width: cardWidth }]}>
                 <View style={[styles.badgeBorder, { borderColor: rarityColors[badge.rarity] }]}>
                   <Ionicons name="ribbon" size={32} color={rarityColors[badge.rarity]} />
                 </View>
@@ -113,7 +115,7 @@ export default function BadgesScreen() {
                 <Text style={[styles.badgeRarity, { color: rarityColors[badge.rarity] }]}>
                   {badge.rarity}
                 </Text>
-              </AivoCard>
+              </Card>
             ))}
           </View>
         )}
@@ -125,11 +127,11 @@ export default function BadgesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
-  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
+  backText: { fontSize: 16, fontFamily: fontFamilies.bodySemiBold, color: colors.primary },
   rewardRow: { flexDirection: "row", gap: 8, marginTop: 12 },
   rewardPill: { flex: 1, alignItems: "center", gap: 2, paddingVertical: 12, borderRadius: 16 },
-  rewardValue: { fontSize: 18, fontFamily: "Nunito-ExtraBold" },
-  rewardLabel: { fontSize: 11, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
+  rewardValue: { fontSize: 18, fontFamily: fontFamilies.bodyExtraBold },
+  rewardLabel: { fontSize: 11, fontFamily: fontFamilies.bodySemiBold, color: colors.textSecondary },
   questLink: {
     flexDirection: "row",
     alignItems: "center",
@@ -140,11 +142,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginTop: 12,
   },
-  questLinkText: { flex: 1, fontSize: 15, fontFamily: "Nunito-Bold" },
-  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  questLinkText: { flex: 1, fontSize: 15, fontFamily: fontFamilies.bodyBold },
+  title: { fontSize: 24, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   subtitle: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginBottom: spacing.lg,
   },
@@ -159,10 +161,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 8,
   },
-  badgeName: { fontSize: 12, fontFamily: "Nunito-Bold", color: colors.text, textAlign: "center" },
+  badgeName: { fontSize: 12, fontFamily: fontFamilies.bodyBold, color: colors.text, textAlign: "center" },
   badgeRarity: {
     fontSize: 10,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     textTransform: "capitalize",
     marginTop: 2,
   },

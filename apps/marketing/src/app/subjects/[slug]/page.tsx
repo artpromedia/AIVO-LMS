@@ -56,19 +56,19 @@ export default async function SubjectPage({ params }: Props) {
       ]}
     >
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-3">
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-3">
           What {subject.tutorName} does
         </h2>
-        <p className="text-slate-700 font-body leading-relaxed">{subject.what}</p>
+        <p className="text-iw-ink font-body leading-relaxed">{subject.what}</p>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("key_features")}</h2>
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-4">{t("key_features")}</h2>
         <ul className="space-y-2">
           {subject.features.map((f) => (
-            <li key={f} className="flex items-start gap-3 text-slate-700 font-body">
+            <li key={f} className="flex items-start gap-3 text-iw-ink font-body">
               <CheckCircle2
-                className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0"
+                className="w-5 h-5 text-iw-success mt-0.5 shrink-0"
                 aria-hidden="true"
               />
               <span>{f}</span>
@@ -78,14 +78,14 @@ export default async function SubjectPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+        <h2 className="text-2xl font-heading font-bold text-iw-ink mb-4">
           {t("topics_covered")}
         </h2>
         <div className="flex flex-wrap gap-2">
           {subject.topics.map((topic) => (
             <span
               key={topic}
-              className="inline-flex items-center px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm font-body"
+              className="inline-flex items-center px-3 py-1.5 rounded-iw-chip bg-iw-raised text-iw-ink text-sm font-body"
             >
               {topic}
             </span>
@@ -93,8 +93,8 @@ export default async function SubjectPage({ params }: Props) {
         </div>
       </section>
 
-      <section className="mt-14 pt-8 border-t border-slate-100">
-        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">
+      <section className="mt-14 pt-8 border-t border-iw-border">
+        <h2 className="text-xl font-heading font-bold text-iw-ink mb-4">
           {t("other_subjects")}
         </h2>
         <div className="flex flex-wrap gap-3">
@@ -102,7 +102,7 @@ export default async function SubjectPage({ params }: Props) {
             <Link
               key={other.slug}
               href={`/subjects/${other.slug}`}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-iw-chip bg-iw-raised text-iw-ink font-bold text-sm hover:bg-iw-border transition"
             >
               {other.name}
             </Link>

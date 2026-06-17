@@ -75,7 +75,7 @@ export function CheckBeat({
       {agentScaffold && (
         <p
           data-testid="agent-scaffold"
-          className="rounded-md bg-amber-50 p-3 text-sm text-amber-900"
+          className="rounded-md bg-iw-warning-subtle p-3 text-sm text-iw-warning-strong"
         >
           {t("agent_scaffold_prefix")} <MathText>{agentScaffold}</MathText>
         </p>

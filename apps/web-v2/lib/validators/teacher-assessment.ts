@@ -1,116 +1,87 @@
 import { z } from "zod";
+import {
+  TEACHER_ASSESSMENT_SECTION_ORDER,
+  getSection,
+  optionLabel,
+  type TeacherAssessmentSectionId,
+} from "@/lib/teacher/assessment-content";
 
 /**
- * Sprint C-07 — teacher assessment wizard validators.
+ * Teacher assessment validators — content-driven.
  *
- * Mirrors `lib/validators/parent-assessment.ts`: one Zod schema per
- * wizard section, a per-step grouping, and a `validateSection` helper.
- * The wizard PATCHes a single section per step (autosave); the BFF
- * submit maps the draft into the assessment-svc `POST /api/assessments/
- * teacher` payload (`teacherRole`, `gradeLevel`, `subjectArea`,
- * `strengths[]`, `challenges[]`, `accommodations[]`, `observations`,
- * `recommendedFocusAreas[]`, `additionalResponses`).
+ * The 8-section "Classroom insights" question bank lives in
+ * lib/teacher/assessment-content.ts; this module derives one Zod schema per
+ * section from that content (single → enum, multi → array of enums, text →
+ * bounded string, every field optional so a partial professional contribution
+ * is accepted) and projects the accumulated answers into the assessment-svc
+ * submit payload (system of record) + the family-svc summary insight that the
+ * brain-clone collaborator fold reads.
  *
- * The teacher backend treats every field except `learnerId` as optional,
- * so these section schemas accept partial professional input — a teacher
- * with six minutes between classes can submit strengths + a couple of
- * supports and still produce a useful contribution. We DO require the
- * primary `context` selectors (role + grade) so the submission reads as a
- * deliberate professional contribution rather than an empty row.
+ * The wizard PATCHes one section per step (autosave); the BFF submit maps the
+ * draft into `POST /api/assessments/teacher` (`teacherRole`, `gradeLevel`,
+ * `subjectArea`, `strengths[]`, `challenges[]`, `accommodations[]`,
+ * `observations`, `recommendedFocusAreas[]`, `additionalResponses`). Every
+ * field except `learnerId` is optional there, so the projection drops empty
+ * sections cleanly and stows the full structured answers under
+ * `additionalResponses` so nothing is ever lost.
  */
 
-export const teacherAssessmentSectionSchemas = {
-  // S1 — Context: who is contributing and the classroom frame. Uses
-  // school constructs (teacher role, grade band, subject area).
-  context: z.object({
-    teacherRole: z.enum([
-      "general_ed",
-      "special_ed",
-      "intervention",
-      "subject_specialist",
-      "paraeducator",
-      "related_service",
-      "other",
-    ]),
-    gradeLevel: z.enum([
-      "preK",
-      "K",
-      "1-2",
-      "3-5",
-      "6-8",
-      "9-12",
-      "post_secondary",
-      "multi_grade",
-    ]),
-    subjectAreas: z.array(z.string().max(60)).max(8).optional(),
-  }),
-
-  // S2 — Strengths first. What the learner does well in this classroom,
-  // and (seeded from the same screen) where the teacher would focus.
-  strengths: z.object({
-    strengths: z.array(z.string().max(200)).max(12).optional(),
-    recommendedFocusAreas: z.array(z.string().max(200)).max(8).optional(),
-  }),
-
-  // S3 — What gets in the way + what already works. Framed in school
-  // constructs: classroom challenges, and supports already working from
-  // an IEP/504 or the teacher's own practice.
-  supports: z.object({
-    challenges: z.array(z.string().max(200)).max(12).optional(),
-    accommodations: z.array(z.string().max(200)).max(20).optional(),
-    /** Which formal plan, if any, the supports come from. Drives copy only. */
-    planContext: z.enum(["iep", "504", "mtss_rti", "informal", "none"]).optional(),
-  }),
-
-  // S4 — Observations + anything else. Narrative + optional structured
-  // extras that flow into the backend's `additionalResponses` JSON.
-  observations: z.object({
-    observations: z.string().max(8000).optional(),
-    /** Optional best window the teacher sees focus land (extra signal). */
-    bestEngagementWindow: z
-      .enum(["morning", "midday", "afternoon", "varies"])
-      .optional(),
-    /** Optional free-text "anything else" captured under additionalResponses. */
-    additionalNotes: z.string().max(2000).optional(),
-  }),
-} as const;
-
-export type TeacherAssessmentSectionId = keyof typeof teacherAssessmentSectionSchemas;
-
-/** Canonical persistence order of the four sections. */
-export const TEACHER_ASSESSMENT_SECTION_ORDER: TeacherAssessmentSectionId[] = [
-  "context",
-  "strengths",
-  "supports",
-  "observations",
-];
+export { TEACHER_ASSESSMENT_SECTION_ORDER };
+export type { TeacherAssessmentSectionId };
 
 /**
- * One wizard step per section plus a final review step. Each step carries
- * i18n keys (resolved by the page under `teacher.learner_assessment`) so
- * no user-facing copy is hardcoded here.
+ * Shape of the accumulated draft answers persisted per learner. Section keys
+ * map to open-shape records (`questionId → string | string[]`); the section
+ * schemas validate them at patch time, the readers below narrow as needed.
  */
-export const TEACHER_WIZARD_STEPS: {
-  id: number;
-  section: TeacherAssessmentSectionId | "review";
-  /** i18n key suffix for the step's short label + long header + helper. */
-  key: string;
-}[] = [
-  { id: 1, section: "context", key: "context" },
-  { id: 2, section: "strengths", key: "strengths" },
-  { id: 3, section: "supports", key: "supports" },
-  { id: 4, section: "observations", key: "observations" },
-  { id: 5, section: "review", key: "review" },
-];
+export type TeacherAssessmentAnswers = Partial<
+  Record<TeacherAssessmentSectionId, Record<string, unknown>>
+>;
 
-/** Total non-review steps — used for time-left + progress math. */
-export const TEACHER_WIZARD_INPUT_STEPS = TEACHER_ASSESSMENT_SECTION_ORDER.length;
+/* ----- schemas (derived from content) -------------------------------------- */
+
+const TEXT_MAX = 4000;
+
+function buildSectionSchema(id: TeacherAssessmentSectionId): z.ZodTypeAny {
+  const section = getSection(id);
+  if (!section) return z.object({}).strict();
+  const shape: Record<string, z.ZodTypeAny> = {};
+  for (const q of section.questions) {
+    if (q.type === "text") {
+      shape[q.id] = z.string().max(TEXT_MAX).optional();
+      continue;
+    }
+    const values = (q.options ?? []).map((o) => o.value);
+    if (values.length === 0) {
+      shape[q.id] = z.string().max(200).optional();
+      continue;
+    }
+    const enumSchema = z.enum(values as [string, ...string[]]);
+    shape[q.id] =
+      q.type === "multi"
+        ? z.array(enumSchema).max(values.length).optional()
+        : enumSchema.optional();
+  }
+  // `.strict()` rejects unknown question ids so a stale client can't smuggle
+  // arbitrary keys into the JSONB draft.
+  return z.object(shape).strict();
+}
+
+const SECTION_SCHEMAS: Record<TeacherAssessmentSectionId, z.ZodTypeAny> =
+  TEACHER_ASSESSMENT_SECTION_ORDER.reduce(
+    (acc, id) => {
+      acc[id] = buildSectionSchema(id);
+      return acc;
+    },
+    {} as Record<TeacherAssessmentSectionId, z.ZodTypeAny>,
+  );
 
 export function validateTeacherSection(
   section: TeacherAssessmentSectionId,
   data: unknown,
 ): { ok: true; data: Record<string, unknown> } | { ok: false; message: string } {
-  const schema = teacherAssessmentSectionSchemas[section];
+  const schema = SECTION_SCHEMAS[section];
+  if (!schema) return { ok: false, message: `Unknown section: ${section}` };
   const parsed = schema.safeParse(data);
   if (!parsed.success) {
     return { ok: false, message: parsed.error.message };
@@ -118,45 +89,68 @@ export function validateTeacherSection(
   return { ok: true, data: parsed.data as Record<string, unknown> };
 }
 
-/**
- * Shape of the accumulated draft answers persisted per learner. Section
- * keys map to open-shape records (the section Zod schemas above validate
- * them at patch time); modelling them loosely here lets the draft store's
- * generic `Record<string, unknown>` answers flow into the projection
- * helpers without a cast at every call site. The readers below narrow the
- * specific fields they use.
- */
-export type TeacherAssessmentAnswers = Partial<Record<TeacherAssessmentSectionId, Record<string, unknown>>>;
+/* ----- answer readers ------------------------------------------------------- */
 
-/** Read a string field from an open-shape section, or undefined. */
-function readStr(section: Record<string, unknown> | undefined, key: string): string | undefined {
-  const v = section?.[key];
+function sectionAnswers(
+  answers: TeacherAssessmentAnswers,
+  id: TeacherAssessmentSectionId,
+): Record<string, unknown> {
+  return (answers[id] ?? {}) as Record<string, unknown>;
+}
+
+function readSingle(
+  answers: TeacherAssessmentAnswers,
+  id: TeacherAssessmentSectionId,
+  questionId: string,
+): string | undefined {
+  const v = sectionAnswers(answers, id)[questionId];
   return typeof v === "string" && v.length > 0 ? v : undefined;
 }
 
-/** Read a string[] field from an open-shape section (empty when absent). */
-function readList(section: Record<string, unknown> | undefined, key: string): string[] {
-  const v = section?.[key];
+function readMulti(
+  answers: TeacherAssessmentAnswers,
+  id: TeacherAssessmentSectionId,
+  questionId: string,
+): string[] {
+  const v = sectionAnswers(answers, id)[questionId];
   return Array.isArray(v) ? (v.filter((x) => typeof x === "string") as string[]) : [];
 }
 
-/** Map the section role enum to the free-text label assessment-svc stores. */
-export const TEACHER_ROLE_LABELS: Record<string, string> = {
-  general_ed: "General Ed Teacher",
-  special_ed: "Special Ed Teacher",
-  intervention: "Intervention Specialist",
-  subject_specialist: "Subject Specialist",
-  paraeducator: "Paraeducator",
-  related_service: "Related Service Provider",
-  other: "Teacher",
-};
+function readText(
+  answers: TeacherAssessmentAnswers,
+  id: TeacherAssessmentSectionId,
+  questionId: string,
+): string | undefined {
+  const v = sectionAnswers(answers, id)[questionId];
+  return typeof v === "string" && v.trim().length > 0 ? v.trim() : undefined;
+}
+
+function labelsOf(
+  id: TeacherAssessmentSectionId,
+  questionId: string,
+  values: string[],
+): string[] {
+  return values.map((v) => optionLabel(id, questionId, v));
+}
+
+function dedupe(list: string[]): string[] {
+  return Array.from(new Set(list));
+}
+
+/* ----- role labels (kept for compatibility) -------------------------------- */
 
 /**
- * Project the accumulated draft answers into the assessment-svc submit
- * payload (system of record). Pure + deterministic so the BFF and a test
- * can both call it. `additionalResponses` carries the structured extras
- * the flat columns don't have a home for.
+ * Map a classroom-context role value to the free-text label assessment-svc
+ * stores. Derived from the content option labels so the two never drift.
  */
+export const TEACHER_ROLE_LABELS: Record<string, string> = Object.fromEntries(
+  (getSection("classroom_context")?.questions.find((q) => q.id === "cc_role")?.options ?? []).map(
+    (o) => [o.value, o.label],
+  ),
+);
+
+/* ----- projection: assessment-svc submit payload --------------------------- */
+
 export function toTeacherSubmitPayload(
   learnerId: string,
   answers: TeacherAssessmentAnswers,
@@ -172,71 +166,114 @@ export function toTeacherSubmitPayload(
   recommendedFocusAreas: string[];
   additionalResponses: Record<string, unknown>;
 } {
-  const ctx = answers.context;
-  const sup = answers.supports;
-  const obs = answers.observations;
+  const roleVal = readSingle(answers, "classroom_context", "cc_role");
+  const teacherRole = roleVal ? optionLabel("classroom_context", "cc_role", roleVal) : undefined;
+  const gradeLevel = readSingle(answers, "classroom_context", "cc_grade");
+  const subjects = labelsOf(
+    "classroom_context",
+    "cc_subject",
+    readMulti(answers, "classroom_context", "cc_subject"),
+  );
 
-  const teacherRole = readStr(ctx, "teacherRole");
-  const gradeLevel = readStr(ctx, "gradeLevel");
-  const subjectAreas = readList(ctx, "subjectAreas");
-  const planContext = readStr(sup, "planContext");
-  const bestEngagementWindow = readStr(obs, "bestEngagementWindow");
-  const additionalNotes = readStr(obs, "additionalNotes");
-  const observations = readStr(obs, "observations");
+  const strengths = labelsOf(
+    "academic_strengths",
+    "as_strong_subjects",
+    readMulti(answers, "academic_strengths", "as_strong_subjects"),
+  );
 
-  const additionalResponses: Record<string, unknown> = {};
-  if (subjectAreas.length > 1) additionalResponses.subjectAreas = subjectAreas;
-  if (planContext) additionalResponses.planContext = planContext;
-  if (bestEngagementWindow) additionalResponses.bestEngagementWindow = bestEngagementWindow;
-  if (additionalNotes) additionalResponses.additionalNotes = additionalNotes;
+  const accommodations = dedupe([
+    ...labelsOf(
+      "support_strategies",
+      "ss_accommodations",
+      readMulti(answers, "support_strategies", "ss_accommodations"),
+    ),
+    ...labelsOf(
+      "support_strategies",
+      "ss_working_now",
+      readMulti(answers, "support_strategies", "ss_working_now"),
+    ),
+  ]);
+
+  const recommendedFocusAreas = labelsOf(
+    "support_strategies",
+    "ss_focus_areas",
+    readMulti(answers, "support_strategies", "ss_focus_areas"),
+  );
+
+  const challenges = labelsOf(
+    "final_notes",
+    "fn_concerns",
+    readMulti(answers, "final_notes", "fn_concerns").filter((v) => v !== "none"),
+  );
+
+  const observations = [
+    readText(answers, "final_notes", "fn_celebrate"),
+    readText(answers, "final_notes", "fn_goals"),
+    readText(answers, "final_notes", "fn_anything"),
+    readText(answers, "academic_strengths", "as_strengths_notes"),
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  const additionalResponses: Record<string, unknown> = {
+    // Full structured answers so nothing the flat columns can't hold is lost.
+    sections: answers,
+  };
+  if (subjects.length > 1) additionalResponses.subjectAreas = subjects;
 
   return {
     learnerId,
-    ...(teacherRole ? { teacherRole: TEACHER_ROLE_LABELS[teacherRole] ?? "Teacher" } : {}),
+    ...(teacherRole ? { teacherRole } : {}),
     ...(gradeLevel ? { gradeLevel } : {}),
-    // The flat column takes the first/primary subject; the full list (if
-    // any) rides in additionalResponses so nothing is lost.
-    ...(subjectAreas.length > 0 ? { subjectArea: subjectAreas[0] } : {}),
-    strengths: readList(answers.strengths, "strengths"),
-    challenges: readList(sup, "challenges"),
-    accommodations: readList(sup, "accommodations"),
+    ...(subjects.length > 0 ? { subjectArea: subjects[0] } : {}),
+    strengths,
+    challenges,
+    accommodations,
     ...(observations ? { observations } : {}),
-    recommendedFocusAreas: readList(answers.strengths, "recommendedFocusAreas"),
+    recommendedFocusAreas,
     additionalResponses,
   };
 }
 
-/**
- * Build the one-line summary insight mirrored to family-svc
- * (`createTeacherInsight`) so the brain-clone collaborator fold sees the
- * teacher's contribution. Strengths-first, plain language, and honest:
- * it names the supports the teacher recommended (what parents actually
- * see), never raw disability signals.
- */
+/* ----- projection: family-svc summary insight ------------------------------ */
+
 export function toTeacherInsightSummary(
   learnerName: string,
   answers: TeacherAssessmentAnswers,
 ): { insightText: string; domain: string } {
-  const strengths = readList(answers.strengths, "strengths");
-  const accommodations = readList(answers.supports, "accommodations");
-  const focus = readList(answers.strengths, "recommendedFocusAreas");
+  const strengths = labelsOf(
+    "academic_strengths",
+    "as_strong_subjects",
+    readMulti(answers, "academic_strengths", "as_strong_subjects"),
+  );
+  const accommodations = dedupe([
+    ...labelsOf(
+      "support_strategies",
+      "ss_working_now",
+      readMulti(answers, "support_strategies", "ss_working_now"),
+    ),
+    ...labelsOf(
+      "support_strategies",
+      "ss_accommodations",
+      readMulti(answers, "support_strategies", "ss_accommodations"),
+    ),
+  ]);
+  const focus = labelsOf(
+    "support_strategies",
+    "ss_focus_areas",
+    readMulti(answers, "support_strategies", "ss_focus_areas"),
+  );
 
   const parts: string[] = [];
-  if (strengths.length > 0) {
-    parts.push(`Classroom strengths: ${strengths.slice(0, 4).join(", ")}.`);
-  }
-  if (accommodations.length > 0) {
+  if (strengths.length > 0) parts.push(`Classroom strengths: ${strengths.slice(0, 4).join(", ")}.`);
+  if (accommodations.length > 0)
     parts.push(`Supports that work: ${accommodations.slice(0, 4).join(", ")}.`);
-  }
-  if (focus.length > 0) {
-    parts.push(`Suggested focus: ${focus.slice(0, 3).join(", ")}.`);
-  }
+  if (focus.length > 0) parts.push(`Suggested focus: ${focus.slice(0, 3).join(", ")}.`);
+
   const insightText =
     parts.length > 0
       ? `Teacher read on ${learnerName}. ${parts.join(" ")}`
       : `A teacher completed a classroom assessment for ${learnerName}.`;
 
-  // "classroom" domain keeps the fold's domain-mapping conservative —
-  // it acknowledges the perspective without forcing a clinical support.
   return { insightText, domain: "classroom" };
 }

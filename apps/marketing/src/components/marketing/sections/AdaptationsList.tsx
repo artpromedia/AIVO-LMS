@@ -15,22 +15,22 @@ export function AdaptationsList({
     <section className="mb-14" aria-labelledby={headingId}>
       <h2
         id={headingId}
-        className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-3"
+        className="text-2xl md:text-3xl font-heading font-bold text-iw-ink mb-3"
       >
         {heading}
       </h2>
-      {subheading && <p className="text-slate-600 font-body mb-6 leading-relaxed">{subheading}</p>}
+      {subheading && <p className="text-iw-ink-muted font-body mb-6 leading-relaxed">{subheading}</p>}
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {items.map((it) => (
           <li
             key={it.title}
-            className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-4"
+            className="flex gap-3 rounded-iw-card border border-iw-border bg-white p-4"
           >
-            <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" aria-hidden="true" />
+            <CheckCircle2 className="w-5 h-5 text-iw-success mt-0.5 shrink-0" aria-hidden="true" />
             <div>
-              <p className="font-heading font-bold text-slate-900 text-sm">{it.title}</p>
+              <p className="font-heading font-bold text-iw-ink text-sm">{it.title}</p>
               {it.body && (
-                <p className="mt-1 text-sm text-slate-600 font-body leading-relaxed">{it.body}</p>
+                <p className="mt-1 text-sm text-iw-ink-muted font-body leading-relaxed">{it.body}</p>
               )}
             </div>
           </li>

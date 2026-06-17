@@ -3,9 +3,11 @@ export * from "./assets.js";
 export * from "./role-themes.js";
 export * from "./playful-calm.js";
 export * from "./inclusive-warm.js";
+export * from "./steady-signal.js";
 export * from "./subjects.js";
 export * from "./contrast-guard.js";
 export * from "./generated/tier-themes.js";
+export * from "./generated/admin-chart.js";
 export * from "./tutor-themes.js";
 
 // Re-imports for the `BRAND` summary object below. The `export *` lines

@@ -1,5 +1,6 @@
 {
   "common": {
+    "preparingSpace": "Preparing your learning space",
     "back": "Back",
     "next": "Next",
     "cancel": "Cancel",
@@ -169,7 +170,8 @@
     "sessionsTrend": "Sessions this week trend",
     "masteryBySubject": "Mastery by subject",
     "reports": "Reports",
-    "districtLogo": "District logo"
+    "districtLogo": "District logo",
+    "resources": "Resources"
   },
   "parentSettings": {
     "title": "Settings",
@@ -1146,5 +1148,20 @@
       "future": "The birth date can't be in the future.",
       "tooOld": "Learners must be 21 or younger."
     }
+  },
+  "parentResources": {
+    "title": "Resources",
+    "intro": "Quick links to the tools you already have. A curated library of guides is on the way.",
+    "reportsLink": "Reports",
+    "reportsDesc": "Weekly mastery and progress for each learner.",
+    "messagesLink": "Messages",
+    "messagesDesc": "Talk with your learner's care team.",
+    "privacyLink": "Privacy & data",
+    "privacyDesc": "Review consent, export, or delete data.",
+    "settingsLink": "Settings",
+    "settingsDesc": "Manage your account and preferences.",
+    "libraryTitle": "Guides & library",
+    "libraryEmptyTitle": "Library coming soon",
+    "libraryEmptyBody": "Curated guides for supporting your learner aren't available yet. We'll add them here when they're ready."
   }
 }

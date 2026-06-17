@@ -24,14 +24,14 @@ export default function LearnerError({
     <StaticRoleShell role="learner">
       <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center">
         <AivoMascot expression="thinking" size={104} className="mb-1" />
-        <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">{t("title")}</p>
+        <p className="text-sm font-medium uppercase tracking-wide text-iw-error">{t("title")}</p>
         <h1 className="mt-2 font-display text-4xl font-bold">{t("body")}</h1>
-        <p className="mt-3 text-aivo-ink-soft">
+        <p className="mt-3 text-iw-ink-muted">
           Your progress is saved. Tap "Try again" to come right back, or visit home for your next
           mission.
         </p>
         {error.digest ? (
-          <p className="mt-2 text-xs text-aivo-muted">Reference: {error.digest}</p>
+          <p className="mt-2 text-xs text-iw-ink-muted">Reference: {error.digest}</p>
         ) : null}
         <div className="mt-6 flex gap-3">
           <Button onClick={() => reset()}>{t("retry")}</Button>

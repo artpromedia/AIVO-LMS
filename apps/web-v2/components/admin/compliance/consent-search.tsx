@@ -71,7 +71,7 @@ export function ConsentSearch() {
         ) : (
           <div className="overflow-x-auto rounded-[var(--radius-card)] border border-aivo-border">
             <table className="w-full text-sm">
-              <thead className="bg-aivo-surface-2 text-left">
+              <thead className="bg-iw-raised text-left">
                 <tr>
                   <th className="p-3 font-semibold">Subject</th>
                   <th className="p-3 font-semibold">Type</th>

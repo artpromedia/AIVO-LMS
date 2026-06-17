@@ -20,6 +20,7 @@ import {
   listSubjects,
 } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { TutorFace } from "@/components/learner/art/tutor-character";
 import { learnerPrefStyleVars } from "@/lib/a11y/learner-prefs";
 
 /**
@@ -111,11 +112,11 @@ export default async function BaselineIntroPage({
               src={reducedArt ? (firstTutor.avatarReduced ?? firstTutor.avatar) : firstTutor.avatar}
               alt=""
               aria-hidden="true"
-              className="h-16 w-16 rounded-2xl object-contain"
+              className="h-16 w-16 rounded-iw-control object-contain"
             />
-          ) : (
-            firstTutor?.emoji
-          )
+          ) : firstTutor ? (
+            <TutorFace tutorKey={firstTutor.tutorKey} size={64} />
+          ) : null
         }
         chips={chips.slice(0, 4).map((v) => (
           <PersonalizationChip key={v} variant={v} />

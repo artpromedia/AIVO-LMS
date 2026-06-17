@@ -96,8 +96,8 @@ export function IdpForm({
               key={p.value}
               className={`cursor-pointer rounded-md border p-3 text-sm transition-colors ${
                 protocol === p.value
-                  ? "border-aivo-primary bg-aivo-primary-soft"
-                  : "border-aivo-border hover:bg-aivo-surface-2"
+                  ? "border-iw-primary bg-iw-purple-100"
+                  : "border-iw-border hover:bg-iw-raised"
               }`}
             >
               <input

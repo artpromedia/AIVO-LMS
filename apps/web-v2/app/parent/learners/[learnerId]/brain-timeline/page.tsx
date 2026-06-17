@@ -98,8 +98,8 @@ export default async function BrainTimelinePage({
       {/* Adjust affordance — the timeline is for awareness; the review screen is
           where the parent changes something. Only meaningful once a clone exists. */}
       {profile && profile.cloneStage !== "pre_clone" ? (
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-aivo-border pt-4">
-          <p className="text-sm text-aivo-ink-soft">{t("adjust_hint", { name })}</p>
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-iw-border pt-4">
+          <p className="text-sm text-iw-ink-muted">{t("adjust_hint", { name })}</p>
           <Button asChild>
             <Link href={`/parent/learners/${learnerId}/brain-review`}>
               {t("review_changes_cta")} <ArrowRight className="ml-1 h-4 w-4" />

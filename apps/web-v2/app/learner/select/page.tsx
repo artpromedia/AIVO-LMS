@@ -1,24 +1,31 @@
 /**
- * Sprint 12: Learner selection — a parent with multiple children picks which
- * one to "view as" on /learner/home. Sets the `aivo_active_learner_id`
- * cookie via a server action and redirects to /learner/home.
+ * Sprint 12: Learner selection — design #1 "Choose your profile".
  *
- * Single-child parents are bounced through automatically.
+ * A parent hands the device to a child: the child picks their avatar and enters
+ * their PIN. This is the PIN-gated session hand-off (`enterAsLearner`), not the
+ * parent "view-as" path — selecting a profile and entering the right PIN swaps
+ * the session to the learner. Authorization + PIN verification live in the
+ * server action.
+ *
+ * Single-child parents are still bounced straight through the view-as auto
+ * route (no profile grid to choose from).
  */
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
-import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader } from "@/components/layout/page-header";
-import { PARENT_NAV } from "@/components/layout/role-shells";
+import {
+  AuthSplitLayout,
+  AuthSidePanel,
+  AuthTrustCard,
+  AuthSecureFooter,
+} from "@/components/auth/auth-split-layout";
+import { AivoBrandMark } from "@/components/auth/auth-brand-mark";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
-import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { listLearnersForParent } from "@/lib/db/repos";
-import { enterLearnerHome } from "@/lib/learner/active-learner-actions";
+import { enterAsLearner } from "@/lib/learner/active-learner-actions";
+import { LearnerProfilePicker } from "./_components/learner-profile-picker";
 
 export default async function LearnerSelectPage({
   searchParams,
@@ -27,6 +34,7 @@ export default async function LearnerSelectPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const t = await getTranslations("learner.select");
+  const tShell = await getTranslations("auth.shell");
   const learners = await listLearnersForParent(session.userId, session.tenantId);
   const params = await searchParams;
 
@@ -37,59 +45,41 @@ export default async function LearnerSelectPage({
     redirect(`/learner/select/auto?learnerId=${encodeURIComponent(learners[0].id)}`);
   }
 
+  const panel = (
+    <AuthSidePanel variant="wave" title={t("panel_title")} body={t("panel_body")}>
+      <AuthTrustCard>{tShell("trust_support")}</AuthTrustCard>
+    </AuthSidePanel>
+  );
+
   return (
-    <AppShell
-      role="parent"
-      roleLabel="Parent"
-      navItems={PARENT_NAV}
-      user={{ displayName: session.displayName, email: session.email }}
-    >
-      <PageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
-      {params.error === "forbidden" && (
-        <Card className="mb-4 border-red-200 bg-red-50 p-4 text-sm text-red-900">
-          {t("forbidden")}
+    <AuthSplitLayout panel={panel}>
+      <div className="mb-8 flex justify-center">
+        <AivoBrandMark sublabel={tShell("wordmark_family")} />
+      </div>
+
+      {params.error && (
+        <Card className="mb-4 border-iw-error bg-iw-error-subtle p-4 text-sm text-iw-error-strong" role="alert">
+          {params.error === "forbidden"
+            ? t("forbidden")
+            : params.error === "locked"
+              ? t("error_locked")
+              : t("error_pin")}
         </Card>
       )}
+
       {learners.length === 0 ? (
-        <EmptyState
-          title={t("no_learners")}
-          description={t("no_learners_desc")}
-          action={
-            <Button asChild>
-              <Link href="/parent/learners/new">{t("add_learner")}</Link>
-            </Button>
-          }
-        />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {learners.map((l) => (
-            <form key={l.id} action={enterLearnerHome}>
-              <input type="hidden" name="learnerId" value={l.id} />
-              <button
-                type="submit"
-                className="block w-full text-left"
-                aria-label={t("view_as_aria", { name: l.displayName })}
-              >
-                <Card className="flex items-center gap-4 p-[var(--aivo-density-card-pad)] transition hover:border-aivo-primary hover:shadow-md">
-                  <LearnerAvatar name={l.displayName} size="lg" />
-                  <div className="flex-1">
-                    <p className="font-display text-lg font-semibold">{l.displayName}</p>
-                    <p className="text-sm text-aivo-ink-soft">
-                      {l.ageRange ?? t("age_not_set")}
-                      {l.gradeBand ? ` · ${l.gradeBand}` : ""}
-                    </p>
-                    <div className="mt-2">
-                      <Badge tone="neutral">
-                        {t("readiness", { state: l.readinessState.replace(/_/g, " ") })}
-                      </Badge>
-                    </div>
-                  </div>
-                </Card>
-              </button>
-            </form>
-          ))}
+        <div className="rounded-iw-card border border-iw-border bg-white p-6 text-center">
+          <p className="font-iw-display text-lg font-semibold text-iw-ink">{t("no_learners")}</p>
+          <p className="mt-2 text-sm text-iw-ink-muted">{t("no_learners_desc")}</p>
+          <Button asChild className="mt-5">
+            <Link href="/parent/learners/new">{t("add_learner")}</Link>
+          </Button>
         </div>
+      ) : (
+        <LearnerProfilePicker learners={learners} action={enterAsLearner} />
       )}
-    </AppShell>
+
+      <AuthSecureFooter lead={tShell("secure_signin")} sub={tShell("encrypted")} />
+    </AuthSplitLayout>
   );
 }

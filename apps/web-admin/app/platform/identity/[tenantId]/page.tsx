@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requirePageRole } from "@aivo/admin-auth";
 import { listScimTokens } from "@aivo/admin-api/scim";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 import { formatDateTime } from "@/components/admin-format";
 
 export default async function TenantScimPage({
@@ -15,7 +16,6 @@ export default async function TenantScimPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Identity"
       title="SCIM provisioning tokens"
       description={`Directory-sync tokens issued for tenant ${tenantId}.`}
       action={
@@ -42,10 +42,10 @@ export default async function TenantScimPage({
                   <td className="font-bold">{token.name}</td>
                   <td className="font-mono text-xs text-slate-500">{token.prefix}</td>
                   <td>
-                    <span className="admin-status">{token.revokedAt ? "revoked" : "active"}</span>
+                    <StatusPill status={token.revokedAt ? "revoked" : "active"} />
                   </td>
-                  <td className="text-sm">{formatDateTime(token.lastUsedAt)}</td>
-                  <td className="text-sm">{formatDateTime(token.createdAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(token.lastUsedAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(token.createdAt)}</td>
                 </tr>
               ))}
               {tokens.length === 0 ? (

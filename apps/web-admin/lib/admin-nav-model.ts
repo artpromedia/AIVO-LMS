@@ -6,12 +6,17 @@
  * Role visibility mirrors the pre-shell gating: pilot/coupon destinations
  * were platform-admin actions, sales leads were platform_admin + sales, and
  * everything else is visible to any platform-staff role.
+ *
+ * `icon` is a stable string key (not a component) so groups stay serialisable
+ * across the server→client boundary; the shell maps the key to a lucide icon.
  */
 import type { Role } from "@aivo/admin-auth/types";
 
 export interface AdminNavItem {
   label: string;
   href: string;
+  /** lucide icon key resolved client-side in the shell. */
+  icon?: string;
   /** Roles that may see this item; omitted = every platform role. */
   roles?: readonly Role[];
 }
@@ -20,6 +25,8 @@ export interface AdminNavGroup {
   /** Stable id used for data-testids and collapse state. */
   id: string;
   label: string;
+  /** lucide icon key for the group header. */
+  icon?: string;
   items: AdminNavItem[];
 }
 
@@ -27,58 +34,73 @@ export const PLATFORM_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
     id: "identity-access",
     label: "Identity & Access",
+    icon: "fingerprint",
     items: [
-      { label: "Tenants", href: "/platform/tenants" },
-      { label: "Users", href: "/platform/users" },
-      { label: "Learners", href: "/platform/learners" },
-      { label: "Identity", href: "/platform/identity" },
-      { label: "API keys", href: "/platform/settings/api-keys" },
+      { label: "Tenants", href: "/platform/tenants", icon: "building-2" },
+      { label: "Users", href: "/platform/users", icon: "users" },
+      { label: "Learners", href: "/platform/learners", icon: "graduation-cap" },
+      { label: "Identity", href: "/platform/identity", icon: "scan-face" },
+      { label: "API keys", href: "/platform/settings/api-keys", icon: "key-round" },
     ],
   },
   {
     id: "ai-governance",
     label: "AI Governance",
+    icon: "sparkles",
     items: [
-      { label: "Models", href: "/platform/ai/models" },
-      { label: "Policies", href: "/platform/ai/policies" },
-      { label: "Incidents", href: "/platform/ai/incidents" },
-      { label: "Evals", href: "/platform/ai/evals" },
-      { label: "Opt-outs", href: "/platform/ai/optouts" },
-      { label: "AI costs", href: "/platform/ai-costs" },
-      { label: "Safety", href: "/platform/safety" },
+      { label: "Models", href: "/platform/ai/models", icon: "boxes" },
+      { label: "Policies", href: "/platform/ai/policies", icon: "file-text" },
+      { label: "Incidents", href: "/platform/ai/incidents", icon: "siren" },
+      { label: "Evals", href: "/platform/ai/evals", icon: "flask-conical" },
+      { label: "Opt-outs", href: "/platform/ai/optouts", icon: "user-minus" },
+      { label: "AI costs", href: "/platform/ai-costs", icon: "dollar-sign" },
+      { label: "Safety", href: "/platform/safety", icon: "shield-alert" },
     ],
   },
   {
     id: "billing-growth",
     label: "Billing & Growth",
+    icon: "trending-up",
     items: [
-      { label: "Billing", href: "/platform/billing" },
-      { label: "Pilots", href: "/platform/pilots", roles: ["platform_admin"] },
-      { label: "Coupons", href: "/platform/billing/coupons", roles: ["platform_admin"] },
-      { label: "Sales leads", href: "/platform/sales/leads", roles: ["platform_admin", "sales"] },
+      { label: "Billing", href: "/platform/billing", icon: "credit-card" },
+      { label: "Pilots", href: "/platform/pilots", icon: "rocket", roles: ["platform_admin"] },
+      {
+        label: "Coupons",
+        href: "/platform/billing/coupons",
+        icon: "ticket",
+        roles: ["platform_admin"],
+      },
+      {
+        label: "Sales leads",
+        href: "/platform/sales/leads",
+        icon: "megaphone",
+        roles: ["platform_admin", "sales"],
+      },
     ],
   },
   {
     id: "compliance-trust",
     label: "Compliance & Trust",
+    icon: "shield-check",
     items: [
-      { label: "Compliance", href: "/platform/compliance" },
-      { label: "Security", href: "/platform/security" },
-      { label: "Audit log", href: "/platform/audit" },
-      { label: "IEP oversight", href: "/platform/iep" },
+      { label: "Compliance", href: "/platform/compliance", icon: "clipboard-check" },
+      { label: "Security", href: "/platform/security", icon: "shield" },
+      { label: "Audit log", href: "/platform/audit", icon: "scroll-text" },
+      { label: "IEP oversight", href: "/platform/iep", icon: "file-check" },
     ],
   },
   {
     id: "operations",
     label: "Operations",
+    icon: "settings",
     items: [
-      { label: "System health", href: "/platform/system-health" },
-      { label: "Jobs", href: "/platform/jobs" },
-      { label: "Feature flags", href: "/platform/feature-flags" },
-      { label: "Support", href: "/platform/support" },
-      { label: "Content", href: "/platform/content" },
-      { label: "Pronunciation", href: "/platform/audio/pronunciation" },
-      { label: "Baseline items", href: "/platform/baseline-items" },
+      { label: "System health", href: "/platform/system-health", icon: "activity" },
+      { label: "Jobs", href: "/platform/jobs", icon: "list-checks" },
+      { label: "Feature flags", href: "/platform/feature-flags", icon: "flag" },
+      { label: "Support", href: "/platform/support", icon: "life-buoy" },
+      { label: "Content", href: "/platform/content", icon: "layout-template" },
+      { label: "Pronunciation", href: "/platform/audio/pronunciation", icon: "volume-2" },
+      { label: "Baseline items", href: "/platform/baseline-items", icon: "list-tree" },
     ],
   },
 ];
@@ -96,29 +118,33 @@ export const SCHOOL_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
     id: "school-operations",
     label: "Operations",
+    icon: "settings",
     items: [
-      { label: "Learners", href: "/school/learners" },
-      { label: "Classes", href: "/school/classes" },
-      { label: "Rostering", href: "/school/rostering" },
+      { label: "Learners", href: "/school/learners", icon: "graduation-cap" },
+      { label: "Classes", href: "/school/classes", icon: "users" },
+      { label: "Rostering", href: "/school/rostering", icon: "upload" },
     ],
   },
   {
     id: "school-reports",
     label: "Reports",
-    items: [{ label: "Reports", href: "/school/reports" }],
+    icon: "bar-chart-3",
+    items: [{ label: "Reports", href: "/school/reports", icon: "bar-chart-3" }],
   },
   {
     id: "school-compliance",
     label: "Compliance",
+    icon: "shield-check",
     items: [
-      { label: "Compliance", href: "/school/compliance" },
-      { label: "Audit log", href: "/school/audit" },
+      { label: "Compliance", href: "/school/compliance", icon: "clipboard-check" },
+      { label: "Audit log", href: "/school/audit", icon: "scroll-text" },
     ],
   },
   {
     id: "school-billing",
     label: "Billing",
-    items: [{ label: "Billing", href: "/school/billing" }],
+    icon: "trending-up",
+    items: [{ label: "Billing", href: "/school/billing", icon: "credit-card" }],
   },
 ];
 
@@ -127,30 +153,34 @@ export const DISTRICT_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
     id: "district-operations",
     label: "Operations",
+    icon: "settings",
     items: [
-      { label: "Parents", href: "/district/parents" },
-      { label: "SIS connectors", href: "/district/sis" },
-      { label: "Single sign-on", href: "/district/sso-config" },
-      { label: "Branding", href: "/district/branding" },
-      { label: "IEP evaluations", href: "/district/iep" },
+      { label: "Parents", href: "/district/parents", icon: "users" },
+      { label: "SIS connectors", href: "/district/sis", icon: "plug" },
+      { label: "Single sign-on", href: "/district/sso-config", icon: "key-round" },
+      { label: "Branding", href: "/district/branding", icon: "palette" },
+      { label: "IEP evaluations", href: "/district/iep", icon: "file-check" },
     ],
   },
   {
     id: "district-reports",
     label: "Reports",
-    items: [{ label: "Reports", href: "/district/reports" }],
+    icon: "bar-chart-3",
+    items: [{ label: "Reports", href: "/district/reports", icon: "bar-chart-3" }],
   },
   {
     id: "district-compliance",
     label: "Compliance",
+    icon: "shield-check",
     items: [
-      { label: "Compliance", href: "/district/compliance" },
-      { label: "Audit log", href: "/district/audit" },
+      { label: "Compliance", href: "/district/compliance", icon: "clipboard-check" },
+      { label: "Audit log", href: "/district/audit", icon: "scroll-text" },
     ],
   },
   {
     id: "district-billing",
     label: "Billing",
-    items: [{ label: "Billing", href: "/district/billing" }],
+    icon: "trending-up",
+    items: [{ label: "Billing", href: "/district/billing", icon: "credit-card" }],
   },
 ];

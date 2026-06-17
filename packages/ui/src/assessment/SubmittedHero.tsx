@@ -46,13 +46,13 @@ export function SubmittedHero({
       <div className="flex items-start gap-4">
         <span
           className={cn(
-            "relative shrink-0 w-14 h-14 rounded-2xl",
+            "relative shrink-0 w-14 h-14 rounded-iw-control",
             "bg-white shadow-[0_4px_16px_rgba(124,58,237,0.18)]",
             "flex items-center justify-center text-[var(--aivo-sensory-primary,#7c3aed)]",
           )}
           aria-hidden="true"
         >
-          <span className="absolute inset-0 rounded-2xl bg-[var(--aivo-color-aivoPurple-100,#ede9fe)]/40 motion-safe:animate-pulse" />
+          <span className="absolute inset-0 rounded-iw-control bg-[var(--aivo-color-aivoPurple-100,#ede9fe)]/40 motion-safe:animate-pulse" />
           <svg
             className="w-7 h-7 relative"
             viewBox="0 0 24 24"

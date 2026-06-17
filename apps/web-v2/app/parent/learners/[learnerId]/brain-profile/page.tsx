@@ -220,8 +220,8 @@ export default async function BrainProfilePage({
           surface the review & correct screen prominently — the parent's path to
           confirm/adjust each inference before approving. Hidden once approved. */}
       {profile.cloneStage === "cloned" ? (
-        <Card className="mb-4 flex flex-wrap items-center justify-between gap-3 border-aivo-primary/40 bg-aivo-primary/5 p-4">
-          <p className="text-sm font-medium text-aivo-ink">
+        <Card className="mb-4 flex flex-wrap items-center justify-between gap-3 border-iw-primary/40 bg-iw-primary/5 p-4">
+          <p className="text-sm font-medium text-iw-ink">
             {t("review_and_adjust_hint", { name: learner.displayName })}
           </p>
           <Button asChild>
@@ -233,11 +233,11 @@ export default async function BrainProfilePage({
       ) : null}
 
       <Card className="mb-4 flex items-start gap-3 p-4">
-        <Sparkles className="h-5 w-5 shrink-0 text-aivo-primary" />
+        <Sparkles className="h-5 w-5 shrink-0 text-iw-primary" />
         <div className="text-sm">
           <p className="font-medium">{t("recommended_tutor_persona")}</p>
-          <p className="mt-1 text-aivo-ink-soft">
-            <span className="font-semibold text-aivo-ink">
+          <p className="mt-1 text-iw-ink-muted">
+            <span className="font-semibold text-iw-ink">
               {PERSONA_LABEL[s.tutorPersonaRecommendation.style]}
             </span>{" "}
             — {s.tutorPersonaRecommendation.rationale}
@@ -280,16 +280,16 @@ export default async function BrainProfilePage({
       <SectionHeader title={t("learning_profile")} className="mt-6" />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("sensory_profile")}
           </p>
           <dl className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">{t("pattern")}</dt>
+              <dt className="text-iw-ink-muted">{t("pattern")}</dt>
               <dd className="capitalize">{s.sensoryProfile.seekingOrAvoiding}</dd>
             </div>
             <div>
-              <dt className="text-aivo-ink-soft">{t("sensitivities")}</dt>
+              <dt className="text-iw-ink-muted">{t("sensitivities")}</dt>
               <dd className="mt-1 flex flex-wrap gap-1">
                 {s.sensoryProfile.sensitivities.length === 0
                   ? "none"
@@ -304,43 +304,43 @@ export default async function BrainProfilePage({
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("attention")}
           </p>
           <dl className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">{t("focus_window")}</dt>
+              <dt className="text-iw-ink-muted">{t("focus_window")}</dt>
               <dd>{s.attentionProfile.focusWindowMinutes} min</dd>
             </div>
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">{t("breaks")}</dt>
+              <dt className="text-iw-ink-muted">{t("breaks")}</dt>
               <dd className="capitalize">{s.attentionProfile.breakStyle.replaceAll("_", " ")}</dd>
             </div>
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">{t("movement_helps")}</dt>
+              <dt className="text-iw-ink-muted">{t("movement_helps")}</dt>
               <dd>{s.attentionProfile.movementHelps ? "Yes" : "No"}</dd>
             </div>
           </dl>
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("comfort")}
           </p>
           <dl className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">{t("reading")}</dt>
+              <dt className="text-iw-ink-muted">{t("reading")}</dt>
               <dd className="capitalize">{s.readingComfort}</dd>
             </div>
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">Math</dt>
+              <dt className="text-iw-ink-muted">Math</dt>
               <dd className="capitalize">{s.mathComfort}</dd>
             </div>
           </dl>
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("preferred_modalities")}
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -353,7 +353,7 @@ export default async function BrainProfilePage({
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("support_defaults")}
           </p>
           <ul className="mt-2 space-y-1 text-sm">
@@ -366,20 +366,20 @@ export default async function BrainProfilePage({
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("motivation")}
           </p>
-          <p className="mt-2 text-xs text-aivo-ink-soft">{t("rewards_that_help")}</p>
+          <p className="mt-2 text-xs text-iw-ink-muted">{t("rewards_that_help")}</p>
           <ul className="mt-1 list-disc pl-5 text-sm">
             {s.motivationProfile.rewardsThatHelp.length === 0 ? (
-              <li className="list-none text-aivo-ink-soft">none recorded</li>
+              <li className="list-none text-iw-ink-muted">none recorded</li>
             ) : (
               s.motivationProfile.rewardsThatHelp.map((r) => <li key={r}>{r}</li>)
             )}
           </ul>
           {s.motivationProfile.avoidanceFactors.length > 0 ? (
             <>
-              <p className="mt-3 text-xs text-aivo-ink-soft">{t("avoidance_factors")}</p>
+              <p className="mt-3 text-xs text-iw-ink-muted">{t("avoidance_factors")}</p>
               <ul className="mt-1 list-disc pl-5 text-sm">
                 {s.motivationProfile.avoidanceFactors.map((r) => (
                   <li key={r}>{r}</li>
@@ -403,7 +403,7 @@ export default async function BrainProfilePage({
       </div>
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-aivo-ink-soft">
+        <p className="text-xs text-iw-ink-muted">
           Last generated {new Date(profile.generatedAt).toLocaleString()}
           {" · "}
           schema v{s.schemaVersion}

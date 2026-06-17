@@ -2,6 +2,7 @@ import { requirePlatformPage } from "@aivo/admin-auth";
 import { getIepProfilesReview, listIepEvaluations } from "@aivo/admin-api/iep";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDate, formatDateTime } from "@/components/admin-format";
+import { StatusPill } from "@/components/status-pill";
 
 export default async function PlatformIepPage() {
   const session = await requirePlatformPage("platform:read");
@@ -15,7 +16,6 @@ export default async function PlatformIepPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="IEP oversight"
       description="Special-education evaluation pipeline and IEP annual-review compliance, read from the live IEP tables."
     >
@@ -46,11 +46,11 @@ export default async function PlatformIepPage() {
                   <td className="font-mono text-xs">{evaluation.learnerId}</td>
                   <td className="text-sm">{evaluation.tenantId ?? "—"}</td>
                   <td>
-                    <span className="admin-status">{evaluation.status}</span>
+                    <StatusPill status={evaluation.status} />
                   </td>
                   <td className="text-sm">{evaluation.decisionEligible ?? "—"}</td>
-                  <td className="text-sm">{formatDateTime(evaluation.submittedAt)}</td>
-                  <td className="text-sm">{formatDateTime(evaluation.decidedAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(evaluation.submittedAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(evaluation.decidedAt)}</td>
                 </tr>
               ))}
               {queue.evaluations.length === 0 ? (
@@ -91,8 +91,8 @@ export default async function PlatformIepPage() {
                   <td className="text-sm">{profile.gradeLevel ?? "—"}</td>
                   <td className="text-sm">{profile.placement ?? "—"}</td>
                   <td className="text-sm">{profile.lifecycleState}</td>
-                  <td className="text-sm font-bold text-red-700">{formatDate(profile.reviewDate)}</td>
-                  <td className="text-sm">{profile.revisionCounter}</td>
+                  <td className="text-sm font-bold text-red-700 tabular-nums">{formatDate(profile.reviewDate)}</td>
+                  <td className="text-sm tabular-nums">{profile.revisionCounter}</td>
                 </tr>
               ))}
               {review.profiles.length === 0 ? (

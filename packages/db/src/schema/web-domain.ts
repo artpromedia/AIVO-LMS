@@ -16,7 +16,8 @@
  *  - `seq BIGSERIAL` gives stable insertion order where the memory
  *    store relied on array push order.
  */
-import { pgTable, text, integer, boolean, jsonb, bigserial, index } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, boolean, jsonb, bigserial, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 // ── notifications ───────────────────────────────────────────────────
 export const webNotifications = pgTable(
@@ -83,7 +84,15 @@ export const webLearnerProfiles = pgTable(
     tenantId: text("tenant_id").notNull(),
     data: jsonb("data").notNull(),
   },
-  (t) => ({ idx: index("web_learner_profiles_tenant_idx").on(t.tenantId) }),
+  (t) => ({
+    idx: index("web_learner_profiles_tenant_idx").on(t.tenantId),
+    // Cross-platform unification (Task #34): at most one web profile may link a
+    // given canonical identity-svc learner per tenant, so concurrent BFF
+    // reconciles can never materialize duplicate web learners for one UUID.
+    identityLink: uniqueIndex("web_learner_profiles_identity_link_uq")
+      .on(t.tenantId, sql`((${t.data}) ->> 'identityLearnerId')`)
+      .where(sql`(${t.data}) ->> 'identityLearnerId' IS NOT NULL`),
+  }),
 );
 
 export const webParentLearnerRelationships = pgTable(
@@ -405,6 +414,18 @@ export const webTeacherAssignments = pgTable(
     data: jsonb("data").notNull(),
   },
   (t) => ({ idx: index("web_teacher_assignments_idx").on(t.teacherId, t.tenantId) }),
+);
+
+// Sprint A4: teacher personal-calendar events (teacher home "Upcoming").
+export const webCalendarEvents = pgTable(
+  "web_calendar_events",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    teacherUserId: text("teacher_user_id").notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => ({ idx: index("web_calendar_events_teacher_idx").on(t.tenantId, t.teacherUserId) }),
 );
 
 // ===== Collaboration (Sprint 4) =====

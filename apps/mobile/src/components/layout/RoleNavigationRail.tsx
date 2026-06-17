@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   badgeText: {
-    color: "#FFF",
+    color: colors.white,
     fontSize: 10,
     fontFamily: "Nunito-Bold",
     lineHeight: 12,

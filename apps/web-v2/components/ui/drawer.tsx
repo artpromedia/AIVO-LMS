@@ -23,7 +23,7 @@ export const DrawerContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-y-0 z-50 flex w-80 flex-col border-aivo-border bg-aivo-surface p-5 shadow-xl",
+        "fixed inset-y-0 z-50 flex w-80 flex-col border-iw-border bg-iw-card p-5 shadow-soft-5",
         side === "right" ? "right-0 border-l" : "left-0 border-r",
         className,
       )}
@@ -31,7 +31,7 @@ export const DrawerContent = React.forwardRef<
     >
       {children}
       <DialogPrimitive.Close
-        className="absolute right-3 top-3 rounded-full p-1 text-aivo-muted hover:bg-aivo-surface-2"
+        className="absolute right-3 top-3 rounded-full p-1 text-iw-ink-muted hover:bg-iw-raised"
         aria-label="Close"
       >
         <X className="h-4 w-4" />

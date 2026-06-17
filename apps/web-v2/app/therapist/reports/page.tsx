@@ -104,11 +104,11 @@ export default async function TherapistReportsPage() {
               <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-base font-semibold">{r.learner.displayName}</p>
-                  <p className="mt-0.5 text-xs text-aivo-ink-soft">
+                  <p className="mt-0.5 text-xs text-iw-ink-muted">
                     {r.learner.gradeBand ? `Grade ${r.learner.gradeBand}` : "Grade not set"}
                   </p>
                   {r.focusSkillName ? (
-                    <p className="mt-1 text-xs text-aivo-ink-soft">
+                    <p className="mt-1 text-xs text-iw-ink-muted">
                       {t("focus_label")} <span className="text-iw-ink">{r.focusSkillName}</span>
                       {r.focusScore === null ? "" : ` (${Math.round(r.focusScore * 100)}%)`}
                     </p>
@@ -116,11 +116,11 @@ export default async function TherapistReportsPage() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                   <div className="text-right">
-                    <p className="text-xs text-aivo-ink-soft">{t("skills_tracked")}</p>
+                    <p className="text-xs text-iw-ink-muted">{t("skills_tracked")}</p>
                     <p className="text-base font-semibold">{r.tracked}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-aivo-ink-soft">{t("avg_score")}</p>
+                    <p className="text-xs text-iw-ink-muted">{t("avg_score")}</p>
                     <p className="text-base font-semibold">
                       {r.tracked > 0 ? `${Math.round(r.avg * 100)}%` : "—"}
                     </p>

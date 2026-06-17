@@ -55,7 +55,7 @@ export default async function EnterAsLearnerPage({
           <ArrowLeft className="h-4 w-4" /> {t("back", { name: learner.displayName })}
         </Link>
 
-        <Card className="flex flex-col items-center gap-5 rounded-iw-hero border-0 bg-white p-8 text-center shadow-[0_30px_80px_-40px_rgba(15,23,42,0.22)]">
+        <Card className="flex flex-col items-center gap-5 rounded-iw-hero border-0 bg-white p-8 text-center shadow-soft-5">
           <LearnerAvatar name={learner.displayName} size="lg" />
           <div className="flex flex-col gap-2">
             <h1 className="font-iw-display text-2xl font-bold text-iw-text-strong">

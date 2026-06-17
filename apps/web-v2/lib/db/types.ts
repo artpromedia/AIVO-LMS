@@ -124,6 +124,16 @@ export type LearnerProfile = {
    * `team_invite_optional`.
    */
   teamInviteDecision?: "pending" | "done" | "skipped";
+  /**
+   * Cross-platform unification (Task #34): the canonical identity-svc
+   * `learners.id` (a UUID) this web profile is linked to. The backend
+   * microservices (learning-svc sessions, mobile pin-login, mastery
+   * bridge) key everything off this id, while the web app keeps its own
+   * `lrn_*` primary key. Null/undefined for profiles that have not been
+   * provisioned in identity-svc yet (older rows, or dev/mock mode); the
+   * BFF reconciles + backfills the link lazily on read.
+   */
+  identityLearnerId?: string | null;
   createdAt: ISODate;
 };
 
@@ -182,7 +192,10 @@ export type ParentAssessment = {
 };
 
 // ===== Teacher assessment draft (Sprint C-07) =====
-export type TeacherAssessmentSectionId = "context" | "strengths" | "supports" | "observations";
+// Section ids live in the content bank (the 8-section "Classroom insights"
+// question set) so the schema, validator, UI, and projection share one source.
+export type { TeacherAssessmentSectionId } from "@/lib/teacher/assessment-content";
+import type { TeacherAssessmentSectionId } from "@/lib/teacher/assessment-content";
 
 /**
  * Web-v2 section-patch DRAFT for the teacher assessment wizard. The
@@ -1464,12 +1477,30 @@ export type QuestProgress = {
 };
 
 // ===== Helper / Teacher =====
+/**
+ * Sprint (Homework Helper work-through): an optional interactive surface the
+ * tutor offers alongside a guided turn — e.g. a number line the learner can
+ * tap to place an answer. Rendered in-chat by `@aivo/learner-surfaces`
+ * `SurfaceRouter`. Derived deterministically from the problem (no fixtures),
+ * so it always matches the numbers in front of the learner.
+ */
+export type HomeworkSurfaceSpec = {
+  surfaceType: "number_line";
+  prompt: string;
+  instructions?: string;
+  numberLine: { min: number; max: number; step: number };
+  /** The value the dot should land on — drives the in-surface correctness hint. */
+  expectedAnswer?: string;
+};
+
 export type HomeworkHelpMessage = {
   id: ID;
   role: "learner" | "tutor";
   text: string;
   /** True for tutor messages that intentionally withhold the final answer. */
   guidedOnly?: boolean;
+  /** Optional interactive surface offered with a tutor turn (e.g. number line). */
+  surface?: HomeworkSurfaceSpec;
   occurredAt: ISODate;
 };
 
@@ -1540,6 +1571,10 @@ export type TeacherAssignment = {
   learnerIds: ID[];
   status: "active" | "archived";
   dueAt: ISODate | null;
+  /** Sprint A4: learner submissions received (teacher-home grading queue). */
+  submissions?: number;
+  /** Sprint A4: submissions the teacher has graded. */
+  graded?: number;
   createdAt: ISODate;
   updatedAt: ISODate;
 };
@@ -2339,6 +2374,16 @@ export type School = {
   createdAt: ISODate;
 };
 
+/** A class meeting slot (teacher home "Today's classes" schedule line). */
+export type ClassroomSchedule = {
+  /** Display start, e.g. "8:15 AM". */
+  startTime: string;
+  /** Display end, e.g. "9:00 AM". */
+  endTime: string;
+  /** Weekday codes the class meets, e.g. ["Mon","Wed","Fri"]. */
+  days: string[];
+};
+
 export type Classroom = {
   id: ID;
   tenantId: ID;
@@ -2350,6 +2395,43 @@ export type Classroom = {
   teacherUserId: ID;
   /** Optional course id; one course can run across many classrooms. */
   courseId: ID | null;
+  /** Sprint A4: subject this class teaches (drives the class-card glyph). */
+  subjectId?: ID | null;
+  /** Sprint A4: optional meeting time for the teacher-home schedule. */
+  schedule?: ClassroomSchedule | null;
+  /** Sprint A4: current unit focus, e.g. "Story elements". */
+  focusArea?: string | null;
+  /** Sprint A4: today's lesson topic, e.g. "Character analysis". */
+  todayTopic?: string | null;
+  createdAt: ISODate;
+};
+
+/** Teacher personal-calendar event kind (teacher home "Upcoming"). */
+export type CalendarEventType =
+  | "professional_development"
+  | "assessment"
+  | "iep_meeting"
+  | "holiday"
+  | "event";
+
+/**
+ * Sprint A4: a teacher's personal calendar entry — staff PD, unit
+ * assessments, IEP meetings, holidays. Powers the teacher-home "Upcoming"
+ * rail. Web-owned row (no microservice system-of-record yet).
+ */
+export type CalendarEvent = {
+  id: ID;
+  tenantId: ID;
+  /** Owning teacher (user id). */
+  teacherUserId: ID;
+  title: string;
+  /** Secondary line, e.g. "4th Grade – Math", a learner name, or "No school". */
+  subtitle: string | null;
+  type: CalendarEventType;
+  /** Event date (ISO, used for the day chip + ordering). */
+  date: ISODate;
+  /** Display time, e.g. "10:00 AM" or "All day". */
+  timeLabel: string;
   createdAt: ISODate;
 };
 

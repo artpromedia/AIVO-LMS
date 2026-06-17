@@ -24,7 +24,7 @@ export function AllocationMatrix({ allocations, unallocated, total }: Allocation
         </span>
       </div>
       <table className="w-full text-sm">
-        <thead className="bg-aivo-surface-2 text-left">
+        <thead className="bg-iw-raised text-left">
           <tr>
             <th className="p-3">School</th>
             <th className="p-3 text-right">Allocated</th>
@@ -40,7 +40,7 @@ export function AllocationMatrix({ allocations, unallocated, total }: Allocation
             return (
               <tr
                 key={row.schoolId}
-                className={`border-t border-aivo-border ${overUtilized ? "bg-aivo-danger/5" : ""}`}
+                className={`border-t border-iw-border ${overUtilized ? "bg-iw-error/5" : ""}`}
               >
                 <td className="p-3 font-medium">{row.schoolName}</td>
                 <td className="p-3 text-right tabular-nums">{row.allocated}</td>

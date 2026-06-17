@@ -62,7 +62,6 @@ export default async function AiOptOutsPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Responsible AI"
       title="Opt-outs"
       description="Per-tenant model and feature opt-outs served by responsible-ai-svc."
       action={
@@ -139,7 +138,7 @@ export default async function AiOptOutsPage({
                     {optOut.createdBy}
                     <span className="block text-slate-500">{optOut.createdByRole}</span>
                   </td>
-                  <td className="text-sm">{formatDateTime(optOut.createdAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(optOut.createdAt)}</td>
                   <td>
                     <ConfirmDangerDialog
                       action={deleteAction}

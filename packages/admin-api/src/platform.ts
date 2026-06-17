@@ -1,6 +1,7 @@
 import "server-only";
 
 import { adminGet, adminGetAllPages } from "./client";
+import { listPilots } from "./billing.js";
 import {
   type AdminLearnerSummary,
   type AdminTenantDetail,
@@ -394,4 +395,109 @@ export function listAdminLearnersPage(
   opts: { page?: number; pageSize?: number; search?: string } = {},
 ): Promise<AdminListPage<AdminLearnerSummary>> {
   return listIdentityPage(session, "/api/admin-svc/learners", "learners", mapLearner, opts);
+}
+
+/**
+ * Global ⌘K search — fans a single query across tenants / users / learners
+ * via admin-svc `/search` (each capped server-side). Powers the command
+ * palette in the admin shell. Returns honest empty arrays for a blank or
+ * sub-threshold query; never throws on "no matches".
+ */
+export interface AdminSearchHitTenant {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+}
+export interface AdminSearchHitUser {
+  id: string;
+  name: string | null;
+  email: string;
+  role: string;
+}
+export interface AdminSearchHitLearner {
+  id: string;
+  name: string;
+  tenantId: string;
+}
+export interface AdminSearchHitPilot {
+  tenantId: string;
+  districtName: string;
+  status: string;
+  tier: string | null;
+}
+export interface AdminSearchResults {
+  tenants: AdminSearchHitTenant[];
+  users: AdminSearchHitUser[];
+  learners: AdminSearchHitLearner[];
+  pilots: AdminSearchHitPilot[];
+}
+
+const PILOT_SEARCH_LIMIT = 5;
+
+/**
+ * Pilots live in billing-svc (not the admin-svc DB the other categories query),
+ * so they are composed in here at the BFF layer rather than inside
+ * admin-svc/search.ts. billing-svc's `listPilots` has no server-side search
+ * param, so we filter the (small) active-pilot list by district name client
+ * side. A billing-svc outage degrades to an empty pilots list without breaking
+ * tenant/user/learner search (per-source settle).
+ */
+async function searchPilots(
+  session: Pick<SessionProfile, "role">,
+  needle: string,
+): Promise<AdminSearchHitPilot[]> {
+  // Only platform_admin can read the billing pilot model; skip the call for
+  // everyone else (mirrors billing-svc's own guard) so non-admin keystrokes
+  // don't fan out forbidden requests on every debounce tick.
+  if (session.role !== "platform_admin") return [];
+  try {
+    const pilots = await listPilots(session);
+    const lowered = needle.toLowerCase();
+    return pilots
+      .filter((p) => (p.districtName ?? "").toLowerCase().includes(lowered))
+      .slice(0, PILOT_SEARCH_LIMIT)
+      .map((p) => ({
+        tenantId: p.tenantId,
+        districtName: p.districtName ?? p.tenantId,
+        status: p.status,
+        tier: p.tier,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+export async function searchAdminEntities(
+  session: Pick<SessionProfile, "role">,
+  query: string,
+): Promise<AdminSearchResults> {
+  const q = query.trim();
+  if (q.length === 0) return { tenants: [], users: [], learners: [], pilots: [] };
+  const [payload, pilots] = await Promise.all([
+    adminGet<Record<string, unknown>>(session, "/api/admin-svc/search", { q }),
+    searchPilots(session, q),
+  ]);
+  const rows = (key: string): Record<string, unknown>[] =>
+    Array.isArray(payload[key]) ? (payload[key] as Record<string, unknown>[]) : [];
+  return {
+    tenants: rows("tenants").map((t) => ({
+      id: String(t.id),
+      name: String(t.name ?? ""),
+      type: String(t.type ?? ""),
+      status: String(t.status ?? ""),
+    })),
+    users: rows("users").map((u) => ({
+      id: String(u.id),
+      name: u.name == null ? null : String(u.name),
+      email: String(u.email ?? ""),
+      role: String(u.role ?? ""),
+    })),
+    learners: rows("learners").map((l) => ({
+      id: String(l.id),
+      name: String(l.name ?? ""),
+      tenantId: String(l.tenantId ?? ""),
+    })),
+    pilots,
+  };
 }

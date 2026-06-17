@@ -6,6 +6,8 @@ import pytest
 
 from ai_svc.services.prompt_builder import (
     _build_sensory_instructions,
+    _locale_from_language_profile,
+    _resolve_locale,
     build_content_generation_prompt,
     build_tutor_system_prompt,
 )
@@ -563,4 +565,114 @@ class TestLinguaLanguageProfile:
             "ADDON_TUTOR_MATH", {}, "STANDARD", locale="es"
         )
         assert "## Language Profile" not in prompt
+
+
+class TestResolveLocale:
+    """`_resolve_locale` accepts a BCP-47 code OR an English language name so
+    a learner's stored instruction language (often a free-text name) maps to
+    the right base code."""
+
+    def test_resolves_base_code(self):
+        assert _resolve_locale("es") == "es"
+
+    def test_resolves_full_bcp47_tag(self):
+        assert _resolve_locale("es-MX") == "es"
+        assert _resolve_locale("fr_CA") == "fr"
+
+    def test_resolves_english_language_name(self):
+        assert _resolve_locale("Spanish") == "es"
+        assert _resolve_locale("french") == "fr"
+        assert _resolve_locale("  PORTUGUESE  ") == "pt"
+
+    def test_resolves_name_aliases(self):
+        assert _resolve_locale("Mandarin") == "zh"
+        assert _resolve_locale("Chinese") == "zh"
+        assert _resolve_locale("Brazilian Portuguese") == "pt"
+        assert _resolve_locale("Castilian") == "es"
+
+    def test_resolves_canonical_chinese_name(self):
+        assert _resolve_locale("Chinese (Simplified)") == "zh"
+
+    def test_unknown_and_empty_fall_back_to_default(self):
+        assert _resolve_locale("Klingon") == "en"
+        assert _resolve_locale("") == "en"
+        assert _resolve_locale(None) == "en"
+
+
+class TestLocaleFromLanguageProfile:
+    """`_locale_from_language_profile` pulls the learner's stored instruction
+    language out of brain_context.language_profile with a clear precedence."""
+
+    def test_prefers_preferred_instruction_language(self):
+        ctx = {
+            "language_profile": {
+                "preferred_instruction_language": "Spanish",
+                "primary_language": "English",
+                "dominant_language": "French",
+            }
+        }
+        assert _locale_from_language_profile(ctx) == "Spanish"
+
+    def test_falls_back_to_primary_then_dominant(self):
+        assert (
+            _locale_from_language_profile(
+                {"language_profile": {"primary_language": "French"}}
+            )
+            == "French"
+        )
+        assert (
+            _locale_from_language_profile(
+                {"language_profile": {"dominant_language": "German"}}
+            )
+            == "German"
+        )
+
+    def test_returns_none_when_absent_or_malformed(self):
+        assert _locale_from_language_profile({}) is None
+        assert _locale_from_language_profile({"language_profile": {}}) is None
+        assert _locale_from_language_profile({"language_profile": "es"}) is None
+
+
+class TestLanguageProfileDrivesDirective:
+    """The real gap this work closes: when no explicit locale is passed, the
+    tutor prompt must honour the learner's STORED instruction language so
+    lessons are delivered in their enrolled language — not English."""
+
+    def test_stored_spanish_profile_drives_spanish_directive(self):
+        ctx = {"language_profile": {"preferred_instruction_language": "Spanish"}}
+        prompt = build_tutor_system_prompt("ADDON_TUTOR_MATH", ctx, "STANDARD")
+        assert "Respond entirely in Spanish" in prompt
+
+    def test_stored_primary_language_code_drives_directive(self):
+        ctx = {"language_profile": {"primary_language": "fr"}}
+        prompt = build_tutor_system_prompt("ADDON_TUTOR_MATH", ctx, "STANDARD")
+        assert "Respond entirely in French" in prompt
+
+    def test_explicit_locale_overrides_stored_profile(self):
+        # A UI locale override must still win over the stored profile.
+        ctx = {"language_profile": {"preferred_instruction_language": "Spanish"}}
+        prompt = build_tutor_system_prompt(
+            "ADDON_TUTOR_MATH", ctx, "STANDARD", locale="de"
+        )
+        assert "Respond entirely in German" in prompt
+        assert "Respond entirely in Spanish" not in prompt
+
+    def test_no_locale_and_no_profile_stays_english(self):
+        prompt = build_tutor_system_prompt("ADDON_TUTOR_MATH", {}, "STANDARD")
+        assert "Respond entirely in English" in prompt
+
+    def test_invalid_explicit_locale_falls_back_to_stored_profile(self):
+        # A non-empty but unrecognised UI locale (typo) must NOT silently
+        # revert a learner to English when they have a stored language.
+        ctx = {"language_profile": {"preferred_instruction_language": "Spanish"}}
+        prompt = build_tutor_system_prompt(
+            "ADDON_TUTOR_MATH", ctx, "STANDARD", locale="sp"
+        )
+        assert "Respond entirely in Spanish" in prompt
+
+    def test_invalid_explicit_locale_and_no_profile_stays_english(self):
+        prompt = build_tutor_system_prompt(
+            "ADDON_TUTOR_MATH", {}, "STANDARD", locale="sp"
+        )
+        assert "Respond entirely in English" in prompt
 

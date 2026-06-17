@@ -1,5 +1,6 @@
 {
   "common": {
+    "preparingSpace": "Preparing your learning space",
     "back": "वापस",
     "next": "अगला",
     "cancel": "रद्द करें",
@@ -169,7 +170,8 @@
     "sessionsTrend": "इस सप्ताह सत्र प्रवृत्ति",
     "masteryBySubject": "विषय अनुसार महारत",
     "reports": "रिपोर्ट",
-    "districtLogo": "डिस्ट्रिक्ट लोगो"
+    "districtLogo": "डिस्ट्रिक्ट लोगो",
+    "resources": "Resources"
   },
   "parentSettings": {
     "title": "सेटिंग्स",
@@ -1146,5 +1148,20 @@
       "future": "जन्म तिथि भविष्य की नहीं हो सकती।",
       "tooOld": "शिक्षार्थी की उम्र 21 वर्ष या उससे कम होनी चाहिए।"
     }
+  },
+  "parentResources": {
+    "title": "Resources",
+    "intro": "Quick links to the tools you already have. A curated library of guides is on the way.",
+    "reportsLink": "Reports",
+    "reportsDesc": "Weekly mastery and progress for each learner.",
+    "messagesLink": "Messages",
+    "messagesDesc": "Talk with your learner's care team.",
+    "privacyLink": "Privacy & data",
+    "privacyDesc": "Review consent, export, or delete data.",
+    "settingsLink": "Settings",
+    "settingsDesc": "Manage your account and preferences.",
+    "libraryTitle": "Guides & library",
+    "libraryEmptyTitle": "Library coming soon",
+    "libraryEmptyBody": "Curated guides for supporting your learner aren't available yet. We'll add them here when they're ready."
   }
 }

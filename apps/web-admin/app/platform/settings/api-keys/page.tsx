@@ -1,6 +1,7 @@
 import { requirePlatformPage } from "@aivo/admin-auth";
 import { listAdminApiKeys } from "@aivo/admin-api/api-keys";
 import { AdminCard, AdminPageFrame } from "@aivo/admin-ui";
+import { StatusPill } from "@/components/status-pill";
 import { formatDate, formatDateTime } from "@/components/admin-format";
 
 function keyState(key: {
@@ -18,7 +19,6 @@ export default async function ApiKeysPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform · Settings"
       title="API keys"
       description="Service and integration credentials, including rotation and grace-period status."
     >
@@ -43,11 +43,11 @@ export default async function ApiKeysPage() {
                   <td className="font-mono text-xs text-slate-500">{key.keyPrefix}</td>
                   <td className="text-sm">{key.scopes.length ? key.scopes.join(", ") : "—"}</td>
                   <td>
-                    <span className="admin-status">{keyState(key)}</span>
+                    <StatusPill status={keyState(key)} />
                   </td>
-                  <td className="text-sm">{formatDateTime(key.lastUsedAt)}</td>
-                  <td className="text-sm">{formatDate(key.expiresAt)}</td>
-                  <td className="text-sm">{formatDate(key.createdAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDateTime(key.lastUsedAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDate(key.expiresAt)}</td>
+                  <td className="text-sm tabular-nums">{formatDate(key.createdAt)}</td>
                 </tr>
               ))}
               {keys.length === 0 ? (

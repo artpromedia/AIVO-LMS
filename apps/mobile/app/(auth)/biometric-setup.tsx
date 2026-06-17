@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.bodyRegular,
     fontSize: 13,
     lineHeight: 19,
-    color: "#b91c1c",
+    color: colors.error,
   },
   row: {
     flexDirection: "row",
@@ -265,6 +265,6 @@ const styles = StyleSheet.create({
   ctaLabel: {
     fontFamily: fontFamilies.bodyBold,
     fontSize: 16,
-    color: "#ffffff",
+    color: colors.white,
   },
 });

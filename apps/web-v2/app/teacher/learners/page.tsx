@@ -68,7 +68,7 @@ export default async function TeacherLearnersPage() {
                     </Link>
                     <Badge tone="neutral">{l.readinessState}</Badge>
                   </div>
-                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-aivo-border pt-3">
+                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-iw-border pt-3">
                     <p className="text-xs text-muted-foreground">
                       {st?.submitted
                         ? ta("cta_done_body")
@@ -76,7 +76,7 @@ export default async function TeacherLearnersPage() {
                     </p>
                     <Link
                       href={assessHref}
-                      className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-aivo-accent px-3 py-1.5 text-xs font-semibold text-aivo-accent hover:bg-aivo-accent/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-iw-warm px-3 py-1.5 text-xs font-semibold text-iw-warm hover:bg-iw-warm/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     >
                       {st?.submitted
                         ? ta("cta_done")

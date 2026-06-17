@@ -20,15 +20,15 @@ export function IncidentBanner({
 
   if (!active && overall === "operational") {
     return (
-      <div className="flex items-center gap-3 rounded-iw-hero border border-iw-border bg-aivo-success/15 px-6 py-5">
-        <span className="h-3 w-3 rounded-full bg-aivo-success" aria-hidden />
+      <div className="flex items-center gap-3 rounded-iw-hero border border-iw-border bg-iw-success/15 px-6 py-5">
+        <span className="h-3 w-3 rounded-full bg-iw-success" aria-hidden />
         <p className="font-iw-display text-xl font-semibold text-iw-ink">All Systems Operational</p>
       </div>
     );
   }
 
-  const toneClass = critical ? "bg-aivo-danger/15" : "bg-aivo-warning/15";
-  const dotClass = critical ? "bg-aivo-danger" : "bg-aivo-warning";
+  const toneClass = critical ? "bg-iw-error/15" : "bg-iw-warning/15";
+  const dotClass = critical ? "bg-iw-error" : "bg-iw-warning";
   const headline = active
     ? (lead?.title ?? "Active incident in progress")
     : "Some systems are experiencing issues";

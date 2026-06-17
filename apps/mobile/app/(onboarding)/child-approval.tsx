@@ -6,7 +6,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { OnboardingScaffold } from "@/src/components/onboarding/OnboardingScaffold";
 import { Card, Button } from "@/components/ui";
-import { spacing } from "@/constants/colors";
+import { colors, spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -52,7 +52,7 @@ export default function ChildApprovalScreen() {
           t("onboarding.approve.point3", "You can export or delete data whenever you want."),
         ].map((line, i) => (
           <View key={i} style={styles.row}>
-            <Ionicons name="checkmark-circle" size={18} color="#22c55e" />
+            <Ionicons name="checkmark-circle" size={18} color={colors.success} />
             <Text style={[styles.body, { color: palette.ink, flex: 1 }]}>{line}</Text>
           </View>
         ))}

@@ -58,7 +58,7 @@ export default async function QuestWorldPage({ params }: Params) {
             const isDone = completed.has(c.id);
             const inner = (
               <Card
-                className={`p-5 ${unlocked ? "hover:shadow-lg transition-shadow" : "opacity-60"}`}
+                className={`p-5 ${unlocked ? "hover:shadow-soft-3 transition-shadow" : "opacity-60"}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>

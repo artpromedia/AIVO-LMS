@@ -154,10 +154,10 @@ export default async function ParentBaselinePage({
 
       {!baseline ? (
         <Card className="flex flex-col gap-3 p-[var(--aivo-density-card-pad)] sm:flex-row sm:items-center">
-          <Sparkles className="h-6 w-6 text-aivo-primary" />
+          <Sparkles className="h-6 w-6 text-iw-primary" />
           <div className="flex-1">
             <p className="font-display text-lg font-semibold">{t("ready_to_start")}</p>
-            <p className="text-sm text-aivo-ink-soft">
+            <p className="text-sm text-iw-ink-muted">
               We'll generate {`${learner.displayName}'s`} personalized baseline now.
             </p>
           </div>
@@ -170,7 +170,7 @@ export default async function ParentBaselinePage({
         </Card>
       ) : baseline.status !== "complete" ? (
         <Card className="flex flex-col gap-3 p-[var(--aivo-density-card-pad)] sm:flex-row sm:items-center">
-          <Play className="h-6 w-6 text-aivo-primary" />
+          <Play className="h-6 w-6 text-iw-primary" />
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <p className="font-display text-lg font-semibold">{t("baseline_in_progress")}</p>
@@ -182,7 +182,7 @@ export default async function ParentBaselinePage({
                 />
               ) : null}
             </div>
-            <p className="text-sm text-aivo-ink-soft">
+            <p className="text-sm text-iw-ink-muted">
               {attempts.length} of {questions.length} answered so far.
             </p>
           </div>
@@ -201,7 +201,7 @@ export default async function ParentBaselinePage({
       ) : (
         <>
           <Card className="flex items-start gap-3 p-[var(--aivo-density-card-pad)]">
-            <CheckCircle2 className="mt-0.5 h-6 w-6 text-aivo-success" />
+            <CheckCircle2 className="mt-0.5 h-6 w-6 text-iw-success" />
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-display text-lg font-semibold">{t("baseline_complete")}</p>
@@ -245,7 +245,7 @@ export default async function ParentBaselinePage({
                   <Badge tone="primary" className="mt-2 capitalize">
                     {row.estimate.replaceAll("_", " ")}
                   </Badge>
-                  <p className="mt-2 text-xs text-aivo-ink-soft">
+                  <p className="mt-2 text-xs text-iw-ink-muted">
                     {row.correct} of {row.answered} correct ({Math.round(row.accuracy * 100)}%)
                   </p>
                 </Card>
@@ -270,7 +270,7 @@ export default async function ParentBaselinePage({
       )}
 
       <SectionHeader title={t("the_six_chapters")} className="mt-8" />
-      <p className="-mt-2 mb-3 text-sm text-aivo-ink-soft">
+      <p className="-mt-2 mb-3 text-sm text-iw-ink-muted">
         Each chapter is hosted by a tutor character. They introduce themselves and adapt the
         difficulty as your learner answers.
       </p>
@@ -295,7 +295,7 @@ export default async function ParentBaselinePage({
                   <p className="text-sm font-semibold">
                     {tutor.name}'s {tutor.landmark}
                   </p>
-                  <p className="text-xs text-aivo-ink-soft">{tutor.subtitle}</p>
+                  <p className="text-xs text-iw-ink-muted">{tutor.subtitle}</p>
                 </div>
                 {summaryRow ? (
                   <Badge tone="success" className="capitalize">
@@ -308,7 +308,7 @@ export default async function ParentBaselinePage({
                   </div>
                 )}
               </div>
-              <p className="mt-2 text-xs text-aivo-ink-soft">{tutor.scene}</p>
+              <p className="mt-2 text-xs text-iw-ink-muted">{tutor.scene}</p>
             </Card>
           );
         })}

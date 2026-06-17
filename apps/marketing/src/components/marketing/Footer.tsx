@@ -31,8 +31,8 @@ function NewsletterSignup() {
 
   return (
     <form onSubmit={handleSubmit} className="mt-6" aria-label="Subscribe to AIVO newsletter">
-      <p className="text-sm text-slate-600 font-medium mb-2.5">Stay updated with AIVO news</p>
-      <div className="flex items-center w-full max-w-sm rounded-full bg-white border border-slate-200 focus-within:border-[var(--aivo-sensory-primary)] focus-within:ring-2 focus-within:ring-purple-300/30 transition overflow-hidden">
+      <p className="text-sm text-iw-ink-muted font-medium mb-2.5">Stay updated with AIVO news</p>
+      <div className="flex items-center w-full max-w-sm rounded-iw-control bg-white border border-iw-border focus-within:border-[var(--aivo-sensory-primary)] focus-within:ring-2 focus-within:ring-iw-ring/30 transition overflow-hidden">
         <input
           type="email"
           required
@@ -41,13 +41,13 @@ function NewsletterSignup() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="your@email.com"
           disabled={status === "submitting" || status === "success"}
-          className="flex-1 min-w-0 bg-transparent px-4 py-3 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none disabled:opacity-60"
+          className="flex-1 min-w-0 bg-transparent px-4 py-3 text-iw-ink text-sm placeholder:text-iw-ink-muted focus:outline-none disabled:opacity-60"
           aria-label="Email address"
         />
         <button
           type="submit"
           disabled={status === "submitting" || status === "success"}
-          className="m-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[var(--aivo-sensory-primary)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition disabled:opacity-70 shrink-0 min-h-10"
+          className="m-1 inline-flex items-center justify-center gap-1.5 rounded-iw-control bg-[var(--aivo-sensory-primary)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition disabled:opacity-70 shrink-0 min-h-10"
         >
           {status === "submitting" && (
             <>
@@ -70,12 +70,12 @@ function NewsletterSignup() {
         </button>
       </div>
       {status === "error" && (
-        <p className="text-xs text-red-500 mt-2">Something went wrong. Please try again.</p>
+        <p className="text-xs text-iw-error-strong mt-2">Something went wrong. Please try again.</p>
       )}
       {status === "success" && (
-        <p className="text-xs text-emerald-600 mt-2">You&apos;re subscribed — thanks!</p>
+        <p className="text-xs text-iw-success-strong mt-2">You&apos;re subscribed — thanks!</p>
       )}
-      <p className="text-[11px] text-slate-500 mt-2">No spam. Unsubscribe any time.</p>
+      <p className="text-[11px] text-iw-ink-muted mt-2">No spam. Unsubscribe any time.</p>
     </form>
   );
 }
@@ -136,7 +136,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-slate-200/70 bg-white/60 backdrop-blur-sm pt-16 pb-10">
+    <footer className="border-t border-iw-border/70 bg-white/60 backdrop-blur-sm pt-16 pb-10">
       <div className="max-w-6xl mx-auto px-6 md:px-8">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-10 mb-12">
           <div className="col-span-2">
@@ -148,10 +148,10 @@ export function Footer() {
               className="mb-5"
               style={{ width: "auto", height: "auto" }}
             />
-            <p className="text-sm text-slate-600 leading-relaxed mb-5 max-w-xs">
+            <p className="text-sm text-iw-ink-muted leading-relaxed mb-5 max-w-xs">
               Engineered for the margins. Transformative for everyone.
             </p>
-            <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-100 px-4 py-2 rounded-full text-[var(--aivo-sensory-primary)]">
+            <div className="inline-flex items-center gap-2 bg-iw-purple-100 border border-iw-purple-100 px-4 py-2 rounded-iw-chip text-[var(--aivo-sensory-primary)]">
               <ShieldCheck className="w-4 h-4" aria-hidden="true" />
               <span className="text-sm font-semibold whitespace-nowrap">COPPA · FERPA · SOC 2</span>
             </div>
@@ -160,7 +160,7 @@ export function Footer() {
 
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.titleKey}>
-              <h3 className="text-sm font-heading font-bold text-slate-900 mb-4">
+              <h3 className="text-sm font-heading font-bold text-iw-ink mb-4">
                 {t(section.titleKey)}
               </h3>
               <ul className="space-y-2.5">
@@ -168,7 +168,7 @@ export function Footer() {
                   <li key={link.labelKey}>
                     <Link
                       href={link.href}
-                      className="text-sm text-slate-600 hover:text-[var(--aivo-sensory-primary)] transition"
+                      className="text-sm text-iw-ink-muted hover:text-[var(--aivo-sensory-primary)] transition"
                     >
                       {t(link.labelKey)}
                     </Link>
@@ -179,11 +179,11 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="border-t border-slate-200/70 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-slate-500">
+        <div className="border-t border-iw-border/70 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-iw-ink-muted">
             {t("copyright", { year: new Date().getFullYear() })}
           </p>
-          <div className="inline-flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full text-[var(--aivo-sensory-primary)]">
+          <div className="inline-flex items-center gap-2 bg-iw-purple-100 px-4 py-2 rounded-iw-chip text-[var(--aivo-sensory-primary)]">
             <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             <span className="text-sm font-semibold">Secure &amp; Compliant</span>
           </div>

@@ -90,7 +90,7 @@ export default function CaregiverObservationsScreen() {
       {selectedId !== "" && (
         <AivoButton
           title={t("caregiverObservations.add", "Add observation")}
-          icon={<Ionicons name="add" size={18} color="#FFF" />}
+          icon={<Ionicons name="add" size={18} color={colors.white} />}
           onPress={() =>
             router.push(`/(caregiver)/child/${selectedId}/observation` as Href)
           }
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   },
   chipActive: { backgroundColor: colors.primary },
   chipText: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
-  chipTextActive: { color: "#FFF" },
+  chipTextActive: { color: colors.white },
   rowHeader: {
     flexDirection: "row",
     alignItems: "center",

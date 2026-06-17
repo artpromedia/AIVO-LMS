@@ -85,10 +85,10 @@ export function OfflineBanner({ copy = DEFAULT_COPY }: OfflineBannerProps) {
       aria-live="polite"
       data-online={online ? "true" : "false"}
       className={
-        "fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full px-4 py-2 text-sm shadow-md " +
+        "fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full px-4 py-2 text-sm shadow-soft-3 " +
         (online
-          ? "bg-emerald-100 text-emerald-900 border border-emerald-200"
-          : "bg-amber-100 text-amber-900 border border-amber-200")
+          ? "bg-iw-success-subtle text-iw-success-strong border border-iw-success"
+          : "bg-iw-warning-subtle text-iw-warning-strong border border-iw-warning")
       }
     >
       {online ? (

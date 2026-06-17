@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginBottom: 8,
   },
-  currentText: { fontSize: 11, fontFamily: "Nunito-Bold", color: "#FFF" },
+  currentText: { fontSize: 11, fontFamily: "Nunito-Bold", color: colors.white },
   planName: { fontSize: 18, fontFamily: "Nunito-ExtraBold", color: colors.text },
   priceRow: { flexDirection: "row", alignItems: "baseline", marginTop: 4, marginBottom: 12 },
   planPrice: { fontSize: 28, fontFamily: "Nunito-ExtraBold", color: colors.primary },

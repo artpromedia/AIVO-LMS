@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
 
 const BG = [
-  "bg-aivo-primary-soft text-aivo-primary",
-  "bg-aivo-warning/30 text-aivo-ink",
-  "bg-aivo-success/20 text-aivo-success",
-  "bg-aivo-danger/15 text-aivo-danger",
+  "bg-iw-accent-soft text-iw-primary",
+  "bg-iw-warning/30 text-iw-ink",
+  "bg-iw-success/20 text-iw-success",
+  "bg-iw-error/15 text-iw-error",
 ];
 
 function pickBg(name: string) {

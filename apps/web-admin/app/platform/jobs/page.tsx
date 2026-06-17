@@ -3,19 +3,13 @@ import { getJobsFreshnessSummary, listJobs } from "@aivo/admin-api/jobs";
 import type { AdminFreshnessStatus, AdminJob } from "@aivo/admin-api/jobs";
 import { AdminCard, AdminKpiCard, AdminPageFrame } from "@aivo/admin-ui";
 import { formatDateTime } from "@/components/admin-format";
+import { StatusPill, type StatusTone } from "@/components/status-pill";
 
-const STATUS_TONE: Record<AdminFreshnessStatus, string> = {
-  fresh: "text-emerald-700",
-  warning: "text-amber-700",
-  stale: "text-red-700",
-  never_run: "text-slate-500",
-};
-
-const STATUS_LABEL: Record<AdminFreshnessStatus, string> = {
-  fresh: "Fresh",
-  warning: "Warning",
-  stale: "Stale",
-  never_run: "Never run",
+const FRESHNESS_TONE: Record<AdminFreshnessStatus, StatusTone> = {
+  fresh: "positive",
+  warning: "warning",
+  stale: "danger",
+  never_run: "neutral",
 };
 
 export default async function PlatformJobsPage() {
@@ -27,7 +21,6 @@ export default async function PlatformJobsPage() {
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Jobs"
       description="Background job registry with freshness status derived from the watchdog ledger."
     >
@@ -72,15 +65,19 @@ function JobsTable({ jobs }: { jobs: AdminJob[] }) {
                   )}
                 </td>
                 <td className="text-sm">{job.service}</td>
-                <td className={`font-bold ${STATUS_TONE[job.freshnessStatus]}`}>
-                  {STATUS_LABEL[job.freshnessStatus]}
-                  {job.failed ? <span className="block text-sm text-red-700">failed</span> : null}
+                <td>
+                  <StatusPill status={job.freshnessStatus} tone={FRESHNESS_TONE[job.freshnessStatus]} />
+                  {job.failed ? (
+                    <span className="mt-1 block">
+                      <StatusPill status="failed" />
+                    </span>
+                  ) : null}
                 </td>
                 <td className="text-sm">
-                  {job.lastStatus ? <span className="admin-status">{job.lastStatus}</span> : "—"}
+                  {job.lastStatus ? <StatusPill status={job.lastStatus} /> : "—"}
                 </td>
-                <td className="text-sm">{formatDateTime(job.lastRunAt)}</td>
-                <td className="text-sm">{formatDateTime(job.lastFinishedAt)}</td>
+                <td className="text-sm tabular-nums">{formatDateTime(job.lastRunAt)}</td>
+                <td className="text-sm tabular-nums">{formatDateTime(job.lastFinishedAt)}</td>
               </tr>
             ))}
             {jobs.length === 0 ? (

@@ -192,7 +192,7 @@ export default async function BrainReviewPage({
       <div className="mb-3">
         <Link
           href={`/parent/learners/${learnerId}/brain-clone-watch`}
-          className="inline-flex items-center gap-1 text-sm text-aivo-ink-soft hover:text-aivo-ink hover:underline"
+          className="inline-flex items-center gap-1 text-sm text-iw-ink-muted hover:text-iw-ink hover:underline"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {t("back_to_summary")}
         </Link>

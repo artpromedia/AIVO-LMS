@@ -3,7 +3,7 @@
  * Uses Animated.View spring animation (not CSS transitions).
  */
 import React, { useEffect, useRef } from "react";
-import { Animated, View, Text, StyleSheet } from "react-native";
+import { Animated, View, Text, StyleSheet, Image, type ImageSourcePropType } from "react-native";
 import type { TutorState } from "../types.js";
 
 import { SEMANTIC } from "@aivo/brand";
@@ -12,24 +12,14 @@ export interface TutorCharacterProps {
   tutorState: TutorState;
   speechText?: string;
   reducedMotion?: boolean;
+  /**
+   * The per-tutor robot portrait. React Native needs a static `require()`
+   * source, which lives app-side (apps/mobile/src/lib/tutor-art), so the
+   * host passes it in. When absent the host shows a neutral initial badge —
+   * never an emoji.
+   */
+  artSource?: ImageSourcePropType | null;
 }
-
-const TUTOR_EMOJIS: Record<string, string> = {
-  nova: "🤖",
-  sage: "🦉",
-  spark: "⚡",
-  chrono: "⏱",
-  pixel: "💻",
-  echo: "🎵",
-  harmony: "💜",
-  atlas: "🌍",
-  cadence: "🎶",
-  vigor: "🏃",
-  lingua: "🌐",
-  forge: "⚙️",
-  compass: "🧭",
-  muse: "🎨",
-};
 
 const STATE_SCALE: Record<TutorState, number> = {
   idle: 1,
@@ -45,6 +35,7 @@ export function TutorCharacter({
   tutorState,
   speechText,
   reducedMotion = false,
+  artSource = null,
 }: TutorCharacterProps) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const targetScale = STATE_SCALE[tutorState] ?? 1;
@@ -62,7 +53,7 @@ export function TutorCharacter({
     }).start();
   }, [tutorState, targetScale, reducedMotion]);
 
-  const emoji = TUTOR_EMOJIS[tutorKey] ?? "🤖";
+  const initial = (tutorKey.charAt(0) || "?").toUpperCase();
 
   return (
     <View
@@ -73,7 +64,17 @@ export function TutorCharacter({
     >
       <Animated.View style={[styles.avatarWrapper, { transform: [{ scale: scaleAnim }] }]}>
         <View style={styles.avatar}>
-          <Text style={styles.emoji}>{emoji}</Text>
+          {artSource ? (
+            <Image
+              source={artSource}
+              style={styles.avatarImage}
+              resizeMode="contain"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+          ) : (
+            <Text style={styles.initial}>{initial}</Text>
+          )}
         </View>
       </Animated.View>
 
@@ -116,8 +117,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: SEMANTIC.color.text.accent,
   },
-  emoji: {
-    fontSize: 40,
+  avatarImage: {
+    width: 72,
+    height: 72,
+  },
+  initial: {
+    fontSize: 34,
+    fontWeight: "700",
+    color: SEMANTIC.color.text.accent,
   },
   speechBubble: {
     backgroundColor: "#1e1b4b",

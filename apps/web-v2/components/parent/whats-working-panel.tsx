@@ -67,7 +67,7 @@ export function WhatsWorkingPanel({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-aivo-ink-soft">{t("intro", { name: learnerName })}</p>
+        <p className="text-sm text-iw-ink-muted">{t("intro", { name: learnerName })}</p>
         <div className="flex items-center gap-1" role="group" aria-label={t("window_label")}>
           {[30, 90].map((w) => (
             <button
@@ -77,8 +77,8 @@ export function WhatsWorkingPanel({
               aria-pressed={windowDays === w}
               className={`rounded-iw-control px-2.5 py-1 text-xs font-medium transition ${
                 windowDays === w
-                  ? "bg-aivo-accent text-white"
-                  : "border border-iw-border text-aivo-ink-soft hover:border-aivo-accent"
+                  ? "bg-iw-warm text-white"
+                  : "border border-iw-border text-iw-ink-muted hover:border-iw-warm"
               }`}
             >
               {w === 30 ? t("window_30") : t("window_90")}
@@ -88,13 +88,13 @@ export function WhatsWorkingPanel({
       </div>
 
       {loading ? (
-        <p className="text-sm text-aivo-ink-soft">{t("loading")}</p>
+        <p className="text-sm text-iw-ink-muted">{t("loading")}</p>
       ) : error ? (
-        <p role="alert" className="text-sm text-aivo-danger">
+        <p role="alert" className="text-sm text-iw-error">
           {error}
         </p>
       ) : !data || data.totalSessions === 0 ? (
-        <p className="text-sm text-aivo-ink-soft">{t("empty", { name: learnerName })}</p>
+        <p className="text-sm text-iw-ink-muted">{t("empty", { name: learnerName })}</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-3">
           <Signal
@@ -149,16 +149,16 @@ function Signal({
 }) {
   const toneClass =
     tone === "success"
-      ? "text-aivo-success"
+      ? "text-iw-success"
       : tone === "danger"
-        ? "text-aivo-danger"
-        : "text-aivo-accent";
+        ? "text-iw-error"
+        : "text-iw-warm";
   return (
     <div className="rounded-iw-control border border-iw-border p-3.5">
       <Icon className={`h-5 w-5 ${toneClass}`} />
-      <p className="mt-2 text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">{label}</p>
+      <p className="mt-2 text-xs font-medium uppercase tracking-wide text-iw-ink-muted">{label}</p>
       <p className="mt-0.5 font-display text-base font-semibold text-iw-text-strong">{value}</p>
-      {sub ? <p className="mt-0.5 text-xs text-aivo-ink-soft">{sub}</p> : null}
+      {sub ? <p className="mt-0.5 text-xs text-iw-ink-muted">{sub}</p> : null}
     </div>
   );
 }

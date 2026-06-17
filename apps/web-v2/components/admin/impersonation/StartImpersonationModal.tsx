@@ -218,7 +218,7 @@ export function StartImpersonationModal({ trigger }: { trigger?: React.ReactNode
           </p>
 
           {error ? (
-            <p className="rounded-iw-card bg-aivo-danger/15 px-3 py-2 text-sm text-iw-ink">
+            <p className="rounded-iw-card bg-iw-error/15 px-3 py-2 text-sm text-iw-ink">
               {error}
             </p>
           ) : null}

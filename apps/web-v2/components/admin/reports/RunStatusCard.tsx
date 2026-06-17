@@ -100,7 +100,7 @@ export function RunStatusCard({ runId, initialRun }: { runId: string; initialRun
       </div>
 
       {status === "failed" ? (
-        <div className="mt-4 rounded-iw-card border border-aivo-danger/40 bg-aivo-danger/10 p-3 text-sm">
+        <div className="mt-4 rounded-iw-card border border-iw-error/40 bg-iw-error/10 p-3 text-sm">
           <p className="font-semibold text-iw-ink">{error?.code ?? "Run failed"}</p>
           {error?.message ? <p className="mt-0.5 text-iw-ink-muted">{error.message}</p> : null}
         </div>

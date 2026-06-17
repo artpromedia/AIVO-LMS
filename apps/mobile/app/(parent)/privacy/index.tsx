@@ -7,7 +7,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card } from "@/components/ui";
-import { spacing } from "@/constants/colors";
+import { colors, spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
@@ -42,7 +42,7 @@ export default function ParentPrivacyScreen() {
       label: t("parentPrivacy.delete", "Delete data"),
       desc: t("parentPrivacy.deleteDesc", "Request deletion of your data."),
       route: "/(parent)/privacy/delete-data",
-      tone: "#ef4444",
+      tone: colors.error,
     },
   ];
 

@@ -25,17 +25,28 @@ import {
   useUploadHomework,
   type HomeworkAssignment,
 } from "@/hooks/useHomework";
-import { AivoCard, AivoButton } from "@aivo/mobile-ui";
+import { SEMANTIC } from "@aivo/brand";
+import { Card, Button } from "@/components/ui";
 import { colors, spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
 
+// Status chip palette — sourced from the brand's SEMANTIC feedback /
+// interactive tokens (surface + foreground pairs) so the chips stay in
+// lockstep with web and carry no free-floating hex.
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
-  PROCESSING: { bg: "#FEF3C7", fg: "#B45309" },
-  READY: { bg: "#DCFCE7", fg: "#166534" },
-  IN_PROGRESS: { bg: "#DBEAFE", fg: "#1D4ED8" },
-  COMPLETED: { bg: "#EDE9FE", fg: "#6D28D9" },
-  FAILED: { bg: "#FEE2E2", fg: "#B91C1C" },
+  PROCESSING: {
+    bg: SEMANTIC.color.feedback.warningSurface,
+    fg: SEMANTIC.color.feedback.warning,
+  },
+  READY: { bg: SEMANTIC.color.feedback.successSurface, fg: SEMANTIC.color.feedback.success },
+  IN_PROGRESS: { bg: SEMANTIC.color.feedback.infoSurface, fg: SEMANTIC.color.feedback.info },
+  COMPLETED: {
+    bg: SEMANTIC.color.interactive.primarySoft,
+    fg: SEMANTIC.color.interactive.primaryHover,
+  },
+  FAILED: { bg: SEMANTIC.color.feedback.dangerSurface, fg: SEMANTIC.color.feedback.danger },
 };
 
 const SUBJECT_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
@@ -227,14 +238,14 @@ export default function HomeworkScreen() {
 
         <Text style={styles.sectionTitle}>{t("learnerHomework.yourHomework")}</Text>
         {isLoading ? (
-          <AivoCard style={styles.loadingCard}>
+          <Card style={styles.loadingCard}>
             <ActivityIndicator color={colors.primary} />
-          </AivoCard>
+          </Card>
         ) : !assignments || assignments.length === 0 ? (
-          <AivoCard style={styles.emptyCard}>
+          <Card style={styles.emptyCard}>
             <Ionicons name="document-outline" size={32} color={colors.textSecondary} />
             <Text style={styles.emptyText}>{t("learnerHomework.noAssignments")}</Text>
-          </AivoCard>
+          </Card>
         ) : (
           <View style={{ gap: spacing.sm, marginBottom: spacing.md }}>
             {assignments.map((a) => {
@@ -250,7 +261,7 @@ export default function HomeworkScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={`${sub} ${statusLabel}`}
                 >
-                  <AivoCard style={styles.assignmentCard}>
+                  <Card style={styles.assignmentCard}>
                     <View style={styles.assignmentRow}>
                       <View style={styles.subjectIcon}>
                         <Ionicons name={subjectIconName(sub)} size={22} color={colors.primary} />
@@ -265,7 +276,7 @@ export default function HomeworkScreen() {
                         <Text style={[styles.statusText, { color: sStyle.fg }]}>{statusLabel}</Text>
                       </View>
                     </View>
-                  </AivoCard>
+                  </Card>
                 </Pressable>
               );
             })}
@@ -273,7 +284,7 @@ export default function HomeworkScreen() {
         )}
 
         <View style={isTablet ? styles.captureRow : undefined}>
-          <AivoCard style={[styles.captureCard, isTablet && styles.captureCardTablet]}>
+          <Card style={[styles.captureCard, isTablet && styles.captureCardTablet]}>
             <View style={[styles.cameraPreview, { height: previewHeight }]}>
               {uploadHomework.isPending ? (
                 <>
@@ -291,39 +302,39 @@ export default function HomeworkScreen() {
             {uploadError ? <Text style={styles.uploadErrorText}>{uploadError}</Text> : null}
 
             <View style={styles.captureActions}>
-              <AivoButton
+              <Button
                 title={t("learnerHomework.takePhoto")}
                 onPress={onTakePhoto}
                 size="lg"
                 disabled={uploadHomework.isPending}
-                icon={<Ionicons name="camera-outline" size={20} color="#FFF" />}
+                iconLeft={<Ionicons name="camera-outline" size={20} color={colors.white} />}
                 style={{ flex: 1, marginRight: 8 }}
               />
-              <AivoButton
+              <Button
                 title={t("learnerHomework.gallery")}
                 onPress={onPickFromGallery}
                 variant="outline"
                 size="lg"
                 disabled={uploadHomework.isPending}
-                icon={<Ionicons name="images-outline" size={20} color={colors.primary} />}
+                iconLeft={<Ionicons name="images-outline" size={20} color={colors.primary} />}
                 style={{ flex: 1 }}
               />
             </View>
-          </AivoCard>
+          </Card>
 
-          <AivoCard style={[styles.uploadCard, isTablet && styles.uploadCardTablet]}>
+          <Card style={[styles.uploadCard, isTablet && styles.uploadCardTablet]}>
             <Ionicons name="document-outline" size={32} color={colors.secondary} />
             <Text style={styles.uploadTitle}>{t("learnerHomework.uploadPDF")}</Text>
             <Text style={styles.uploadDesc}>{t("learnerHomework.uploadPDFDesc")}</Text>
-            <AivoButton
+            <Button
               title={t("learnerHomework.chooseFile")}
               onPress={onPickPdf}
-              variant="secondary"
+              variant="ghost"
               size="sm"
               disabled={uploadHomework.isPending}
               style={{ marginTop: spacing.sm }}
             />
-          </AivoCard>
+          </Card>
         </View>
       </View>
     </ScrollView>
@@ -333,17 +344,17 @@ export default function HomeworkScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
-  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
-  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  backText: { fontSize: 16, fontFamily: fontFamilies.bodySemiBold, color: colors.primary },
+  title: { fontSize: 24, fontFamily: fontFamilies.bodyExtraBold, color: colors.text },
   subtitle: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginBottom: spacing.lg,
   },
   sectionTitle: {
     fontSize: 13,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -358,7 +369,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.textSecondary,
     textAlign: "center",
   },
@@ -374,18 +385,18 @@ const styles = StyleSheet.create({
   },
   assignmentSubject: {
     fontSize: 15,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     color: colors.text,
     textTransform: "capitalize",
   },
   assignmentMeta: {
     fontSize: 12,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: 2,
   },
   statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.full },
-  statusText: { fontSize: 11, fontFamily: "Nunito-Bold" },
+  statusText: { fontSize: 11, fontFamily: fontFamilies.bodyBold },
   captureCard: { marginBottom: spacing.md },
   captureRow: { flexDirection: "row", gap: spacing.md, alignItems: "stretch" },
   captureCardTablet: { flex: 2 },
@@ -403,23 +414,23 @@ const styles = StyleSheet.create({
   },
   cameraText: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: 8,
   },
   uploadErrorText: {
     fontSize: 13,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodySemiBold,
     color: colors.error,
     textAlign: "center",
     marginBottom: spacing.sm,
   },
   captureActions: { flexDirection: "row" },
   uploadCard: { alignItems: "center" as const, paddingVertical: spacing.lg },
-  uploadTitle: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text, marginTop: 8 },
+  uploadTitle: { fontSize: 16, fontFamily: fontFamilies.bodyBold, color: colors.text, marginTop: 8 },
   uploadDesc: {
     fontSize: 13,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     color: colors.textSecondary,
     marginTop: 4,
   },

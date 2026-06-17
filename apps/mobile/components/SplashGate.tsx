@@ -2,15 +2,15 @@
 // first authenticated surface.
 //
 // Behaviour:
-//   - Renders a centered white AIVO wordmark on the brand purple (#7C3AED),
-//     matching the native splash background so there is NO white flash at
-//     the native → JS handoff.
+//   - Renders the AIVO "Preparing your learning space" splash scene
+//     (`SplashScene`) over a dark-indigo base that matches the native splash
+//     background so there is NO white flash at the native → JS handoff.
 //   - Hides the native splash (`expo-splash-screen`) only once this gate has
-//     mounted and the animated logo is on screen — the handshake the brief
-//     asks us to move out of `_layout`.
-//   - Plays a gentle fade + scale entrance via Reanimated (~500 ms). When the
-//     OS "reduce motion" setting is on (AccessibilityInfo), the logo renders
-//     statically and the overlay is dismissed without a fade.
+//     mounted and the scene is on screen — the handshake the brief asks us to
+//     move out of `_layout`.
+//   - The scene plays its own gentle entrance / mascot bob / dot pulse via
+//     Reanimated. When the OS "reduce motion" setting is on, it renders
+//     statically and this gate dismisses the overlay without a fade.
 //   - Holds the overlay until `ready` (fonts loaded AND auth hydrated), then
 //     fades to the children beneath.
 
@@ -24,16 +24,12 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import * as SplashScreen from "expo-splash-screen";
-import { AivoLogo } from "@/components/AivoLogo";
+import { SplashScene, SPLASH_BG_BOTTOM } from "@/components/SplashScene";
 
-/** Brand purple — kept in lockstep with `app.json` splash backgroundColor. */
-const BRAND = "#7C3AED";
-const ENTRANCE_MS = 500;
-const SCALE_MS = 550;
 const FADE_OUT_MS = 400;
-/** Minimum time the static logo is shown in reduced-motion mode so the
+/** Minimum time the static scene is shown in reduced-motion mode so the
  *  brand bridge stays perceivable instead of blinking past. */
-const REDUCED_HOLD_MS = 300;
+const REDUCED_HOLD_MS = 400;
 
 interface SplashGateProps {
   /** True once fonts are loaded AND auth has hydrated. */
@@ -48,8 +44,6 @@ export function SplashGate({ ready, children }: SplashGateProps) {
   const [mounted, setMounted] = useState(false);
   const [done, setDone] = useState(false);
 
-  const logoOpacity = useSharedValue(0);
-  const logoScale = useSharedValue(0.92);
   const overlayOpacity = useSharedValue(1);
 
   // Resolve + subscribe to the reduce-motion preference.
@@ -71,20 +65,14 @@ export function SplashGate({ ready, children }: SplashGateProps) {
     };
   }, []);
 
-  // Mount: hide the native splash (logo is on screen now) and play / skip
-  // the entrance. Runs once, after the reduce-motion preference resolves.
+  // Mount: hide the native splash once the scene is on screen. Runs once,
+  // after the reduce-motion preference resolves (the scene reads it to decide
+  // whether to animate its entrance).
   useEffect(() => {
     if (mounted || reduceMotion === null) return;
     setMounted(true);
     SplashScreen.hideAsync().catch(() => {});
-    if (reduceMotion) {
-      logoOpacity.value = 1;
-      logoScale.value = 1;
-    } else {
-      logoOpacity.value = withTiming(1, { duration: ENTRANCE_MS, easing: Easing.out(Easing.cubic) });
-      logoScale.value = withTiming(1, { duration: SCALE_MS, easing: Easing.out(Easing.cubic) });
-    }
-  }, [mounted, reduceMotion, logoOpacity, logoScale]);
+  }, [mounted, reduceMotion]);
 
   // Once ready (and mounted), dismiss the overlay.
   useEffect(() => {
@@ -102,10 +90,6 @@ export function SplashGate({ ready, children }: SplashGateProps) {
     );
   }, [ready, mounted, done, reduceMotion, overlayOpacity]);
 
-  const logoStyle = useAnimatedStyle(() => ({
-    opacity: logoOpacity.value,
-    transform: [{ scale: logoScale.value }],
-  }));
   const overlayStyle = useAnimatedStyle(() => ({ opacity: overlayOpacity.value }));
 
   return (
@@ -115,12 +99,12 @@ export function SplashGate({ ready, children }: SplashGateProps) {
         <Animated.View
           style={[styles.overlay, overlayStyle]}
           pointerEvents="auto"
-          accessibilityLabel="AIVO"
+          accessibilityLabel="AIVO — Preparing your learning space"
           accessibilityRole="image"
         >
-          <Animated.View style={logoStyle}>
-            <AivoLogo variant="white" width={200} />
-          </Animated.View>
+          {/* Wait for the reduce-motion preference before mounting the scene
+              so it never starts an animation it would have skipped. */}
+          {reduceMotion !== null && <SplashScene reduceMotion={reduceMotion} />}
         </Animated.View>
       )}
     </View>
@@ -131,7 +115,7 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: BRAND,
+    backgroundColor: SPLASH_BG_BOTTOM,
     alignItems: "center",
     justifyContent: "center",
   },

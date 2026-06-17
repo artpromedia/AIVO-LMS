@@ -137,7 +137,7 @@ export default async function Page() {
               day-to-day learning — pacing notes, read-aloud preferences, scaffolding cues. We use
               that context to personalize supports.
             </p>
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-iw-ink-muted">
               We never display raw IEP text inside the learner experience. Clinical sections
               (eligibility, evaluations, signatures) belong in your district's system, not ours.
             </p>

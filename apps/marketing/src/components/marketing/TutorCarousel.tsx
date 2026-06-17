@@ -78,23 +78,23 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
     >
       <div className="max-w-6xl mx-auto px-6 md:px-8">
         <div className="text-center mb-16">
-          <p className="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-3">
+          <p className="text-sm font-bold text-iw-success-strong uppercase tracking-widest mb-3">
             {t("label")}
           </p>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-heading font-bold text-iw-ink mb-4">
             {t("title")}
           </h2>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto font-body">{t("subtitle")}</p>
+          <p className="text-lg text-iw-ink-muted max-w-2xl mx-auto font-body">{t("subtitle")}</p>
         </div>
 
         <div className="relative h-[520px] md:h-[560px]">
           <button
             onClick={goPrev}
-            className="absolute left-0 md:left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/90 shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all"
+            className="absolute left-0 md:left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/90 shadow-soft-3 flex items-center justify-center hover:bg-white hover:scale-110 transition-all"
             aria-label={t("prev_tutor")}
           >
             <svg
-              className="w-6 h-6 text-slate-600"
+              className="w-6 h-6 text-iw-ink-muted"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -109,11 +109,11 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
           </button>
           <button
             onClick={goNext}
-            className="absolute right-0 md:right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/90 shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all"
+            className="absolute right-0 md:right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/90 shadow-soft-3 flex items-center justify-center hover:bg-white hover:scale-110 transition-all"
             aria-label={t("next_tutor")}
           >
             <svg
-              className="w-6 h-6 text-slate-600"
+              className="w-6 h-6 text-iw-ink-muted"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -139,7 +139,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
                 <button
                   key={tutor.name}
                   onClick={() => !isCenter && goTo(index)}
-                  className="absolute transition-all duration-700 ease-in-out focus:outline-none focus-visible:ring-4 focus-visible:ring-purple-300 rounded-3xl"
+                  className="absolute transition-all duration-700 ease-in-out focus:outline-none focus-visible:ring-4 focus-visible:ring-iw-ring rounded-iw-card-lg"
                   style={{
                     transform: `translateX(${translateX}px) scale(${scale})`,
                     zIndex,
@@ -154,7 +154,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
                   tabIndex={isCenter ? -1 : 0}
                 >
                   <div
-                    className={`w-[260px] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br ${tutor.bg}`}
+                    className={`w-[260px] rounded-iw-card-lg overflow-hidden shadow-soft-5 bg-gradient-to-br ${tutor.bg}`}
                     style={{ transformStyle: "preserve-3d" }}
                   >
                     <div className="relative h-[340px] overflow-hidden">
@@ -179,14 +179,14 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
           </div>
 
           <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-[340px] z-[25] pointer-events-none">
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-slate-100 pointer-events-auto">
+            <div className="bg-white/95 backdrop-blur-sm rounded-iw-card p-8 shadow-soft-5 border border-iw-border pointer-events-auto">
               <p
                 className="text-sm font-semibold uppercase tracking-wider mb-1"
                 style={{ color: current.color }}
               >
                 {current.domain}
               </p>
-              <h3 className="text-3xl font-heading font-bold text-slate-900 mb-2">
+              <h3 className="text-3xl font-heading font-bold text-iw-ink mb-2">
                 {current.name}
               </h3>
               <p className="text-base italic mb-4" style={{ color: current.color }}>
@@ -194,7 +194,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
               </p>
               <ul className="space-y-3 mb-6">
                 {current.bullets.map((b) => (
-                  <li key={b} className="flex items-start gap-2 text-sm text-slate-600">
+                  <li key={b} className="flex items-start gap-2 text-sm text-iw-ink-muted">
                     <svg
                       className="w-4 h-4 mt-0.5 flex-shrink-0"
                       style={{ color: current.color }}
@@ -219,7 +219,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
                   trackCTAClick("tutor_learn_with", `${WEB_APP_URL}/signup?plan=free`);
                   trackSignupInitiation("tutor_carousel");
                 }}
-                className="block w-full py-3 rounded-full text-white font-bold transition hover:opacity-90 shadow-lg text-center"
+                className="block w-full py-3 rounded-iw-control text-white font-bold transition hover:opacity-90 shadow-soft-3 text-center"
                 style={{ backgroundColor: current.color }}
               >
                 {t("learn_with", { name: current.name })}
@@ -228,7 +228,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
           </div>
 
           <div className="md:hidden absolute bottom-0 left-0 right-0 z-[25]">
-            <div className="bg-white/95 backdrop-blur-sm rounded-t-2xl p-6 shadow-xl border-t border-slate-100">
+            <div className="bg-white/95 backdrop-blur-sm rounded-t-iw-card p-6 shadow-soft-5 border-t border-iw-border">
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <p
@@ -237,7 +237,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
                   >
                     {current.domain}
                   </p>
-                  <h3 className="text-xl font-heading font-bold text-slate-900">{current.name}</h3>
+                  <h3 className="text-xl font-heading font-bold text-iw-ink">{current.name}</h3>
                 </div>
                 <a
                   href={`${WEB_APP_URL}/signup?plan=free`}
@@ -245,7 +245,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
                     trackCTAClick("tutor_learn_mobile", `${WEB_APP_URL}/signup?plan=free`);
                     trackSignupInitiation("tutor_carousel_mobile");
                   }}
-                  className="px-4 py-2 rounded-full text-white text-sm font-bold"
+                  className="px-4 py-2 rounded-iw-control text-white text-sm font-bold"
                   style={{ backgroundColor: current.color }}
                 >
                   {t("learn")}
@@ -261,16 +261,16 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
         <div className="flex items-center justify-center gap-2 mt-8">
           <button
             onClick={toggleAutoPlay}
-            className="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-slate-50 transition mr-2"
+            className="w-8 h-8 rounded-full bg-white shadow-soft-3 flex items-center justify-center hover:bg-iw-raised transition mr-2"
             aria-label={isAutoPlaying ? t("pause_carousel") : t("play_carousel")}
           >
             {isAutoPlaying ? (
-              <svg className="w-4 h-4 text-slate-600" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-iw-ink-muted" fill="currentColor" viewBox="0 0 24 24">
                 <rect x="6" y="4" width="4" height="16" />
                 <rect x="14" y="4" width="4" height="16" />
               </svg>
             ) : (
-              <svg className="w-4 h-4 text-slate-600" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-iw-ink-muted" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
             )}

@@ -47,7 +47,7 @@ export function OpenIncidentForm() {
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-xs font-semibold text-aivo-ink-soft">Title</span>
           <input
-            className="rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
+            className="rounded-md border border-iw-border bg-iw-card px-3 py-2 text-sm"
             value={title}
             required
             maxLength={160}
@@ -57,7 +57,7 @@ export function OpenIncidentForm() {
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-xs font-semibold text-aivo-ink-soft">Severity</span>
           <select
-            className="rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
+            className="rounded-md border border-iw-border bg-iw-card px-3 py-2 text-sm"
             value={severity}
             onChange={(e) => setSeverity(e.target.value as typeof severity)}
           >
@@ -71,7 +71,7 @@ export function OpenIncidentForm() {
       <label className="flex flex-col gap-1 text-sm">
         <span className="text-xs font-semibold text-aivo-ink-soft">Summary</span>
         <textarea
-          className="rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
+          className="rounded-md border border-iw-border bg-iw-card px-3 py-2 text-sm"
           rows={3}
           value={summary}
           required

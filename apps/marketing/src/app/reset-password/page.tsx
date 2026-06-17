@@ -231,7 +231,7 @@ function ResetPasswordInner() {
                   disabled={submitDisabled}
                   aria-busy={loading}
                   style={{ minHeight: 44 }}
-                  className="w-full h-14 rounded-2xl bg-gradient-to-r from-[hsl(var(--visual-primary))] to-[hsl(var(--visual-primary-dark))] hover:opacity-95 text-white font-bold text-lg shadow-xl shadow-purple-200 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                  className="w-full h-14 rounded-full bg-gradient-to-r from-[hsl(var(--visual-primary))] to-[hsl(var(--visual-primary-dark))] hover:opacity-95 text-white font-semibold text-lg shadow-[0_18px_40px_-12px_rgba(124,58,237,0.6)] transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>

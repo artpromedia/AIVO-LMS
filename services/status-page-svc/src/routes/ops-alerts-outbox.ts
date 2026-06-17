@@ -51,7 +51,7 @@ const ESCALATION_COOLDOWN_MS = 30 * 60 * 1000;
 // dashboard so a single deploy doesn't have to touch two configs.
 const DEFAULT_SOURCE_KEYS: Array<{ service: string; envKey: string; devDefault: string }> = [
   { service: "identity-svc", envKey: "IDENTITY_SVC_URL", devDefault: "http://localhost:3001" },
-  { service: "assessment-svc", envKey: "ASSESSMENT_SVC_URL", devDefault: "http://localhost:3003" },
+  { service: "assessment-svc", envKey: "ASSESSMENT_SVC_URL", devDefault: "http://localhost:3012" },
   { service: "learning-svc", envKey: "LEARNING_SVC_URL", devDefault: "http://localhost:3005" },
   { service: "tutor-svc", envKey: "TUTOR_SVC_URL", devDefault: "http://localhost:3006" },
   { service: "family-svc", envKey: "FAMILY_SVC_URL", devDefault: "http://localhost:3007" },

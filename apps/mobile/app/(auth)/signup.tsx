@@ -290,7 +290,7 @@ export default function SignupScreen() {
               value={coppaConsent}
               onValueChange={setCoppaConsent}
               trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={coppaConsent ? colors.primary : "#f4f3f4"}
+              thumbColor={coppaConsent ? colors.primary : colors.background}
             />
             <Text style={styles.switchLabel}>{t("auth.coppaConsent")}</Text>
           </View>
@@ -300,7 +300,7 @@ export default function SignupScreen() {
               value={termsAccepted}
               onValueChange={setTermsAccepted}
               trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={termsAccepted ? colors.primary : "#f4f3f4"}
+              thumbColor={termsAccepted ? colors.primary : colors.background}
             />
             <Text style={styles.switchLabel}>{t("auth.termsConsent")}</Text>
           </View>
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     gap: 10,
     marginBottom: spacing.sm,
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.xxl,
     padding: spacing.lg,
     borderWidth: 1,
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 12,

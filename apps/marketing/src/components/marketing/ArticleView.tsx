@@ -21,7 +21,7 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
     <div className="min-h-screen bg-white">
       <JsonLd data={articleJsonLd} />
 
-      <header className="sticky top-0 z-50 border-b border-slate-100 bg-white">
+      <header className="sticky top-0 z-50 border-b border-iw-border bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 md:px-8">
           <Link href="/" className="flex items-center">
             <Image
@@ -37,13 +37,13 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
             <LanguageSwitcher compact />
             <Link
               href={backHref}
-              className="hidden min-h-[44px] items-center rounded-lg px-5 py-2 font-semibold text-slate-600 transition hover:text-primary sm:inline-flex"
+              className="hidden min-h-[44px] items-center rounded-lg px-5 py-2 font-semibold text-iw-ink-muted transition hover:text-primary sm:inline-flex"
             >
               {backLabel}
             </Link>
             <a
               href={`${WEB_APP_URL}/signup?plan=free`}
-              className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 py-2.5 font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-primary-dark"
+              className="inline-flex min-h-[44px] items-center rounded-iw-control bg-primary px-5 py-2.5 font-bold text-white shadow-soft-3 transition hover:bg-primary-dark"
             >
               Get Started
             </a>
@@ -51,9 +51,9 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
         </div>
       </header>
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-purple-50/40 via-white to-white py-12 md:py-20">
+      <section className="relative overflow-hidden bg-gradient-to-b from-iw-purple-50/40 via-white to-white py-12 md:py-20">
         <div className="mx-auto max-w-3xl px-6 md:px-8">
-          <nav aria-label="Breadcrumb" className="mb-4 text-sm font-body text-slate-500">
+          <nav aria-label="Breadcrumb" className="mb-4 text-sm font-body text-iw-ink-muted">
             <Link href="/" className="hover:text-primary">
               Home
             </Link>
@@ -62,19 +62,19 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
               {backLabel}
             </Link>
             <span aria-hidden="true"> / </span>
-            <span className="text-slate-700">{article.title}</span>
+            <span className="text-iw-ink">{article.title}</span>
           </nav>
           <span
-            className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold text-white"
+            className="inline-flex items-center gap-2 rounded-iw-chip px-3 py-1 text-xs font-bold text-white"
             style={{ backgroundColor: article.categoryColor }}
           >
             {article.category}
           </span>
-          <h1 className="mt-4 font-heading text-3xl font-bold leading-tight text-slate-900 md:text-5xl">
+          <h1 className="mt-4 font-heading text-3xl font-bold leading-tight text-iw-ink md:text-5xl">
             {article.title}
           </h1>
-          <p className="mt-4 max-w-2xl font-body text-lg text-slate-600">{article.excerpt}</p>
-          <p className="mt-4 font-body text-sm text-slate-400">
+          <p className="mt-4 max-w-2xl font-body text-lg text-iw-ink-muted">{article.excerpt}</p>
+          <p className="mt-4 font-body text-sm text-iw-ink-muted">
             {new Date(article.publishedAt).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -90,17 +90,17 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
             engines preferentially quote. Sits above the article body. */}
         <section
           aria-labelledby="key-takeaways-heading"
-          className="mb-12 rounded-2xl border border-purple-100 bg-purple-50/40 p-6 md:p-7"
+          className="mb-12 rounded-iw-card border border-iw-purple-100 bg-iw-purple-100/40 p-6 md:p-7"
         >
-          <h2 id="key-takeaways-heading" className="font-heading text-lg font-bold text-slate-900">
+          <h2 id="key-takeaways-heading" className="font-heading text-lg font-bold text-iw-ink">
             Key takeaways
           </h2>
-          <ul className="mt-3 space-y-2 font-body text-base leading-relaxed text-slate-700">
+          <ul className="mt-3 space-y-2 font-body text-base leading-relaxed text-iw-ink">
             {article.keyTakeaways.map((takeaway, i) => (
               <li key={i} className="flex gap-2.5">
                 <span
                   aria-hidden="true"
-                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-purple-500"
+                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-iw-primary"
                 />
                 <span>{takeaway}</span>
               </li>
@@ -108,12 +108,12 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
           </ul>
         </section>
 
-        <article className="space-y-6 font-body text-lg leading-relaxed text-slate-700">
+        <article className="space-y-6 font-body text-lg leading-relaxed text-iw-ink">
           {article.body.map((block, i) => {
             if (block.type === "p") return <p key={i}>{block.text}</p>;
             if (block.type === "h2")
               return (
-                <h2 key={i} className="mt-10 font-heading text-2xl font-bold text-slate-900">
+                <h2 key={i} className="mt-10 font-heading text-2xl font-bold text-iw-ink">
                   {block.text}
                 </h2>
               );
@@ -129,23 +129,23 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
           })}
         </article>
 
-        <div className="mt-16 rounded-3xl border border-purple-100 bg-purple-50/40 p-8">
-          <h3 className="font-heading text-xl font-bold text-slate-900">
+        <div className="mt-16 rounded-iw-card-lg border border-iw-purple-100 bg-iw-purple-100/40 p-8">
+          <h3 className="font-heading text-xl font-bold text-iw-ink">
             See AIVO for your learner
           </h3>
-          <p className="mt-2 font-body text-slate-600">
+          <p className="mt-2 font-body text-iw-ink-muted">
             Get a personalized walkthrough, or start a free parent account today.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <a
               href={`${WEB_APP_URL}/signup?plan=free`}
-              className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-6 py-3 font-bold text-white shadow-lg transition hover:bg-purple-700"
+              className="inline-flex items-center gap-2 rounded-iw-control bg-iw-primary px-6 py-3 font-bold text-white shadow-soft-3 transition hover:bg-iw-primary-hover"
             >
               Start a free account
             </a>
             <Link
               href="/demo"
-              className="inline-flex items-center gap-2 rounded-full border border-purple-200 bg-white px-6 py-3 font-bold text-purple-700 transition hover:bg-purple-50"
+              className="inline-flex items-center gap-2 rounded-iw-control border border-iw-purple-200 bg-white px-6 py-3 font-bold text-iw-primary transition hover:bg-iw-purple-100"
             >
               Request a demo
             </Link>
@@ -153,7 +153,7 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
         </div>
       </main>
 
-      <footer className="bg-slate-900 py-8">
+      <footer className="bg-iw-ink py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 md:flex-row md:px-8">
           <div className="flex items-center gap-6">
             <Image
@@ -164,27 +164,27 @@ export function ArticleView({ article, backHref, backLabel }: Props) {
               style={{ width: "auto", height: "auto" }}
             />
             <nav className="hidden items-center gap-4 md:flex">
-              <Link href="/blog" className="text-sm text-slate-400 transition hover:text-white">
+              <Link href="/blog" className="text-sm text-iw-ink-muted transition hover:text-white">
                 Blog
               </Link>
               <Link
                 href="/resources"
-                className="text-sm text-slate-400 transition hover:text-white"
+                className="text-sm text-iw-ink-muted transition hover:text-white"
               >
                 Resources
               </Link>
               <Link
                 href="/privacy-policy"
-                className="text-sm text-slate-400 transition hover:text-white"
+                className="text-sm text-iw-ink-muted transition hover:text-white"
               >
                 Privacy
               </Link>
-              <Link href="/security" className="text-sm text-slate-400 transition hover:text-white">
+              <Link href="/security" className="text-sm text-iw-ink-muted transition hover:text-white">
                 Security
               </Link>
             </nav>
           </div>
-          <p className="font-body text-sm text-slate-500">
+          <p className="font-body text-sm text-iw-ink-muted">
             &copy; {new Date().getFullYear()} AIVO Learning Platform
           </p>
         </div>

@@ -19,7 +19,6 @@ export default async function UsersPage({
 
   return (
     <AdminPageFrame
-      eyebrow="Platform"
       title="Users"
       description={`${result.total.toLocaleString()} administrator, educator, and guardian accounts.`}
     >
@@ -40,7 +39,7 @@ export default async function UsersPage({
               key: "user",
               header: "User",
               render: (row) => (
-                <Link className="font-semibold text-blue-700 hover:underline" href={`/platform/users/${row.id}`}>
+                <Link className="font-semibold text-violet-700 hover:underline" href={`/platform/users/${row.id}`}>
                   {row.name || row.email}
                   <span className="block text-xs font-normal text-slate-500">{row.email}</span>
                 </Link>

@@ -84,7 +84,7 @@ export function JobTray({ schoolId }: JobTrayProps) {
           id="job-tray-panel"
           role="region"
           aria-label="Import job status"
-          className="rounded-lg border border-iw-border bg-iw-card shadow-lg"
+          className="rounded-lg border border-iw-border bg-iw-card shadow-soft-3"
         >
           <ul className="divide-y divide-iw-border">
             {recentJobs.map((job) => (

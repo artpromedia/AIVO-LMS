@@ -75,9 +75,9 @@ export function TutorMemoryCard({ learnerId }: { learnerId: string }) {
   return (
     <Card data-testid="tutor-memory-card" className="p-[var(--aivo-density-card-pad)]">
       <h3 className="font-display text-lg">{t("title")}</h3>
-      <p className="mt-1 text-sm text-aivo-ink-soft">{t("description")}</p>
+      <p className="mt-1 text-sm text-iw-ink-muted">{t("description")}</p>
       {memories.length === 0 ? (
-        <p data-testid="tutor-memory-empty" className="mt-3 text-sm text-aivo-ink-soft">
+        <p data-testid="tutor-memory-empty" className="mt-3 text-sm text-iw-ink-muted">
           {t("empty")}
         </p>
       ) : (
@@ -88,17 +88,17 @@ export function TutorMemoryCard({ learnerId }: { learnerId: string }) {
               <li
                 key={m.id}
                 data-testid="tutor-memory-row"
-                className="flex items-start justify-between gap-3 rounded-md border border-aivo-border p-3"
+                className="flex items-start justify-between gap-3 rounded-md border border-iw-border p-3"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone="neutral">{t(`kind_${m.kind}`)}</Badge>
-                    <span className="text-xs text-aivo-ink-soft">
+                    <span className="text-xs text-iw-ink-muted">
                       {tutor ? `${tutor.icon} ${tutor.name}` : m.tutorKey}
                     </span>
                   </div>
                   <p className="mt-1 text-sm">{m.content}</p>
-                  <p className="mt-1 text-xs text-aivo-ink-soft">
+                  <p className="mt-1 text-xs text-iw-ink-muted">
                     {t("expires", {
                       date: new Date(m.expiresAt).toLocaleDateString(),
                     })}

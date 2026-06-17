@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import json
 
+from ..services.prompt_builder import _build_language_directive, _resolve_locale
+
 _ACTION_BRIEFS: dict[str, str] = {
     "advance": '{"kind":"advance","encouragement?":"short praise (<=300 chars)"} — the learner is ready for the next beat.',
     "remediate": '{"kind":"remediate","focus":"what to re-teach","approach":"worked_example|simpler_item|manipulative|re_explain"} — re-teach before moving on.',
@@ -30,6 +32,7 @@ def build_turn_prompts(
     history_digest: str = "",
     tool_results: list[dict] | None = None,
     validation_feedback: str | None = None,
+    locale: str | None = None,
 ) -> tuple[str, str]:
     """Return ``(system_prompt, user_prompt)`` for one agent turn."""
     action_lines = [
@@ -64,6 +67,9 @@ def build_turn_prompts(
             "learner's functioning level; regulation (break) beats instruction when",
             "frustration signals fire; keep every learner-visible word warm,",
             "concrete, and calm.",
+            # Pin the learner-visible response language (action text,
+            # encouragement, etc.) to the learner's selected/stored language.
+            _build_language_directive(_resolve_locale(locale)),
         ]
     )
 

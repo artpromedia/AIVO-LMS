@@ -17,12 +17,12 @@ export function SectionHeader({
   return (
     <div className={`${alignment} max-w-3xl ${className}`}>
       {eyebrow && (
-        <p className="text-sm font-semibold uppercase tracking-wider text-purple-600">{eyebrow}</p>
+        <p className="text-sm font-semibold uppercase tracking-wider text-iw-primary">{eyebrow}</p>
       )}
-      <h2 className="mt-3 font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">
+      <h2 className="mt-3 font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-iw-ink">
         {title}
       </h2>
-      {subtitle && <p className="mt-4 text-lg text-slate-600">{subtitle}</p>}
+      {subtitle && <p className="mt-4 text-lg text-iw-ink-muted">{subtitle}</p>}
     </div>
   );
 }

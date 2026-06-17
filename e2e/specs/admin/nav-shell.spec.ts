@@ -78,14 +78,14 @@ test.describe("Platform nav shell (web-admin :5001)", () => {
     // Only one nav item carries the active state.
     await expect(sidebar.locator('a[aria-current="page"]')).toHaveCount(1);
 
-    // Global search filters the visible nav items across groups.
+    // The ⌘K trigger opens the global command palette; Escape dismisses it.
     const search = page.getByTestId(T.adminShellSearch);
-    await search.fill("audit");
-    await expect(sidebar.getByRole("link", { name: "Audit log" })).toBeVisible();
-    await expect(sidebar.getByRole("link", { name: "Tenants" })).toHaveCount(0);
-    await expect(sidebar.getByTestId(T.navGroupIdentityAccess)).toHaveCount(0);
-    await search.fill("");
-    await expect(sidebar.getByRole("link", { name: "Tenants" })).toBeVisible();
+    await search.click();
+    const palette = page.getByRole("dialog", { name: /search tenants/i });
+    await expect(palette).toBeVisible();
+    await expect(page.getByTestId("admin-command-input")).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(palette).toHaveCount(0);
   });
 
   test("role-gated items are hidden from non-admin platform staff", async ({ page }) => {

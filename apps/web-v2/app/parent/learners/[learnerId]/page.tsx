@@ -89,7 +89,7 @@ export default async function LearnerDetailPage({
       <Card className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center">
         <LearnerAvatar name={learner.displayName} size="lg" />
         <div className="flex-1">
-          <p className="text-xs text-aivo-ink-soft">{t("next_step")}</p>
+          <p className="text-xs text-iw-ink-muted">{t("next_step")}</p>
           <p className="font-display text-lg font-semibold">{tReadiness(next.labelKey)}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <Badge tone={tone}>{tReadiness(READINESS_LABEL_KEY[learner.readinessState])}</Badge>
@@ -177,10 +177,10 @@ export default async function LearnerDetailPage({
           },
         ].map((q) => (
           <Link key={q.href} href={q.href}>
-            <Card className="h-full p-4 transition hover:border-aivo-accent">
-              <q.Icon className="h-5 w-5 text-aivo-accent" />
+            <Card className="h-full p-4 transition hover:border-iw-warm">
+              <q.Icon className="h-5 w-5 text-iw-warm" />
               <p className="mt-2 font-medium">{q.label}</p>
-              <p className="mt-0.5 text-xs text-aivo-ink-soft">{q.desc}</p>
+              <p className="mt-0.5 text-xs text-iw-ink-muted">{q.desc}</p>
             </Card>
           </Link>
         ))}
@@ -189,22 +189,22 @@ export default async function LearnerDetailPage({
       <SectionHeader title={t("profile_basics")} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("comfort_levels")}
           </p>
           <dl className="mt-2 grid grid-cols-2 gap-y-2 text-sm">
-            <dt className="text-aivo-ink-soft">{t("reading")}</dt>
+            <dt className="text-iw-ink-muted">{t("reading")}</dt>
             <dd>{learner.readingComfort ?? "—"}</dd>
-            <dt className="text-aivo-ink-soft">Math</dt>
+            <dt className="text-iw-ink-muted">Math</dt>
             <dd>{learner.mathComfort ?? "—"}</dd>
           </dl>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("strengths")}
           </p>
           {learner.knownStrengths.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-ink-soft">{t("none_recorded")}</p>
+            <p className="mt-2 text-sm text-iw-ink-muted">{t("none_recorded")}</p>
           ) : (
             <ul className="mt-2 list-disc pl-5 text-sm">
               {learner.knownStrengths.map((s) => (
@@ -214,11 +214,11 @@ export default async function LearnerDetailPage({
           )}
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("challenges")}
           </p>
           {learner.knownChallenges.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-ink-soft">{t("none_recorded")}</p>
+            <p className="mt-2 text-sm text-iw-ink-muted">{t("none_recorded")}</p>
           ) : (
             <ul className="mt-2 list-disc pl-5 text-sm">
               {learner.knownChallenges.map((s) => (
@@ -228,7 +228,7 @@ export default async function LearnerDetailPage({
           )}
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+          <p className="text-xs font-medium uppercase tracking-wide text-iw-ink-muted">
             {t("accessibility_defaults")}
           </p>
           <ul className="mt-2 space-y-1 text-sm">

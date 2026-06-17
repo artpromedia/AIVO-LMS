@@ -27,14 +27,14 @@ function statusLabel(status: ComponentStatus): string {
 function dotClass(status: ComponentStatus): string {
   switch (status) {
     case "operational":
-      return "bg-aivo-success";
+      return "bg-iw-success";
     case "under_maintenance":
       return "bg-iw-primary";
     case "degraded_performance":
     case "partial_outage":
-      return "bg-aivo-warning";
+      return "bg-iw-warning";
     case "major_outage":
-      return "bg-aivo-danger";
+      return "bg-iw-error";
     default:
       return "bg-iw-border";
   }

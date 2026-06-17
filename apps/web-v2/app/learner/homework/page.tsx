@@ -83,7 +83,7 @@ export default async function LearnerHomeworkPage() {
               <li key={s.id}>
                 <Link
                   href={`/learner/homework/${s.id}`}
-                  className="block rounded-iw-card-lg bg-white border border-iw-border p-4 hover:shadow-[0_12px_32px_-12px_rgba(15,23,42,0.18)] transition-shadow focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-[var(--aivo-color-surface-canvas)]"
+                  className="block rounded-iw-card-lg bg-white border border-iw-border p-4 hover:shadow-soft-3 transition-shadow focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-[var(--aivo-color-surface-canvas)]"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">

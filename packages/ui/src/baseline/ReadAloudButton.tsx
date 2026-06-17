@@ -31,10 +31,16 @@ export interface ReadAloudButtonProps {
    * control carries `data-scan-target` + `data-scan-action="read-aloud"` so
    * the baseline scan controller activates the spoken read-aloud instead of
    * following the SSR `href`. `scanReadText` is the text the scanner speaks.
+   *
+   * Pass `scanAction={null}` when the control owns its own JS playback (e.g.
+   * the server-TTS-backed listen island): omitting `data-scan-action` lets the
+   * scan controller activate it by clicking the real control — driving the
+   * richer audio + caption path — instead of the browser-only `speak()`.
    */
   scanTargetId?: string;
   scanLabel?: string;
   scanReadText?: string;
+  scanAction?: string | null;
 }
 
 export function ReadAloudButton({
@@ -47,14 +53,15 @@ export function ReadAloudButton({
   scanTargetId,
   scanLabel,
   scanReadText,
+  scanAction = "read-aloud",
 }: ReadAloudButtonProps) {
   const ariaLabel = playing ? "Stop reading aloud" : "Read this aloud";
   const scanProps = scanTargetId
     ? {
         "data-scan-target": scanTargetId,
-        "data-scan-action": "read-aloud",
+        ...(scanAction != null ? { "data-scan-action": scanAction } : {}),
         "data-scan-label": scanLabel,
-        "data-scan-read": scanReadText,
+        ...(scanReadText != null ? { "data-scan-read": scanReadText } : {}),
       }
     : undefined;
   const content = (

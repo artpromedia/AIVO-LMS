@@ -5,7 +5,7 @@ import { router, type Href } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
-import { spacing, radius } from "@/constants/colors";
+import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Card, Button, SensoryToggle } from "@/components/ui";
@@ -242,7 +242,7 @@ export default function LearnerSettingsScreen() {
 
       {saved && (
         <View style={[styles.savedBanner, { backgroundColor: "rgba(22, 163, 74, 0.10)" }]}>
-          <Ionicons name="checkmark-circle" size={18} color="#16a34a" />
+          <Ionicons name="checkmark-circle" size={18} color={colors.success} />
           <Text style={styles.savedText}>{t("learnerSettings.saved")}</Text>
         </View>
       )}
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     marginTop: spacing.sm,
   },
-  savedText: { fontSize: 13, fontFamily: fontFamilies.bodyBold, color: "#16a34a" },
+  savedText: { fontSize: 13, fontFamily: fontFamilies.bodyBold, color: colors.success },
   localeGrid: {
     flexDirection: "row",
     flexWrap: "wrap",

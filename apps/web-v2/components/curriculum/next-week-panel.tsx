@@ -43,7 +43,7 @@ export function NextWeekPanel({ apiBase }: { apiBase: string }) {
     <section className="rounded-iw-card-lg border border-iw-border bg-white p-6 flex flex-col gap-4">
       <h3 className="text-lg font-semibold text-iw-text-strong">{t("title")}</h3>
       {error ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-iw-error-strong">
           {error}
         </p>
       ) : lessons === null ? (

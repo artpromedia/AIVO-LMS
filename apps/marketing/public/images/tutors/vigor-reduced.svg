@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Vigor tutor avatar (reduced motion)">
   <title>Vigor</title>
-  <desc>Static brand-color disc with the tutor's monogram. Rendered when prefers-reduced-motion is enabled.</desc>
-  <circle cx="48" cy="48" r="46" fill="#22C55E"/>
-  <text x="48" y="63" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="48" font-weight="700" text-anchor="middle" fill="#FFFFFF">V</text>
+  <desc>Static accent-colored AIVO robot avatar for Vigor, matching the animated tutor art. Rendered when prefers-reduced-motion is enabled.</desc>
+  <circle cx="48" cy="48" r="44.5" fill="#E0F7E8" stroke="#22C55E" stroke-width="3"/>
+  <!-- headphone ears -->
+  <rect x="18" y="34" width="7" height="16" rx="3.5" fill="#22C55E"/>
+  <rect x="71" y="34" width="7" height="16" rx="3.5" fill="#22C55E"/>
+  <!-- antenna -->
+  <line x1="48" y1="23" x2="48" y2="12" stroke="#22C55E" stroke-width="2.6" stroke-linecap="round"/>
+  <circle cx="48" cy="10" r="3" fill="#22C55E"/>
+  <!-- head -->
+  <rect x="26" y="22" width="44" height="38" rx="14" fill="#FFFFFF" stroke="#0000001A" stroke-width="1.5"/>
+  <!-- screen face -->
+  <rect x="31" y="28" width="34" height="26" rx="11" fill="#1E2333"/>
+  <!-- eyes -->
+  <rect x="39.5" y="36" width="5.5" height="8" rx="2.75" fill="#4ACF7B"/>
+  <rect x="51" y="36" width="5.5" height="8" rx="2.75" fill="#4ACF7B"/>
+  <!-- smile -->
+  <path d="M41 47 Q48 53 55 47" fill="none" stroke="#4ACF7B" stroke-width="2.6" stroke-linecap="round"/>
+  <!-- neck collar -->
+  <rect x="39" y="58" width="18" height="5" rx="2.5" fill="#22C55E"/>
+  <!-- shoulders -->
+  <rect x="33" y="61" width="30" height="16" rx="9" fill="#FFFFFF" stroke="#0000001A" stroke-width="1.5"/>
+  <!-- chest heart -->
+  <path d="M48 72 C45 69 41.5 67 41.5 64 A3 3 0 0 1 48 63 A3 3 0 0 1 54.5 64 C54.5 67 51 69 48 72 Z" fill="#22C55E"/>
 </svg>

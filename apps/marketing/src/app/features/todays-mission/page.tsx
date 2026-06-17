@@ -93,17 +93,17 @@ export default async function Page() {
         mockupTitle="Today's Mission · Maya, Grade 3"
         mockup={
           <div className="space-y-3">
-            <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-4 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">
+            <div className="rounded-iw-card bg-iw-primary p-4 text-white">
+              <p className="text-xs uppercase tracking-wider text-iw-primary-fg/80">
                 {t("mockup_todays_mission")}
               </p>
               <h3 className="mt-1 font-heading text-xl font-bold">{t("mockup_lesson_title")}</h3>
-              <p className="mt-1 text-xs text-purple-100">{t("mockup_lesson_meta")}</p>
+              <p className="mt-1 text-xs text-iw-primary-fg/80">{t("mockup_lesson_meta")}</p>
             </div>
-            <div className="rounded-lg bg-slate-900 py-2.5 text-center text-sm font-semibold text-white">
+            <div className="rounded-lg bg-iw-ink py-2.5 text-center text-sm font-semibold text-white">
               {t("mockup_start_mission")}
             </div>
-            <p className="text-xs text-slate-500">{t("mockup_accessibility_note")}</p>
+            <p className="text-xs text-iw-ink-muted">{t("mockup_accessibility_note")}</p>
           </div>
         }
       />
@@ -139,11 +139,11 @@ export default async function Page() {
               <div
                 key={r.l}
                 className={`flex items-center justify-between rounded-lg border p-2.5 text-xs ${
-                  r.flag ? "border-amber-200 bg-amber-50" : "border-slate-200 bg-white"
+                  r.flag ? "border-iw-warning bg-iw-warning-subtle" : "border-iw-border bg-white"
                 }`}
               >
-                <span className="font-semibold text-slate-900">{r.l}</span>
-                <span className="text-slate-600">{r.m}</span>
+                <span className="font-semibold text-iw-ink">{r.l}</span>
+                <span className="text-iw-ink-muted">{r.m}</span>
               </div>
             ))}
           </div>
@@ -161,7 +161,7 @@ export default async function Page() {
               whether it was completed, paused, or skipped. Teachers see the roster view above. No
               raw scores, no rankings, no decoder ring required.
             </p>
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-iw-ink-muted">
               Today's Mission is visible across the parent dashboard, the teacher class view, and
               the weekly parent summary email.
             </p>

@@ -22,7 +22,7 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
   const valid = ["teacher", "caregiver", "therapist"].includes(kind) && invite.length > 0;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-aivo-surface-soft p-6">
+    <div className="flex min-h-screen items-center justify-center bg-iw-raised p-6">
       <Card className="w-full max-w-md space-y-4 p-8 text-center">
         <h1 className="text-xl font-bold">{t("title")}</h1>
         {valid ? (
@@ -35,7 +35,7 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
             errorLabel={t("error")}
           />
         ) : (
-          <p className="text-sm text-aivo-ink-soft">{t("invalid")}</p>
+          <p className="text-sm text-iw-ink-muted">{t("invalid")}</p>
         )}
       </Card>
     </div>

@@ -60,7 +60,7 @@ export function CompletionHero({
     >
       <div className="flex items-start gap-4">
         <span
-          className="shrink-0 w-14 h-14 rounded-2xl bg-white shadow-[0_4px_16px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] inline-flex items-center justify-center text-[var(--aivo-sensory-primary)]"
+          className="shrink-0 w-14 h-14 rounded-iw-control bg-white shadow-[0_4px_16px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] inline-flex items-center justify-center text-[var(--aivo-sensory-primary)]"
           aria-hidden="true"
         >
           <svg

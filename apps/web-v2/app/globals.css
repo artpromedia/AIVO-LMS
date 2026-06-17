@@ -353,3 +353,28 @@ body {
   --tutor-accent-soft: initial !important;
   --tutor-accent-ink: initial !important;
 }
+
+/* Auth cloud mascot — a gentle "breathing" float and a one-shot wave on the
+   raised arm. Both are honored by the reduced-motion overrides above
+   (OS media query + [data-reduced-motion="reduce"]). Decorative only. */
+@keyframes aivo-cloud-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes aivo-cloud-wave {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(16deg); }
+  40% { transform: rotate(-6deg); }
+}
+.aivo-cloud-breathe {
+  animation: aivo-cloud-breathe 5s ease-in-out infinite;
+}
+.aivo-cloud-wave {
+  animation: aivo-cloud-wave 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aivo-cloud-breathe,
+  .aivo-cloud-wave {
+    animation: none;
+  }
+}

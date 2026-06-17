@@ -58,19 +58,19 @@ export default async function ContactPage() {
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.2fr_1fr]">
         <section
           aria-labelledby="contact-form-heading"
-          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
+          className="rounded-iw-card-lg border border-iw-border bg-white p-6 shadow-soft-1 md:p-8"
         >
-          <h2 id="contact-form-heading" className="font-heading text-2xl font-bold text-slate-900">
+          <h2 id="contact-form-heading" className="font-heading text-2xl font-bold text-iw-ink">
             {t("form_heading")}
           </h2>
-          <p className="mt-1 mb-6 font-body text-slate-600">{t("form_subheading")}</p>
+          <p className="mt-1 mb-6 font-body text-iw-ink-muted">{t("form_subheading")}</p>
           <ContactForm />
         </section>
 
         <aside aria-labelledby="contact-inboxes-heading" className="space-y-4">
           <h2
             id="contact-inboxes-heading"
-            className="font-heading text-2xl font-bold text-slate-900"
+            className="font-heading text-2xl font-bold text-iw-ink"
           >
             {t("inboxes_heading")}
           </h2>
@@ -78,19 +78,19 @@ export default async function ContactPage() {
             <a
               key={c.email}
               href={`mailto:${c.email}`}
-              className="block rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-slate-300 hover:shadow-sm"
+              className="block rounded-iw-card border border-iw-border bg-white p-5 transition hover:border-iw-border hover:shadow-soft-1"
             >
               <div className="flex items-start gap-3">
                 <div
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xl"
+                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-iw-control text-xl"
                   style={{ backgroundColor: `${c.color}15`, color: c.color }}
                   aria-hidden="true"
                 >
                   {c.icon}
                 </div>
                 <div>
-                  <h3 className="font-heading font-bold text-slate-900">{c.title}</h3>
-                  <p className="mt-1 text-sm font-body text-slate-600">{c.description}</p>
+                  <h3 className="font-heading font-bold text-iw-ink">{c.title}</h3>
+                  <p className="mt-1 text-sm font-body text-iw-ink-muted">{c.description}</p>
                   <p className="mt-2 text-sm font-bold" style={{ color: c.color }}>
                     {c.email}
                   </p>

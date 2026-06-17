@@ -79,7 +79,7 @@ function requireUrl(name: string, devDefault: string): string {
   if (IS_PROD) throw new Error(`identity-svc: ${name} must be set in production`);
   return devDefault;
 }
-const ASSESSMENT_SVC_URL = requireUrl("ASSESSMENT_SVC_URL", "http://localhost:3003");
+const ASSESSMENT_SVC_URL = requireUrl("ASSESSMENT_SVC_URL", "http://localhost:3012");
 const COMMS_SVC_URL = requireUrl("COMMS_SVC_URL", "http://localhost:3003");
 const DEV_INTERNAL_KEY = IS_PROD ? "" : "aivo-internal-dev-key";
 

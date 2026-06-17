@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   badgeTextOn: {
-    color: "#FFF",
+    color: colors.white,
   },
   section: {
     marginTop: spacing.sm,
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     alignSelf: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: colors.white,
     borderRadius: radius.md,
     marginVertical: spacing.sm,
   },
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 14,
     fontFamily: "Nunito-Bold",
-    color: "#FFF",
+    color: colors.white,
   },
   ctaTextDanger: {
     color: colors.error,

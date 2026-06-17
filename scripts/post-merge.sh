@@ -3,15 +3,109 @@ set -e
 
 echo "=== Post-merge setup ==="
 
+# --- Reap orphaned leftovers from previously CANCELLED post-merge runs ---
+# When the platform cancels a post-merge it SIGKILLs our script, but the
+# install's grandchildren (the per-package `prepare` tsc compilers, and the
+# `pnpm install` itself) get reparented to init (ppid=1) and keep
+# running/hung forever. They never exit on their own, so they steadily drain
+# this container's cgroup pids.max=1024 budget (the resident dev workflows
+# already hold ~900). Once the free headroom is gone the NEXT install can no
+# longer fork, runs for many minutes, and is itself cancelled -- leaving even
+# MORE orphans. That feedback loop is what surfaces as repeated
+# "Error in river, code: CANCEL" on post-merge + reconciliation.
+#
+# Breaking the loop here makes the script self-healing regardless of how the
+# previous run died (SIGKILL can't be trapped, so start-of-run cleanup is the
+# only reliable place). We ONLY target processes reparented to init (ppid=1):
+# a healthy prepare-build tsc is a short-lived child of pnpm (ppid!=1) and a
+# legitimate concurrent peer install is a child of its own post-merge script,
+# so neither matches. tsserver / next-dev / the running services are never
+# bare `typescript/bin/tsc` or `pnpm install` under init.
+reap_orphaned_builds() {
+  local p stat after ppid cmd reaped=0
+  for p in $(ls /proc 2>/dev/null | grep -E '^[0-9]+$'); do
+    [ "$p" = "$$" ] && continue
+    stat=$(cat "/proc/$p/stat" 2>/dev/null) || continue
+    after=${stat##*) }          # strip "pid (comm) " -> "state ppid pgrp ..."
+    ppid=$(echo "$after" | awk '{print $2}')
+    [ "$ppid" = "1" ] || continue
+    cmd=$(tr '\0' ' ' < "/proc/$p/cmdline" 2>/dev/null) || continue
+    case "$cmd" in
+      *typescript/bin/tsc*|*"pnpm install"*|*pnpm*\ install\ *)
+        echo "  reaping orphaned post-merge leftover pid=$p" >&2
+        kill -9 "$p" 2>/dev/null && reaped=$((reaped + 1)) || true
+        ;;
+    esac
+  done
+  echo "  reaped $reaped orphaned build process(es) from prior cancelled runs" >&2
+}
+reap_orphaned_builds
+
+# If we are cancelled gracefully (SIGTERM), tear down our own build subtree so
+# we don't add to the orphan pile. SIGKILL still can't be trapped -- the
+# start-of-run reap above is the backstop for that case.
+trap 'pkill -9 -P $$ 2>/dev/null || true' TERM INT
+
 echo "Installing pnpm dependencies..."
-# --prefer-offline reuses the local pnpm store on warm containers (huge speedup
-# on subsequent merges in the same repl). --reporter=append-only keeps the
-# stdout buffer small for the post-merge log so we don't waste time flushing
-# progress redraws to the captured stream. We deliberately do NOT pass
-# --ignore-scripts because workspace post-install hooks (Drizzle codegen,
-# package builds) are required for downstream services to start.
-pnpm install --frozen-lockfile --prefer-offline --reporter=append-only 2>/dev/null \
-  || pnpm install --prefer-offline --reporter=append-only
+# This post-merge runs while every dev workflow is still resident (Marketing,
+# Web App, Brain, Identity, mockup-sandbox), so the container is memory- and
+# thread-constrained. Two transient failure modes show up here, both resource
+# spikes rather than real bugs:
+#   * heap OOM aborts of parallel `tsc` lifecycle builds (exit -11 / "Aborted")
+#   * inability to spawn a process/thread under momentary pressure -- e.g.
+#     "Cannot fork" from a `tsc` prepare script, or a "new Worker" failure
+#     during pnpm's symlinkAllModules link step. (ulimit -u is ~64k here, so
+#     this is memory pressure on fork()/thread-stack alloc, not a PID cap.)
+#
+# --child-concurrency=1 serializes the workspace `prepare` (tsc) builds so only
+# one compiler heap exists at a time (fixes the OOM-abort mode). --prefer-offline
+# reuses the warm pnpm store; --reporter=append-only keeps the captured log
+# small. We deliberately do NOT pass --ignore-scripts: those prepare hooks
+# (package builds, Drizzle codegen) are required for downstream services to boot.
+#
+# The fork/Worker failures are momentary, so retry the whole install a few times
+# with a growing pause, letting the competing workflow build spike pass before
+# trying again. install_deps is invoked as an `until` condition, so `set -e`
+# does not abort on an individual attempt's failure. The 30-min post-merge
+# timeout leaves ample headroom for the retries.
+#
+# Root cause: this container's cgroup caps total processes at pids.max=1024 and
+# the resident dev workflows already hold ~900 of them, so only ~100 PIDs are
+# free. When several task merges land close together each fires its own
+# post-merge install; their concurrent pnpm link-worker pools + tsc builds blow
+# past the PID ceiling and every fork fails. Two mitigations:
+#   1. flock mutex -- overlapping post-merge runs queue on one lock instead of
+#      colliding. The wait is BOUNDED (-w): a post-merge that is cancelled
+#      mid-install can leave an orphaned `pnpm install` child (reparented to
+#      pid 1) that inherited this lock fd and never releases it. An unbounded
+#      `flock 9` then blocks the NEXT merge forever until the platform cancels
+#      it -- surfacing as "Error in river, code: CANCEL". With `-w` we wait a
+#      short while for a genuine peer install, then proceed regardless so a
+#      stale holder can never wedge future merges. The lock still releases
+#      automatically when this process exits (no stale locks of our own).
+#   2. UV_THREADPOOL_SIZE=2 -- shrink each node process's libuv thread pool
+#      (default 4) so pnpm + every tsc child claim fewer of the scarce PIDs.
+exec 9>/tmp/aivo-post-merge-install.lock
+flock -w 120 9 || echo "install lock busy after 120s; proceeding without it." >&2
+export UV_THREADPOOL_SIZE=2
+
+install_deps() {
+  pnpm install --frozen-lockfile --prefer-offline --child-concurrency=1 --reporter=append-only 2>/dev/null \
+    || pnpm install --prefer-offline --child-concurrency=1 --reporter=append-only
+}
+
+attempt=1
+max_attempts=4
+until install_deps; do
+  if [ "$attempt" -ge "$max_attempts" ]; then
+    echo "pnpm install still failing after $max_attempts attempts; aborting." >&2
+    exit 1
+  fi
+  backoff=$((attempt * 20))
+  echo "pnpm install attempt $attempt failed (transient resource spike); retrying in ${backoff}s..." >&2
+  sleep "$backoff"
+  attempt=$((attempt + 1))
+done
 
 echo "Installing brain-svc Python dependencies..."
 cd services/brain-svc && pip install -q -r requirements.txt 2>/dev/null; cd ../..
