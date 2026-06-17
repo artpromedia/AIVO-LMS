@@ -3,8 +3,15 @@ import { TrendingUp } from "lucide-react";
 
 /**
  * Landing-hero illustration. Mirrors apps/marketing: a softly rounded
- * photo of a learner-at-laptop with a floating "Focus Duration +47.2%"
- * stat card overlapping the bottom-left corner.
+ * photo of a learner-at-laptop with a floating "Focus Duration" stat card
+ * overlapping the bottom-left corner.
+ *
+ * The numeric efficacy figure is intentionally omitted here — it mirrors
+ * the citation-guarded rendering in apps/marketing/src/app/page.tsx, where
+ * the value is only shown once a documented source is on file in
+ * apps/marketing/src/content/claims.ts. Until then, both surfaces show the
+ * qualitative fallback so the same unsourced claim cannot appear in the
+ * rendered HTML of either app.
  */
 export function HeroVisual() {
   return (
@@ -27,10 +34,10 @@ export function HeroVisual() {
           </span>
           <div>
             <p className="text-xs font-semibold text-iw-ink-muted">Focus Duration</p>
-            <p className="font-iw-display text-2xl font-bold leading-none text-iw-primary">
-              +47.2%
+            <p className="text-sm font-semibold leading-snug text-iw-primary">
+              Students show meaningful gains in focus
             </p>
-            <p className="mt-1 text-[11px] text-iw-ink-muted">Average increase week 1</p>
+            <p className="mt-1 text-[11px] text-iw-ink-muted">Measured in early learning sessions</p>
           </div>
         </div>
       </div>
