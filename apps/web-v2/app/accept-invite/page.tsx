@@ -11,8 +11,9 @@
  * buttons because they call server actions and update local state.
  */
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense } from "react";
-import { Mail } from "lucide-react";
+import { Lock } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getSession } from "@/lib/auth/session";
 import { ROLE_HOME } from "@/lib/auth/types";
@@ -22,6 +23,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AcceptInviteActions } from "./accept-invite-actions";
 import { StaffAcceptForm } from "./staff-accept-form";
+import styles from "./accept-invite.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -159,17 +161,29 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
 
 function Shell({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-iw-raised p-6">
-      <Card className="w-full max-w-md space-y-5 p-8">
-        <div
-          className="mx-auto flex h-14 w-14 items-center justify-center rounded-iw-control bg-iw-warm/10 text-iw-warm"
-          aria-hidden="true"
-        >
-          <Mail className="h-7 w-7" />
+    <div className={`${styles.canvas} flex flex-col`}>
+      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-7 py-4">
+        <Image
+          src="/images/aivo-logo-purple.png"
+          alt="AIVO Learning"
+          width={120}
+          height={30}
+          className="h-[30px] w-auto"
+          priority
+        />
+        <span className="flex items-center gap-1.5 text-[13.5px] font-extrabold text-iw-text-muted">
+          <Lock className="h-4 w-4" aria-hidden="true" />
+          Secure invitation
+        </span>
+      </header>
+      <main className="flex flex-1 items-center justify-center px-6 pb-16 pt-2">
+        <div className="w-full max-w-md rounded-[26px] bg-white p-8 shadow-[0_30px_70px_-28px_rgba(124,58,237,0.34)]">
+          <h1 className="font-iw-display mb-5 text-center text-2xl font-bold text-iw-text-strong">
+            {heading}
+          </h1>
+          <div className="space-y-5">{children}</div>
         </div>
-        <h1 className="text-center text-2xl font-bold">{heading}</h1>
-        {children}
-      </Card>
-    </main>
+      </main>
+    </div>
   );
 }

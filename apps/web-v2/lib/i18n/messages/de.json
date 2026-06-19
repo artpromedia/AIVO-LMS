@@ -764,7 +764,13 @@
       "onboarding_subtitle": "Invite a teacher, caregiver, or therapist to add their perspective before AIVO builds the brain. You can do this now or skip and add them later.",
       "continue_to_baseline": "Continue to baseline",
       "skip_for_now": "Skip for now",
-      "classroom_connections_title": "Also connected through {name}â€™s classroom"
+      "classroom_connections_title": "Also connected through {name}â€™s classroom",
+      "invite_blurb": "Pick a role, add their email, and we’ll send a warm invitation.",
+      "their_role": "Their role",
+      "seats_full": "Seats full",
+      "sending": "Sending…",
+      "send_invite": "Send invite",
+      "invite_sent": "Invitation sent."
     },
     "schedule": {
       "title": "Stundenplan",

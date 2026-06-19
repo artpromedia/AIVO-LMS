@@ -7,11 +7,11 @@
  */
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { Mail, Users } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader, SectionHeader } from "@/components/layout/page-header";
+import { SectionHeader } from "@/components/layout/page-header";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -154,11 +154,21 @@ export default async function ParentTeamPage({
       navItems={PARENT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow={learner.displayName}
-        title={t("title")}
-        description="Everyone supporting this learner. Parents, teachers, therapists, and caregivers can all see progress."
-      />
+      <div className="flex items-center gap-3.5">
+        <span
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[13px] bg-iw-primary-soft text-[var(--aivo-sensory-primary)]"
+          aria-hidden="true"
+        >
+          <Users className="h-6 w-6" />
+        </span>
+        <div className="min-w-0">
+          <h1 className="font-iw-display text-2xl font-bold text-iw-text-strong">{t("title")}</h1>
+          <p className="mt-0.5 text-sm text-iw-text-muted">
+            Everyone supporting this learner. Parents, teachers, therapists, and caregivers can all
+            see progress.
+          </p>
+        </div>
+      </div>
 
       {isOnboarding ? (
         <Card className="mb-2 border-iw-warm/40 bg-iw-warm/5 p-[var(--aivo-density-card-pad)]">

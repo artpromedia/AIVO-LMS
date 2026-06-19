@@ -1,0 +1,11 @@
+/*
+ * AcceptInvite canvas (AcceptInvite.dc.html) — the lavender radial-over-surface
+ * gradient. Kept in a CSS module so the page .tsx stays free of raw hex
+ * (no-hex lint), matching the onboarding / brain-review canvases.
+ */
+.canvas {
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, #f1eafe 0%, transparent 55%),
+    #f4f1fa;
+}
