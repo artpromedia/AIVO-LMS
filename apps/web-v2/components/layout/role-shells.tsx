@@ -42,7 +42,7 @@ export const PARENT_NAV: RoleNavItem[] = [
   { href: "/parent/reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
   { href: "/parent/resources", label: "Resources", icon: <BookOpen className="h-4 w-4" /> },
   { href: "/parent/privacy", label: "Privacy", icon: <ShieldCheck className="h-4 w-4" /> },
-  { href: "/notifications", label: "Notifications", icon: <Bell className="h-4 w-4" /> },
+  { href: "/parent/notifications", label: "Notifications", icon: <Bell className="h-4 w-4" /> },
   { href: "/parent/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];
 

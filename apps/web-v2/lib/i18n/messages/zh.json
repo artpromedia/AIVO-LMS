@@ -105,7 +105,11 @@
       "prefs_cadence_off": "å…³é—­",
       "prefs_saving": "æ­£åœ¨ä¿å­˜â€¦",
       "prefs_save": "ä¿å­˜åå¥½è®¾ç½®",
-      "prefs_saved": "å·²ä¿å­˜ã€‚"
+      "prefs_saved": "å·²ä¿å­˜ã€‚",
+      "page_title": "Notifications",
+      "page_subtitle": "AIVO’s suggestions for {name} — you decide what to accept. Plus updates from your team.",
+      "recs_heading": "Recommendations for {name}",
+      "other_updates_heading": "Other updates"
     },
     "privacy": {
       "eyebrow": "éšç§",
@@ -575,7 +579,8 @@
       "open_learner": "æ‰“å¼€å­¦ä¹ è€… â†’",
       "recent_lessons": "æœ€è¿‘è¯¾ç¨‹",
       "period_label_30d": "è¾ƒè¿‡åŽ»30å¤©",
-      "period_label_all_time": "å…¨éƒ¨æ—¶é—´"
+      "period_label_all_time": "å…¨éƒ¨æ—¶é—´",
+      "whats_working_heading": "What’s working"
     },
     "settings_account_form": {
       "display_name": "æ˜¾ç¤ºåç§°",

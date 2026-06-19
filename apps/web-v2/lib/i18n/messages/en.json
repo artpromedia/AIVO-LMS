@@ -397,7 +397,11 @@
       "prefs_cadence_off": "Off",
       "prefs_saving": "Savingâ€¦",
       "prefs_save": "Save preferences",
-      "prefs_saved": "Saved."
+      "prefs_saved": "Saved.",
+      "page_title": "Notifications",
+      "page_subtitle": "AIVO’s suggestions for {name} — you decide what to accept. Plus updates from your team.",
+      "recs_heading": "Recommendations for {name}",
+      "other_updates_heading": "Other updates"
     },
     "privacy": {
       "eyebrow": "Privacy",
@@ -898,7 +902,8 @@
       "open_learner": "Open learner â†’",
       "recent_lessons": "Recent lessons",
       "period_label_30d": "vs last 30 days",
-      "period_label_all_time": "all time"
+      "period_label_all_time": "all time",
+      "whats_working_heading": "What’s working"
     },
     "settings_account_form": {
       "display_name": "Display name",

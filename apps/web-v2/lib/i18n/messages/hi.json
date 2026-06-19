@@ -105,7 +105,11 @@
       "prefs_cadence_off": "à¤¬à¤‚à¤¦",
       "prefs_saving": "à¤¸à¤¹à¥‡à¤œà¤¾ à¤œà¤¾ à¤°à¤¹à¤¾ à¤¹à¥ˆâ€¦",
       "prefs_save": "à¤ªà¥à¤°à¤¾à¤¥à¤®à¤¿à¤•à¤¤à¤¾à¤à¤ à¤¸à¤¹à¥‡à¤œà¥‡à¤‚",
-      "prefs_saved": "à¤¸à¤¹à¥‡à¤œà¤¾ à¤—à¤¯à¤¾à¥¤"
+      "prefs_saved": "à¤¸à¤¹à¥‡à¤œà¤¾ à¤—à¤¯à¤¾à¥¤",
+      "page_title": "Notifications",
+      "page_subtitle": "AIVO’s suggestions for {name} — you decide what to accept. Plus updates from your team.",
+      "recs_heading": "Recommendations for {name}",
+      "other_updates_heading": "Other updates"
     },
     "privacy": {
       "eyebrow": "à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾",
@@ -575,7 +579,8 @@
       "open_learner": "à¤¶à¤¿à¤•à¥à¤·à¤¾à¤°à¥à¤¥à¥€ à¤–à¥‹à¤²à¥‡à¤‚ â†’",
       "recent_lessons": "à¤¹à¤¾à¤² à¤•à¥‡ à¤ªà¤¾à¤ ",
       "period_label_30d": "à¤ªà¤¿à¤›à¤²à¥‡ 30 à¤¦à¤¿à¤¨à¥‹à¤‚ à¤•à¥€ à¤¤à¥à¤²à¤¨à¤¾ à¤®à¥‡à¤‚",
-      "period_label_all_time": "à¤¶à¥à¤°à¥‚ à¤¸à¥‡ à¤…à¤¬ à¤¤à¤•"
+      "period_label_all_time": "à¤¶à¥à¤°à¥‚ à¤¸à¥‡ à¤…à¤¬ à¤¤à¤•",
+      "whats_working_heading": "What’s working"
     },
     "settings_account_form": {
       "display_name": "à¤ªà¥à¤°à¤¦à¤°à¥à¤¶à¤¨ à¤¨à¤¾à¤®",

@@ -17,6 +17,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { InsightChip, GlassCard, EmptyState } from "@aivo/ui";
 import { KpiCard } from "@aivo/ui/chart";
 import { PARENT_NAV } from "@/components/layout/role-shells";
+import { WhatsWorkingPanel } from "@/components/parent/whats-working-panel";
 import {
   getIEPForLearner,
   getMasteryMap,
@@ -198,6 +199,15 @@ export default async function Page() {
                         ))}
                       </div>
                     )}
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <h3 className="text-base font-semibold text-iw-text-strong">
+                      {t("whats_working_heading")}
+                    </h3>
+                    <div className="rounded-iw-card-lg bg-white border border-iw-border p-5">
+                      <WhatsWorkingPanel learnerId={l.id} learnerName={l.displayName} />
+                    </div>
                   </div>
                 </section>
               );

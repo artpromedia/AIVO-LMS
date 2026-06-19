@@ -105,7 +105,11 @@
       "prefs_cadence_off": "Desactivado",
       "prefs_saving": "Guardandoâ€¦",
       "prefs_save": "Guardar preferencias",
-      "prefs_saved": "Guardado."
+      "prefs_saved": "Guardado.",
+      "page_title": "Notifications",
+      "page_subtitle": "AIVO’s suggestions for {name} — you decide what to accept. Plus updates from your team.",
+      "recs_heading": "Recommendations for {name}",
+      "other_updates_heading": "Other updates"
     },
     "privacy": {
       "eyebrow": "Privacidad",
@@ -575,7 +579,8 @@
       "open_learner": "Abrir estudiante â†’",
       "recent_lessons": "Lecciones recientes",
       "period_label_30d": "vs Ãºltimos 30 dÃ­as",
-      "period_label_all_time": "desde siempre"
+      "period_label_all_time": "desde siempre",
+      "whats_working_heading": "What’s working"
     },
     "settings_account_form": {
       "display_name": "Nombre para mostrar",
@@ -2176,12 +2181,6 @@
       "no_code": "Didn't get a code?"
     },
     "sso_start": {
-      "eyebrow": "Inicio de sesiÃ³n Ãºnico",
-      "title": "Continuar con {idp}",
-      "subtitle": "Te enviaremos al proveedor de identidad de tu organizaciÃ³n para terminar de iniciar sesiÃ³n.",
-      "continue": "Continuar",
-      "redirect_note": "La redirecciÃ³n puede tardar unos segundos.",
-      "back_to_login": "Volver al inicio de sesiÃ³n",
       "eyebrow": "Single sign-on",
       "title": "Continue with {idp}",
       "subtitle": "We'll hand you off to your organization's identity provider to finish signing in.",
