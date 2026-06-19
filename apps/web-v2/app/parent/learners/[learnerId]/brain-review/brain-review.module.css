@@ -1,0 +1,33 @@
+/*
+ * BrainReview "Setup" canvas (BrainReview.dc.html). The lavender radial-over-
+ * surface gradient and the bobbing brain hero live here so the page/client
+ * .tsx stay free of raw hex (no-hex lint), matching the onboarding canvases.
+ */
+.canvas {
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, #ece7fb 0%, transparent 60%),
+    #f3f1fb;
+}
+
+.brain {
+  font-size: 140px;
+  line-height: 1;
+  filter: drop-shadow(0 18px 24px rgba(124, 58, 237, 0.25));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .brain {
+    animation: brainReviewBob 4s ease-in-out infinite;
+  }
+}
+
+@keyframes brainReviewBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
