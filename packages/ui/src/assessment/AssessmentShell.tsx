@@ -26,6 +26,8 @@ export interface AssessmentShellProps {
   reassurance?: React.ReactNode;
   /** Optional save indicator rendered above the card on the right. */
   saveIndicator?: React.ReactNode;
+  /** Override the default canvas background (e.g. the cool onboarding palette). */
+  canvasClassName?: string;
   className?: string;
 }
 
@@ -35,13 +37,14 @@ export function AssessmentShell({
   children,
   reassurance,
   saveIndicator,
+  canvasClassName,
   className,
 }: AssessmentShellProps) {
   return (
     <main
       className={cn(
         "relative min-h-[100dvh] w-full",
-        "bg-[var(--aivo-color-surface-canvas,#f4f6f5)]",
+        canvasClassName ?? "bg-[var(--aivo-color-surface-canvas,#f4f6f5)]",
         "px-4 py-6 md:px-8 md:py-10",
         className,
       )}

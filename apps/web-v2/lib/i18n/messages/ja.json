@@ -256,7 +256,19 @@
       "autosave_saving": "ä¿å­˜ä¸­â€¦",
       "autosave_saved": "ä¿å­˜ã—ã¾ã—ãŸ âœ“ Â· ãŸã£ãŸä»Š",
       "autosave_retry": "ä¿å­˜ã§ãã¾ã›ã‚“ã§ã—ãŸ â€” å†è©¦è¡Œã—ã¦ã„ã¾ã™â€¦",
-      "diagnoses_reassurance": "ã—ã£ãã‚Šãã‚‹ã‚‚ã®ã‚’é¸ã‚“ã§ãã ã•ã„ã€‚AIVOã«æ­£å¼ãªè¨ºæ–­åã¯å¿…è¦ã‚ã‚Šã¾ã›ã‚“ â€” æ—¥ã€…ã®åŠ©ã‘ã«ãªã‚‹ã“ã¨ã ã‘ã§ååˆ†ã§ã™ã€‚ã„ã¤ã§ã‚‚å¤‰æ›´ã§ãã¾ã™ã€‚"
+      "diagnoses_reassurance": "ã—ã£ãã‚Šãã‚‹ã‚‚ã®ã‚’é¸ã‚“ã§ãã ã•ã„ã€‚AIVOã«æ­£å¼ãªè¨ºæ–­åã¯å¿…è¦ã‚ã‚Šã¾ã›ã‚“ â€” æ—¥ã€…ã®åŠ©ã‘ã«ãªã‚‹ã“ã¨ã ã‘ã§ååˆ†ã§ã™ã€‚ã„ã¤ã§ã‚‚å¤‰æ›´ã§ãã¾ã™ã€‚",
+      "coach_1": "Let’s start with the basics — there are no wrong answers here.",
+      "coach_2": "I love learning what makes your child light up!",
+      "coach_3": "Knowing the tricky bits helps me plan gently.",
+      "coach_4": "This shapes where their very first lessons begin.",
+      "coach_5": "This helps me keep the energy and breaks just right.",
+      "coach_6": "I’ll meet your child where they’re most comfortable.",
+      "coach_7": "No tests here — just how reading feels right now.",
+      "coach_8": "A best guess is perfect — I fine-tune as we go.",
+      "coach_9": "I use this so lessons are never too loud or surprising.",
+      "coach_10": "I’ll fit learning into the moments that work for you.",
+      "coach_11": "Tell me what a win looks like, and I’ll build around it.",
+      "coach_12": "Almost there! Anything you share helps me help them."
     },
     "learner_assessment_review": {
       "reassurance_review_title": "é©ç”¨å‰ã«ã‚‚ã†ä¸€åº¦ç¢ºèª",

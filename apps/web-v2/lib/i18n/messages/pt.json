@@ -256,7 +256,19 @@
       "autosave_saving": "A guardarâ€¦",
       "autosave_saved": "Guardado âœ“ Â· agora mesmo",
       "autosave_retry": "NÃ£o foi possÃ­vel guardar â€” a tentar de novoâ€¦",
-      "diagnoses_reassurance": "Escolha o que lhe parecer certo. O AIVO nÃ£o precisa de um diagnÃ³stico formal â€” apenas do que ajuda no dia a dia. Pode alterar isto a qualquer momento."
+      "diagnoses_reassurance": "Escolha o que lhe parecer certo. O AIVO nÃ£o precisa de um diagnÃ³stico formal â€” apenas do que ajuda no dia a dia. Pode alterar isto a qualquer momento.",
+      "coach_1": "Let’s start with the basics — there are no wrong answers here.",
+      "coach_2": "I love learning what makes your child light up!",
+      "coach_3": "Knowing the tricky bits helps me plan gently.",
+      "coach_4": "This shapes where their very first lessons begin.",
+      "coach_5": "This helps me keep the energy and breaks just right.",
+      "coach_6": "I’ll meet your child where they’re most comfortable.",
+      "coach_7": "No tests here — just how reading feels right now.",
+      "coach_8": "A best guess is perfect — I fine-tune as we go.",
+      "coach_9": "I use this so lessons are never too loud or surprising.",
+      "coach_10": "I’ll fit learning into the moments that work for you.",
+      "coach_11": "Tell me what a win looks like, and I’ll build around it.",
+      "coach_12": "Almost there! Anything you share helps me help them."
     },
     "learner_assessment_review": {
       "reassurance_review_title": "Mais uma revisÃ£o antes de aplicar",
