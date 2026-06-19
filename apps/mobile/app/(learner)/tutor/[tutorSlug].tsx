@@ -72,7 +72,7 @@ export default function TutorSessionScreen() {
     return (
       <View style={[styles.container, { paddingTop: insets.top + 16, paddingHorizontal: hPad }]}>
         <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel={t("common.back", "Back")}>
-          <Ionicons name="arrow-back" size={24} color={colors.white} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </Pressable>
         <Text style={styles.title}>{t("learnerTutor.tutorNotFound", "Tutor not found")}</Text>
       </View>
@@ -198,7 +198,7 @@ export default function TutorSessionScreen() {
               accessibilityRole="button"
               accessibilityLabel={t("common.back", "Back")}
             >
-              <Ionicons name="arrow-back" size={20} color="rgba(255,255,255,0.8)" />
+              <Ionicons name="arrow-back" size={20} color={colors.textSecondary} />
               <Text style={styles.backText}>{t("common.back", "Back")}</Text>
             </Pressable>
             {sessionId ? (
@@ -257,7 +257,7 @@ export default function TutorSessionScreen() {
 
               {!entitled && !entitlementsLoading ? (
                 <View style={styles.lockedCallout} accessibilityLiveRegion="polite">
-                  <Ionicons name="lock-closed" size={18} color={colors.white} />
+                  <Ionicons name="lock-closed" size={18} color={colors.warning} />
                   <Text style={styles.lockedText}>
                     {t(
                       "learnerTutor.lockedBody",
@@ -295,10 +295,10 @@ export default function TutorSessionScreen() {
                 accessibilityRole="button"
               >
                 {structuredStarting ? (
-                  <ActivityIndicator color={colors.white} />
+                  <ActivityIndicator color={colors.primary} />
                 ) : (
                   <>
-                    <Ionicons name="play" size={18} color={colors.white} />
+                    <Ionicons name="play" size={18} color={colors.text} />
                     <Text style={styles.secondaryButtonText}>
                       {t("learnerTutor.startLesson", "Start structured lesson")}
                     </Text>
@@ -323,7 +323,14 @@ export default function TutorSessionScreen() {
                       turn.role === "learner" ? styles.learnerBubble : styles.tutorBubble,
                     ]}
                   >
-                    <Text style={styles.bubbleText}>{turn.text}</Text>
+                    <Text
+                      style={[
+                        styles.bubbleText,
+                        { color: turn.role === "learner" ? colors.white : colors.text },
+                      ]}
+                    >
+                      {turn.text}
+                    </Text>
                     {turn.role === "tutor" ? (
                       <Pressable
                         onPress={() => Speech.speak(turn.text, { language: i18n.language })}
@@ -331,14 +338,14 @@ export default function TutorSessionScreen() {
                         accessibilityLabel={t("learnerTutor.readAloud", "Read response aloud")}
                         style={styles.speakButton}
                       >
-                        <Ionicons name="volume-high-outline" size={17} color={colors.white} />
+                        <Ionicons name="volume-high-outline" size={17} color={colors.primary} />
                       </Pressable>
                     ) : null}
                   </View>
                 ))}
                 {sendMessage.isPending ? (
                   <View style={[styles.bubble, styles.tutorBubble]}>
-                    <ActivityIndicator color={colors.white} />
+                    <ActivityIndicator color={colors.primary} />
                   </View>
                 ) : null}
               </ScrollView>
@@ -354,7 +361,7 @@ export default function TutorSessionScreen() {
                   <Ionicons
                     name={autoSpeak ? "volume-high" : "volume-mute-outline"}
                     size={20}
-                    color={colors.white}
+                    color={autoSpeak ? colors.white : colors.text}
                   />
                 </Pressable>
                 {speechInput.isSupported ? (
@@ -375,12 +382,12 @@ export default function TutorSessionScreen() {
                     }
                   >
                     {speechInput.status === "processing" ? (
-                      <ActivityIndicator color={colors.white} size="small" />
+                      <ActivityIndicator color={colors.primary} size="small" />
                     ) : (
                       <Ionicons
                         name={speechInput.status === "listening" ? "stop" : "mic"}
                         size={20}
-                        color={colors.white}
+                        color={speechInput.status === "listening" ? colors.white : colors.text}
                       />
                     )}
                   </Pressable>
@@ -390,7 +397,7 @@ export default function TutorSessionScreen() {
                   onChangeText={setInput}
                   onSubmitEditing={send}
                   placeholder={t("learnerTutor.prompt", "Ask about this subject...")}
-                  placeholderTextColor="rgba(255,255,255,0.45)"
+                  placeholderTextColor={colors.textSecondary}
                   style={styles.input}
                   multiline
                   accessibilityLabel={t("learnerTutor.prompt", "Ask about this subject")}
@@ -423,7 +430,7 @@ function InfoCard({ icon, color, text }: { icon: keyof typeof Ionicons.glyphMap;
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1A1A2E" },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { flex: 1, alignSelf: "center" },
   headerRow: {
     flexDirection: "row",
@@ -432,16 +439,18 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, minHeight: 44 },
-  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: "rgba(255,255,255,0.8)" },
+  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
   endButton: {
     minHeight: 40,
     justifyContent: "center",
     paddingHorizontal: spacing.md,
     borderRadius: radius.full,
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  endButtonText: { color: colors.white, fontFamily: "Nunito-Bold" },
-  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.white, marginTop: spacing.md },
+  endButtonText: { color: colors.text, fontFamily: "Nunito-Bold" },
+  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text, marginTop: spacing.md },
   tutorIntro: {
     flexDirection: "row",
     alignItems: "center",
@@ -456,12 +465,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tutorIcon: { fontSize: 34 },
-  tutorName: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.white },
-  tutorDomain: { fontSize: 14, fontFamily: "Nunito-SemiBold", color: "rgba(255,255,255,0.75)" },
+  tutorName: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  tutorDomain: { fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
   scopeText: {
     fontSize: 12,
     fontFamily: "Nunito-SemiBold",
-    color: "rgba(255,255,255,0.55)",
+    color: colors.textSecondary,
     marginTop: 3,
   },
   landing: { paddingBottom: spacing.xl },
@@ -470,23 +479,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: radius.xl,
     padding: spacing.md,
   },
-  infoText: { flex: 1, fontSize: 14, lineHeight: 20, fontFamily: "Nunito-SemiBold", color: colors.white },
+  infoText: { flex: 1, fontSize: 14, lineHeight: 20, fontFamily: "Nunito-SemiBold", color: colors.text },
   lockedCallout: {
     marginTop: spacing.lg,
     padding: spacing.md,
     borderRadius: radius.xl,
-    backgroundColor: "rgba(255, 200, 0, 0.15)",
+    backgroundColor: "rgba(245, 158, 11, 0.12)",
     borderWidth: 1,
-    borderColor: "rgba(255, 200, 0, 0.6)",
+    borderColor: "rgba(245, 158, 11, 0.5)",
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
   },
-  lockedText: { flex: 1, fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.white },
+  lockedText: { flex: 1, fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.text },
   primaryButton: {
     minHeight: 54,
     marginTop: spacing.xl,
@@ -502,26 +513,42 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     borderRadius: radius.xl,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.25)",
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     gap: spacing.sm,
   },
-  secondaryButtonText: { color: colors.white, fontSize: 15, fontFamily: "Nunito-Bold" },
+  secondaryButtonText: { color: colors.text, fontSize: 15, fontFamily: "Nunito-Bold" },
   chat: { flex: 1 },
   chatContent: { paddingVertical: spacing.sm, gap: spacing.sm },
   bubble: {
     maxWidth: "88%",
-    borderRadius: radius.xl,
     padding: spacing.md,
     flexDirection: "row",
     alignItems: "flex-end",
     gap: spacing.sm,
   },
-  tutorBubble: { alignSelf: "flex-start", backgroundColor: "rgba(255,255,255,0.12)" },
-  learnerBubble: { alignSelf: "flex-end", backgroundColor: "rgba(124,58,237,0.8)" },
-  bubbleText: { flexShrink: 1, color: colors.white, fontFamily: "Nunito-SemiBold", fontSize: 15, lineHeight: 21 },
+  tutorBubble: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: radius.lg,
+    borderBottomLeftRadius: radius.lg,
+    borderBottomRightRadius: radius.lg,
+  },
+  learnerBubble: {
+    alignSelf: "flex-end",
+    backgroundColor: colors.primary,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
+    borderBottomLeftRadius: radius.lg,
+    borderBottomRightRadius: 4,
+  },
+  bubbleText: { flexShrink: 1, fontFamily: "Nunito-SemiBold", fontSize: 15, lineHeight: 21 },
   speakButton: { padding: 3 },
   chatControls: {
     flexDirection: "row",
@@ -536,7 +563,9 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   input: {
     flex: 1,
@@ -545,8 +574,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 11,
     borderRadius: 22,
-    color: colors.white,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    color: colors.text,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
     fontFamily: "Nunito-SemiBold",
   },
   sendButton: {
