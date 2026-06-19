@@ -52,13 +52,35 @@ export async function IepReportsCard({
       className="flex flex-col rounded-iw-card-lg border border-iw-border bg-white p-5 shadow-soft-3 sm:p-6"
       aria-label={t("iep_reports_title")}
     >
-      <header className="mb-4 flex items-center gap-2.5">
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-iw-control bg-[var(--aivo-domain-completion-complete-subtle)] text-[var(--aivo-domain-completion-complete-strong)]">
-          <AivoIcon name="iep" size={18} />
-        </span>
-        <h3 className="text-base font-semibold text-iw-text-strong sm:text-lg">
-          {t("iep_reports_title")}
-        </h3>
+      <header className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-iw-control bg-[var(--aivo-domain-completion-complete-subtle)] text-[var(--aivo-domain-completion-complete-strong)]">
+            <AivoIcon name="iep" size={18} />
+          </span>
+          <h3 className="text-base font-semibold text-iw-text-strong sm:text-lg">
+            {t("iep_reports_title")}
+          </h3>
+        </div>
+        <a
+          href={`/api/bff/parent/learners/${learnerId}/iep-report`}
+          download
+          className="inline-flex items-center gap-1.5 rounded-iw-control border border-[var(--aivo-aivoPurple-200)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:bg-iw-card"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" />
+          </svg>
+          {t("iep_download_pdf")}
+        </a>
       </header>
 
       <div className="mb-4 grid grid-cols-3 gap-2.5">
