@@ -919,9 +919,13 @@
       "action_reports": "Reports",
       "action_schedule": "Schedule",
       "action_privacy": "Privacy & consent",
-      "open_learning": "Open {name}â€™s learning",
+      "open_learning": "افتح تعلّم {name}",
       "snapshot_day_done": "completed a lesson",
-      "snapshot_day_none": "no lesson"
+      "snapshot_day_none": "no lesson",
+      "action_view_reports": "عرض التقارير",
+      "action_message_team": "مراسلة الفريق",
+      "action_care_team": "فريق الرعاية",
+      "snapshot_age_grade": "العمر {age} · الصف {grade}"
     },
     "home": {
       "greeting": "Ø§Ù„ØªØ­ÙŠØ©",

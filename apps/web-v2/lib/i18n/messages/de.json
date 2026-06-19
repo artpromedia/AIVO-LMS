@@ -919,9 +919,13 @@
       "action_reports": "Reports",
       "action_schedule": "Schedule",
       "action_privacy": "Privacy & consent",
-      "open_learning": "Open {name}â€™s learning",
+      "open_learning": "Lernen für {name} öffnen",
       "snapshot_day_done": "completed a lesson",
-      "snapshot_day_none": "no lesson"
+      "snapshot_day_none": "no lesson",
+      "action_view_reports": "Berichte ansehen",
+      "action_message_team": "Team benachrichtigen",
+      "action_care_team": "Betreuungsteam",
+      "snapshot_age_grade": "Alter {age} · Klasse {grade}"
     },
     "home": {
       "greeting": "BegrÃ¼ÃŸung",

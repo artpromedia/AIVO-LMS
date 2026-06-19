@@ -919,9 +919,13 @@
       "action_reports": "Reports",
       "action_schedule": "Schedule",
       "action_privacy": "Privacy & consent",
-      "open_learning": "Open {name}â€™s learning",
+      "open_learning": "{name}の学習を開く",
       "snapshot_day_done": "completed a lesson",
-      "snapshot_day_none": "no lesson"
+      "snapshot_day_none": "no lesson",
+      "action_view_reports": "レポートを見る",
+      "action_message_team": "チームに連絡",
+      "action_care_team": "サポートチーム",
+      "snapshot_age_grade": "{age}歳 · {grade}年生"
     },
     "home": {
       "greeting": "æŒ¨æ‹¶",

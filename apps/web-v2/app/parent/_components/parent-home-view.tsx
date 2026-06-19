@@ -274,12 +274,17 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
     );
   }
 
-  // Feature the requested learner when it belongs to this parent; otherwise the
-  // most-actionable learner (anyone not yet ready), else the first.
+  // Feature the requested learner when it belongs to this parent; otherwise an
+  // already-active learner (so the home leads with the daily dashboard, like the
+  // design), then the most-actionable not-yet-ready learner, else the first.
   const requested = selectedLearnerId
     ? learners.find((l) => l.id === selectedLearnerId)
     : undefined;
-  const featured = requested ?? learners.find((l) => !READY_STATES.has(l.readinessState)) ?? learners[0];
+  const featured =
+    requested ??
+    learners.find((l) => READY_STATES.has(l.readinessState)) ??
+    learners.find((l) => !READY_STATES.has(l.readinessState)) ??
+    learners[0];
   const featuredFirst = featured.displayName.split(" ")[0];
   const featuredNext = nextStepFor(featured);
   const featuredReady = READY_STATES.has(featured.readinessState);
@@ -355,9 +360,13 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
   const nextActive: LessonRun | undefined = activeRuns[0];
   const nextAssignment = sortedAssignments[0];
 
-  const ageLabel = featured.birthYear
-    ? t("snapshot_age", { age: new Date().getFullYear() - featured.birthYear })
-    : null;
+  const age = featured.birthYear ? new Date().getFullYear() - featured.birthYear : null;
+  const ageLabel =
+    age === null
+      ? null
+      : featured.gradeBand
+        ? t("snapshot_age_grade", { age, grade: featured.gradeBand })
+        : t("snapshot_age", { age });
   const streakLabel = streak > 0 ? t("snapshot_streak", { days: streak }) : t("snapshot_streak_zero");
 
   const setupSteps = buildSetupSteps(featured, t);
@@ -566,10 +575,10 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
         >
           <ul className="grid grid-cols-2 gap-2">
             {[
-              { href: `/parent/learners/${featured.id}/progress`, label: t("action_progress") },
-              { href: "/parent/reports", label: t("action_reports") },
-              { href: "/parent/schedule", label: t("action_schedule") },
-              { href: "/parent/privacy", label: t("action_privacy") },
+              { href: "/parent/reports", label: t("action_view_reports") },
+              { href: "/parent/calendar", label: t("action_schedule") },
+              { href: "/parent/messages", label: t("action_message_team") },
+              { href: `/parent/learners/${featured.id}/team`, label: t("action_care_team") },
             ].map((a) => (
               <li key={a.href}>
                 <Link

@@ -919,9 +919,13 @@
       "action_reports": "Reports",
       "action_schedule": "Schedule",
       "action_privacy": "Privacy & consent",
-      "open_learning": "Open {name}â€™s learning",
+      "open_learning": "Abrir o aprendizado de {name}",
       "snapshot_day_done": "completed a lesson",
-      "snapshot_day_none": "no lesson"
+      "snapshot_day_none": "no lesson",
+      "action_view_reports": "Ver relatórios",
+      "action_message_team": "Mensagem à equipe",
+      "action_care_team": "Equipe de apoio",
+      "snapshot_age_grade": "{age} anos · Série {grade}"
     },
     "home": {
       "greeting": "SaudaÃ§Ã£o",
