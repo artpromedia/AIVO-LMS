@@ -478,7 +478,9 @@
     "progress": "Progress",
     "subjects": "Subjects",
     "missions": "Missions",
-    "library": "Library"
+    "library": "Library",
+    "coachGreeting": "I’m so happy to see you. Let’s keep learning together.",
+    "startNextThing": "Start my next thing"
   },
   "learnerBrain": {
     "title": "My Brain",

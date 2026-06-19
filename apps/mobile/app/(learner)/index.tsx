@@ -129,9 +129,35 @@ export default function LearnerWorldMap() {
               >
                 {t("learner.greeting", { name: user?.name || "Alex" })}
               </Text>
-              <Text style={[styles.heroSub, { color: palette.inkMuted }]}>
-                {t("learner.dailyChallengeDesc")}
-              </Text>
+              {/* Coach speech bubble (MobileApp handoff) */}
+              <View
+                style={[
+                  styles.speechBubble,
+                  { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
+                ]}
+              >
+                <View style={[styles.speechAvatar, { backgroundColor: palette.bgCard }]}>
+                  <Text style={styles.speechAvatarEmoji}>☁️</Text>
+                </View>
+                <Text style={[styles.speechText, { color: palette.ink }]}>
+                  {t("learner.coachGreeting")}
+                </Text>
+              </View>
+
+              {/* Primary action — "Start my next thing" (handoff hero CTA). */}
+              <Pressable
+                onPress={() => router.push("/(learner)/adventure" as Href)}
+                style={({ pressed }) => [
+                  styles.startCta,
+                  { backgroundColor: palette.primary, opacity: pressed ? 0.92 : 1 },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={t("learner.startNextThing")}
+              >
+                <Ionicons name="sparkles" size={18} color={colors.white} />
+                <Text style={styles.startCtaText}>{t("learner.startNextThing")}</Text>
+                <Ionicons name="arrow-forward" size={18} color={colors.white} />
+              </Pressable>
 
               <View
                 style={[
@@ -486,6 +512,44 @@ const styles = StyleSheet.create({
     textAlign: "center",
     maxWidth: 260,
     marginBottom: spacing.md,
+  },
+  speechBubble: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+    width: "100%",
+    padding: 14,
+    borderRadius: radius.lg,
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  speechAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  speechAvatarEmoji: { fontSize: 18 },
+  speechText: {
+    ...typography.bodyMd,
+    fontFamily: fontFamilies.bodySemiBold,
+    flex: 1,
+  },
+  startCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    width: "100%",
+    paddingVertical: 16,
+    borderRadius: radius.xl,
+    marginBottom: spacing.md,
+  },
+  startCtaText: {
+    fontFamily: fontFamilies.displayBold,
+    fontSize: 18,
+    color: colors.white,
   },
   goalRow: {
     width: "100%",

@@ -478,7 +478,9 @@
     "progress": "Fortschritt",
     "subjects": "Fächer",
     "missions": "Missionen",
-    "library": "Bibliothek"
+    "library": "Bibliothek",
+    "coachGreeting": "I’m so happy to see you. Let’s keep learning together.",
+    "startNextThing": "Start my next thing"
   },
   "learnerBrain": {
     "title": "Mein Gehirn",
