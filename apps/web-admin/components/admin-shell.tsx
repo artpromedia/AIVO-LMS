@@ -290,9 +290,16 @@ export function AdminShell({
                 A
               </span>
             ) : (
-              <span className="flex min-w-0 flex-col leading-none">
-                <span className="text-xl font-extrabold tracking-tight text-slate-900">AIVO</span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-slate-400">
+              // Handoff brand lockup: the AIVO wordmark image + a violet "Admin"
+              // eyebrow (replaces the plain text "AIVO / Admin" wordmark).
+              <span className="flex min-w-0 flex-col gap-1 leading-none">
+                {/* Static brand asset (matches the tenant-logo <img> path above). */}
+                <img
+                  src="/images/aivo-logo-horizontal-dark.png"
+                  alt="AIVO Learning"
+                  className="h-7 w-auto"
+                />
+                <span className="text-[10px] font-extrabold uppercase tracking-[0.28em] text-violet-700">
                   Admin
                 </span>
               </span>
