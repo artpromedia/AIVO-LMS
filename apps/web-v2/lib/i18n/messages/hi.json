@@ -2532,7 +2532,21 @@
       "check_just": "Just for {name}",
       "check_safe": "Keeps their space safe",
       "help_title": "Need help?",
-      "help_body": "If {name} forgets their PIN, you can reset it anytime from your parent account."
+      "help_body": "If {name} forgets their PIN, you can reset it anytime from your parent account.",
+      "setup_label": "Setup",
+      "secure_private": "Secure & Private",
+      "create_title": "Create a PIN for {name}",
+      "create_subtitle": "A 4-digit PIN keeps {name}’s learning space safe. They’ll use it to start each session.",
+      "confirm_title": "Confirm the PIN",
+      "confirm_subtitle": "Enter the same 4 digits again to confirm.",
+      "done_title": "{name}’s all set! 🎉",
+      "done_subtitle": "The PIN keeps {name}’s learning space safe and just for them. They’ll enter it to start each adventure.",
+      "pin_label": "{name}’s PIN",
+      "enter_stage": "Enter the learning stage",
+      "back_to_dashboard": "Back to parent dashboard",
+      "your_learner": "your learner",
+      "digits_entered": "{count} of 4 digits entered",
+      "delete": "Delete"
     },
     "parent_verify": {
       "eyebrow": "à¤…à¤­à¤¿à¤­à¤¾à¤µà¤• à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¨",
