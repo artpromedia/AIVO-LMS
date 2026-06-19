@@ -113,13 +113,13 @@ const nextConfig: NextConfig = {
       // `CROSS_CUTTING_REGISTRY.notifications.legacyRoutes` (web).
       // Only the routes that actually rendered notifications are
       // redirected; "closest equivalent" admin staff pages stay put.
+      // NB: `/parent/notifications` is intentionally NOT redirected —
+      // the parent shell ships a bespoke recommendations inbox at
+      // app/parent/notifications/page.tsx (Accept / Add context / Deny
+      // the AIVO suggestions, plus the "Other updates" activity stream).
+      // Redirecting it would shadow that page with the generic surface.
       {
         source: "/learner/notifications",
-        destination: "/notifications",
-        permanent: true,
-      },
-      {
-        source: "/parent/notifications",
         destination: "/notifications",
         permanent: true,
       },
