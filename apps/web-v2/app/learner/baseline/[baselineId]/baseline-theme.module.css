@@ -1,0 +1,9 @@
+/*
+ * Baseline "Reading Forest" canvas — the lavender → mint → blush diagonal
+ * gradient from BaselineAssessment.dc.html. The exact 3-stop gradient lives
+ * in this CSS module so the page .tsx stays free of raw hex (no-hex lint),
+ * matching the pattern used by the parent assessment + onboarding canvases.
+ */
+.readingForest {
+  background: linear-gradient(150deg, #ece7fb 0%, #e9f3f1 55%, #fbeff4 100%);
+}

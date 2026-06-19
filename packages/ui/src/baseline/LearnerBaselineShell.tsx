@@ -28,6 +28,18 @@ export interface LearnerBaselineShellProps {
   status?: React.ReactNode;
   /** Optional bottom bar — typically the submit / continue action. */
   bottomBar?: React.ReactNode;
+  /**
+   * Override the default canvas background — e.g. the BaselineAssessment
+   * "Reading Forest" gradient. Falls back to the calm surface canvas.
+   */
+  canvasClassName?: string;
+  /**
+   * Float the header / footer transparently over the canvas (no opaque
+   * fill, border, or blur) so a gradient canvas shows through and the
+   * header slots sit as free-standing white pills — the handoff top-bar
+   * look. Default keeps the bordered, blurred, sticky chrome.
+   */
+  chromeless?: boolean;
   className?: string;
   /**
    * Inline style for the shell root. The baseline pages use this to stamp the
@@ -46,6 +58,8 @@ export function LearnerBaselineShell({
   children,
   status,
   bottomBar,
+  canvasClassName,
+  chromeless,
   className,
   style,
 }: LearnerBaselineShellProps) {
@@ -54,13 +68,25 @@ export function LearnerBaselineShell({
       style={style}
       className={cn(
         "relative min-h-[100dvh] flex flex-col",
-        "bg-[var(--aivo-color-surface-canvas)]",
+        canvasClassName ?? "bg-[var(--aivo-color-surface-canvas)]",
         className,
       )}
     >
       {topBanner}
-      <header className="sticky top-0 z-10 bg-[var(--aivo-color-surface-canvas)]/85 backdrop-blur supports-[backdrop-filter]:bg-[var(--aivo-color-surface-canvas)]/70 border-b border-iw-border">
-        <div className="mx-auto w-full max-w-4xl px-4 py-3 flex items-center justify-between gap-3">
+      <header
+        className={cn(
+          "sticky top-0 z-10",
+          chromeless
+            ? "bg-transparent"
+            : "bg-[var(--aivo-color-surface-canvas)]/85 backdrop-blur supports-[backdrop-filter]:bg-[var(--aivo-color-surface-canvas)]/70 border-b border-iw-border",
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto w-full max-w-4xl flex items-center justify-between gap-3 px-4",
+            chromeless ? "py-4 md:py-5" : "py-3",
+          )}
+        >
           <div className="min-w-0 flex items-center gap-2">{headerLeft}</div>
           <div className="shrink-0 flex items-center gap-2">{headerRight}</div>
         </div>
@@ -76,7 +102,12 @@ export function LearnerBaselineShell({
       </main>
 
       {bottomBar ? (
-        <footer className="sticky bottom-0 bg-white/95 backdrop-blur border-t border-iw-border">
+        <footer
+          className={cn(
+            "sticky bottom-0",
+            chromeless ? "bg-transparent" : "bg-white/95 backdrop-blur border-t border-iw-border",
+          )}
+        >
           <div className="mx-auto w-full max-w-4xl px-4 py-3 flex items-center justify-between gap-3">
             {bottomBar}
           </div>
