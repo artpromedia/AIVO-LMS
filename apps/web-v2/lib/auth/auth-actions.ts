@@ -27,6 +27,7 @@ import {
   toSessionProfile,
 } from "@/lib/auth/identity-client";
 import { setAuthSessionCookies } from "@/lib/auth/session-cookies";
+import { isAllowedWrongSurfaceRedirect } from "@/lib/auth/surface-redirect";
 
 const EMAIL_RE = /.+@.+\..+/;
 
@@ -159,11 +160,8 @@ export async function onboardingSignInAction(formData: FormData): Promise<void> 
   }
 
   if (result.kind === "error") {
-    if (result.status === 403 && result.redirectTo) {
-      const { isSafeSurfaceRedirect } = await import("@/lib/auth/surface-redirect");
-      if (isSafeSurfaceRedirect(result.redirectTo)) {
+    if (result.status === 403 && isAllowedWrongSurfaceRedirect(result.wrongSurface, result.redirectTo)) {
         redirect(result.redirectTo);
-      }
     }
     // A real 401 (wrong email/password) stays `invalid_credentials` and a 403
     // (right credentials, wrong portal) stays `wrong_surface`. Everything else
@@ -307,11 +305,8 @@ export async function loginAction(formData: FormData): Promise<void> {
     // 403 + redirectTo: identity-svc is telling us the user belongs on a
     // different portal (admin / district). Forward them straight there
     // instead of stranding them on the consumer login with an opaque error.
-    if (result.status === 403 && result.redirectTo) {
-      const { isSafeSurfaceRedirect } = await import("@/lib/auth/surface-redirect");
-      if (isSafeSurfaceRedirect(result.redirectTo)) {
+    if (result.status === 403 && isAllowedWrongSurfaceRedirect(result.wrongSurface, result.redirectTo)) {
         redirect(result.redirectTo);
-      }
     }
     // A real 401 (wrong email/password) stays `invalid_credentials` and a 403
     // (right credentials, wrong portal) stays `wrong_surface`. Everything else

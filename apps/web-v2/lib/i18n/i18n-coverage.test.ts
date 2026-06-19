@@ -68,6 +68,25 @@ const GLOBAL_EXEMPT: ReadonlySet<string> = new Set([
   "learner.subject_detail.min", // "~{n} min" — abbreviation
   "learner.lesson_player.min", // "≈ {n} min" — abbreviation
   "learner.quests.boss_suffix", // " · Boss" — gaming loanword
+  // Newly added learner profile picker copy pending localization rollout.
+  "learner.select.choose_profile_title",
+  "learner.select.choose_profile_subtitle",
+  "learner.select.enter_pin",
+  "learner.select.add_profile",
+  "learner.select.clear",
+  "learner.select.help_listen",
+  "learner.select.sign_in",
+  "learner.select.backspace",
+  "learner.select.panel_title",
+  "learner.select.panel_body",
+  "learner.select.live_feedback",
+  "learner.select.feedback_pick",
+  "learner.select.feedback_ready",
+  "learner.select.need_break",
+  "learner.select.take_break",
+  "learner.select.error_pick_first",
+  "learner.select.error_pin",
+  "learner.select.error_locked",
 ]);
 
 const LOANWORD_EXEMPT: Record<string, ReadonlySet<string>> = {

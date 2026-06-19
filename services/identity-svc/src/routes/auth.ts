@@ -660,13 +660,6 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         return reply.status(401).send({ error: "Invalid credentials" });
       }
 
-      if (user.role === "DISTRICT_ADMIN") {
-        return reply.status(403).send({
-          error: "District administrators must sign in at district.aivolearning.com.",
-          redirectTo: districtLoginUrl(req),
-          wrongSurface: "district",
-        });
-      }
       if (
         [
           "PLATFORM_ADMIN",

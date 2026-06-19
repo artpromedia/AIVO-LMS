@@ -27,3 +27,51 @@ export function isSafeSurfaceRedirect(url: string | undefined | null): url is st
     return false;
   }
 }
+
+export type WrongSurface = "admin" | "district";
+
+export function isKnownWrongSurface(value: string | undefined | null): value is WrongSurface {
+  return value === "admin" || value === "district";
+}
+
+/**
+ * Only follow wrong-surface redirects for known target surfaces and only when
+ * the target host matches that surface (or is a same-origin relative path in
+ * dev/preview environments).
+ */
+export function isAllowedWrongSurfaceRedirect(
+  wrongSurface: string | undefined | null,
+  redirectTo: string | undefined | null,
+): redirectTo is string {
+  if (!isSafeSurfaceRedirect(redirectTo)) return false;
+
+  const inferredSurface: WrongSurface | null = (() => {
+    if (isKnownWrongSurface(wrongSurface)) return wrongSurface;
+    if (redirectTo.startsWith("/admin/district")) return "district";
+    if (redirectTo.startsWith("/admin")) return "admin";
+    try {
+      const hostname = new URL(redirectTo).hostname.toLowerCase();
+      if (hostname === "district.aivolearning.com") return "district";
+      if (hostname === "admin.aivolearning.com") return "admin";
+    } catch {
+      // ignore parse failures; safety is enforced by isSafeSurfaceRedirect.
+    }
+    return null;
+  })();
+
+  if (!inferredSurface) return false;
+  if (redirectTo.startsWith("/")) {
+    return (
+      (inferredSurface === "district" && redirectTo.startsWith("/admin/district")) ||
+      (inferredSurface === "admin" && redirectTo.startsWith("/admin"))
+    );
+  }
+
+  try {
+    const hostname = new URL(redirectTo).hostname.toLowerCase();
+    if (inferredSurface === "admin") return hostname === "admin.aivolearning.com";
+    return hostname === "district.aivolearning.com";
+  } catch {
+    return false;
+  }
+}

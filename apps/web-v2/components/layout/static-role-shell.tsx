@@ -36,7 +36,7 @@ export const STATIC_NAV = {
   parent: [
     { href: "/parent/home", label: "Home", icon: Home },
     { href: "/parent/learners", label: "Learners", icon: Users },
-    { href: "/parent/schedule", label: "Schedule", icon: Calendar },
+    { href: "/parent/calendar", label: "Calendar", icon: Calendar },
     { href: "/parent/reports", label: "Reports", icon: FileText },
     { href: "/parent/privacy", label: "Privacy", icon: ShieldCheck },
     { href: "/notifications", label: "Notifications", icon: Bell },
@@ -77,10 +77,10 @@ export type StaticShellRole = keyof typeof STATIC_NAV;
 export function StaticRoleShell({
   role,
   children,
-}: {
+}: Readonly<{
   role: StaticShellRole;
   children: React.ReactNode;
-}) {
+}>) {
   const nav = STATIC_NAV[role];
   return (
     <div className="min-h-screen bg-iw-bg">
