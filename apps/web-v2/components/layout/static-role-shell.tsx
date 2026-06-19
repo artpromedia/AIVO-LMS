@@ -36,10 +36,10 @@ export const STATIC_NAV = {
   parent: [
     { href: "/parent/home", label: "Home", icon: Home },
     { href: "/parent/learners", label: "Learners", icon: Users },
-    { href: "/parent/schedule", label: "Schedule", icon: Calendar },
+    { href: "/parent/calendar", label: "Calendar", icon: Calendar },
     { href: "/parent/reports", label: "Reports", icon: FileText },
     { href: "/parent/privacy", label: "Privacy", icon: ShieldCheck },
-    { href: "/notifications", label: "Notifications", icon: Bell },
+    { href: "/parent/notifications", label: "Notifications", icon: Bell },
     { href: "/parent/settings", label: "Settings", icon: Settings },
   ],
   learner: [

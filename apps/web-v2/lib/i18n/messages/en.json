@@ -1395,6 +1395,21 @@
       "library_title": "Resource library",
       "library_empty_title": "No resources yet",
       "library_empty_desc": "Curated guides and downloads for parents will appear here as they are published."
+    },
+    "shell": {
+      "workspace_eyebrow": "Family workspace",
+      "switch_learner": "Switch learner",
+      "manage_learners": "Manage learners",
+      "add_learner": "Add a learner",
+      "account_menu": "Account menu",
+      "profile": "Profile",
+      "settings": "Settings",
+      "accessibility": "Accessibility",
+      "sign_out": "Sign out",
+      "notifications": "Notifications",
+      "notifications_unread": "{count} unread notifications",
+      "mascot_title": "You’re doing amazing!",
+      "mascot_body": "Your support helps {name} grow every day."
     }
   },
   "brain_clone": {
