@@ -28,6 +28,9 @@ import type {
 } from "@/lib/db/types";
 import { WhatsWorkingPanel } from "@/components/parent/whats-working-panel";
 import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
+import { LiveUpdatesCard } from "@/components/parent/live-updates-card";
+import { IepReportsCard } from "@/components/parent/iep-reports-card";
+import { computeLearnerReportKpis } from "@/lib/parent/report-kpis";
 import { SectionCard } from "../home-v2/_components/SectionCard";
 
 /**
@@ -284,14 +287,16 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
   const featuredReady = READY_STATES.has(featured.readinessState);
 
   // ---- real data for the featured learner ----
-  const [engagement, allRuns, mastery, snapshots, assignments, subjectList] = await Promise.all([
-    getLearnerEngagement(featured.id, session.tenantId),
-    listLessonRunsForLearner(featured.id, session.tenantId),
-    getMasteryMap(featured.id, session.tenantId),
-    listMasterySnapshots(featured.id, session.tenantId),
-    listActiveAssignmentsForLearner(featured.id, session.tenantId),
-    listSubjects(),
-  ]);
+  const [engagement, allRuns, mastery, snapshots, assignments, subjectList, reportKpis] =
+    await Promise.all([
+      getLearnerEngagement(featured.id, session.tenantId),
+      listLessonRunsForLearner(featured.id, session.tenantId),
+      getMasteryMap(featured.id, session.tenantId),
+      listMasterySnapshots(featured.id, session.tenantId),
+      listActiveAssignmentsForLearner(featured.id, session.tenantId),
+      listSubjects(),
+      computeLearnerReportKpis(featured.id, session.tenantId),
+    ]);
   const subjectName = new Map(subjectList.map((s) => [s.id, s.name]));
 
   const completed = allRuns.filter((r) => r.status === "completed");
@@ -505,6 +510,16 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
           />
         </div>
       </section>
+
+      {featuredReady ? (
+        <section
+          aria-label={t("iep_live_section")}
+          className="grid gap-4 lg:grid-cols-[1.45fr_1fr]"
+        >
+          <IepReportsCard kpis={reportKpis} learnerId={featured.id} />
+          <LiveUpdatesCard learnerId={featured.id} learnerName={featuredFirst} />
+        </section>
+      ) : null}
 
       <section aria-label={t("details")} className="grid gap-4 lg:grid-cols-2">
         <SectionCard
