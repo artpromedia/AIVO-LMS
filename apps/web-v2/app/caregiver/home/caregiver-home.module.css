@@ -1,0 +1,10 @@
+/*
+ * Caregiver welcome hero (CaregiverApp.dc.html) — the warm peach→lavender
+ * gradient. Kept in a CSS module so the page .tsx stays free of raw hex
+ * (no-hex lint), matching the other handoff canvases.
+ */
+.welcome {
+  background:
+    radial-gradient(ellipse 80% 90% at 85% 10%, #fcefd2 0%, transparent 60%),
+    linear-gradient(120deg, #fef7e6 0%, #f3eefe 100%);
+}

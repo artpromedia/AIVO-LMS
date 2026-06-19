@@ -4114,7 +4114,10 @@
       "no_learners_yet": "No learners yet",
       "period_label_active": "active",
       "period_label_vs_last_week": "vs last week",
-      "period_label_this_week": "this week"
+      "period_label_this_week": "this week",
+      "welcome_hi": "Hi, {name}",
+      "welcome_sub": "Here’s how your learners are doing.",
+      "welcome_blurb": "You’re on the care team for the learners below — follow their progress and cheer them on. Everything here is shared with you by their parent."
     },
     "learners": {
       "title": "Learners",

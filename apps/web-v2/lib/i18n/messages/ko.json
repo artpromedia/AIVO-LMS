@@ -4114,7 +4114,10 @@
       "no_learners_yet": "ì•„ì§ í•™ìŠµìžê°€ ì—†ìŠµë‹ˆë‹¤",
       "period_label_active": "í™œì„±",
       "period_label_vs_last_week": "ì§€ë‚œ ì£¼ ëŒ€ë¹„",
-      "period_label_this_week": "ì´ë²ˆ ì£¼"
+      "period_label_this_week": "ì´ë²ˆ ì£¼",
+      "welcome_hi": "Hi, {name}",
+      "welcome_sub": "Here’s how your learners are doing.",
+      "welcome_blurb": "You’re on the care team for the learners below — follow their progress and cheer them on. Everything here is shared with you by their parent."
     },
     "learners": {
       "title": "í•™ìŠµìž",

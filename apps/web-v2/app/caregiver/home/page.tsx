@@ -11,8 +11,9 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader, SectionHeader } from "@/components/layout/page-header";
+import { SectionHeader } from "@/components/layout/page-header";
 import { CAREGIVER_NAV } from "@/components/layout/role-shells";
+import styles from "./caregiver-home.module.css";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { KpiCard } from "@aivo/ui/chart";
@@ -75,10 +76,19 @@ export default async function CaregiverHomePage() {
       navItems={CAREGIVER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        title={`Welcome, ${session.displayName.split(" ")[0]}`}
-        description="You're on the care team for the learners listed below."
-      />
+      <div
+        className={`${styles.welcome} relative overflow-hidden rounded-iw-card-lg border border-iw-border p-7 md:p-8`}
+      >
+        <h1 className="font-iw-display text-3xl font-bold leading-tight text-iw-text-strong">
+          {t("welcome_hi", { name: session.displayName.split(" ")[0] })} 💛
+        </h1>
+        <p className="font-iw-display mt-1 text-xl font-bold text-iw-text-muted">
+          {t("welcome_sub")}
+        </p>
+        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-iw-text-muted">
+          {t("welcome_blurb")}
+        </p>
+      </div>
 
       {fresh.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-3">
