@@ -927,7 +927,15 @@
       "status_declined": "à¤…à¤¸à¥à¤µà¥€à¤•à¥ƒà¤¤ â€” à¤•à¥à¤› à¤¨à¤¹à¥€à¤‚ à¤¬à¤¦à¤²à¥‡à¤—à¤¾à¥¤",
       "status_failed": "à¤®à¤‚à¤œà¤¼à¥‚à¤°, à¤²à¥‡à¤•à¤¿à¤¨ à¤²à¤¾à¤—à¥‚ à¤•à¤°à¤¨à¥‡ à¤®à¥‡à¤‚ à¤µà¤¿à¤«à¤² â€” à¤¹à¤®à¤¾à¤°à¥€ à¤Ÿà¥€à¤® à¤•à¥‹ à¤¸à¥‚à¤šà¤¿à¤¤ à¤•à¤° à¤¦à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤¹à¥ˆà¥¤",
       "history": "à¤¹à¤¾à¤² à¤•à¥‡ à¤¨à¤¿à¤°à¥à¤£à¤¯ ({count})",
-      "retry": "à¤«à¤¿à¤° à¤•à¥‹à¤¶à¤¿à¤¶ à¤•à¤°à¥‡à¤‚"
+      "retry": "à¤«à¤¿à¤° à¤•à¥‹à¤¶à¤¿à¤¶ à¤•à¤°à¥‡à¤‚",
+      "accept": "Accept",
+      "add_context": "Add context",
+      "deny": "Deny",
+      "add_context_label": "Add context for AIVO",
+      "context_placeholder": "Add context for AIVO — e.g. ‘He has speech therapy Tuesday mornings.’",
+      "send_to_aivo": "Send to AIVO",
+      "undo": "Undo",
+      "status_context": "Context sent to AIVO — we’ll refine this suggestion."
     },
     "tutor_memories": {
       "title": "à¤†à¤ªà¤•à¤¾ à¤Ÿà¥à¤¯à¥‚à¤Ÿà¤° à¤•à¥à¤¯à¤¾ à¤¯à¤¾à¤¦ à¤°à¤–à¤¤à¤¾ à¤¹à¥ˆ",

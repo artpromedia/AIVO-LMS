@@ -68,7 +68,7 @@ describe("PendingRecommendationsPanel", () => {
       expect(screen.getByText("Raise delivery level — sustained mastery")).toBeTruthy(),
     );
     expect(screen.getByText("3 → 4")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "approve" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "accept" })).toBeTruthy();
   });
 
   it("renders the empty state", async () => {
@@ -83,8 +83,8 @@ describe("PendingRecommendationsPanel", () => {
       "/recommendations": () => ({ ok: true, requestId: "t", data: { pending: [REC], decided: [] } }),
     });
     renderWithQuery(<PendingRecommendationsPanel learnerId="lrn-1" />);
-    await waitFor(() => expect(screen.getByRole("button", { name: "approve" })).toBeTruthy());
-    fireEvent.click(screen.getByRole("button", { name: "approve" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "accept" })).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "accept" }));
     await waitFor(() => expect(screen.getByTestId("decided-card")).toBeTruthy());
     expect(screen.getByText("status_applied")).toBeTruthy();
     const respondCall = (fn as unknown as ReturnType<typeof vi.fn>).mock.calls.find((c) =>
@@ -104,8 +104,8 @@ describe("PendingRecommendationsPanel", () => {
       "/recommendations": () => ({ ok: true, requestId: "t", data: { pending: [REC], decided: [] } }),
     });
     renderWithQuery(<PendingRecommendationsPanel learnerId="lrn-1" />);
-    await waitFor(() => expect(screen.getByRole("button", { name: "decline" })).toBeTruthy());
-    fireEvent.click(screen.getByRole("button", { name: "decline" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "deny" })).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "deny" }));
     const confirm = screen.getByRole("button", { name: "confirm_decline" });
     expect((confirm as HTMLButtonElement).disabled).toBe(true);
     fireEvent.change(screen.getByLabelText("decline_reason_label"), {
@@ -114,6 +114,41 @@ describe("PendingRecommendationsPanel", () => {
     expect((confirm as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(confirm);
     await waitFor(() => expect(screen.getByText("status_declined")).toBeTruthy());
+  });
+
+  it("add-context sends the note, shows context-sent, and undo reverts to pending", async () => {
+    const fn = stubFetch({
+      "/respond": (init) => {
+        const action = JSON.parse(String((init as RequestInit).body)).action;
+        const status = action === "undo" ? "PENDING" : "CONTEXT_ADDED";
+        return { ok: true, requestId: "t", data: { recommendation: { ...REC, status } } };
+      },
+      "/recommendations": () => ({ ok: true, requestId: "t", data: { pending: [REC], decided: [] } }),
+    });
+    renderWithQuery(<PendingRecommendationsPanel learnerId="lrn-1" />);
+    await waitFor(() => expect(screen.getByRole("button", { name: "add_context" })).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "add_context" }));
+
+    const send = screen.getByRole("button", { name: "send_to_aivo" }) as HTMLButtonElement;
+    expect(send.disabled).toBe(true);
+    fireEvent.change(screen.getByLabelText("add_context_label"), {
+      target: { value: "Speech therapy Tuesday mornings" },
+    });
+    expect(send.disabled).toBe(false);
+    fireEvent.click(send);
+
+    await waitFor(() => expect(screen.getByText("status_context")).toBeTruthy());
+    const ctxCall = (fn as unknown as ReturnType<typeof vi.fn>).mock.calls.find(
+      (c) => (c[1] as RequestInit)?.body && JSON.parse(String((c[1] as RequestInit).body)).action === "add_context",
+    )!;
+    expect(JSON.parse(String((ctxCall[1] as RequestInit).body))).toEqual({
+      action: "add_context",
+      context: "Speech therapy Tuesday mornings",
+    });
+
+    // Undo returns the card to its actionable state.
+    fireEvent.click(screen.getByRole("button", { name: "undo" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "accept" })).toBeTruthy());
   });
 
   it("renders the error state when the list fails", async () => {

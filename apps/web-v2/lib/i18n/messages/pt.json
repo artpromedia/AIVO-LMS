@@ -927,7 +927,15 @@
       "status_declined": "Recusado â€” nada muda.",
       "status_failed": "Aprovado, mas a aplicaÃ§Ã£o falhou â€” nossa equipe foi notificada.",
       "history": "DecisÃµes recentes ({count})",
-      "retry": "Tentar de novo"
+      "retry": "Tentar de novo",
+      "accept": "Accept",
+      "add_context": "Add context",
+      "deny": "Deny",
+      "add_context_label": "Add context for AIVO",
+      "context_placeholder": "Add context for AIVO — e.g. ‘He has speech therapy Tuesday mornings.’",
+      "send_to_aivo": "Send to AIVO",
+      "undo": "Undo",
+      "status_context": "Context sent to AIVO — we’ll refine this suggestion."
     },
     "tutor_memories": {
       "title": "O que o seu tutor lembra",

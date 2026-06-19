@@ -927,7 +927,15 @@
       "status_declined": "ê±°ì ˆë¨ â€” ë³€ê²½ ì‚¬í•­ ì—†ìŒ.",
       "status_failed": "ìŠ¹ì¸ë˜ì—ˆì§€ë§Œ ì ìš©ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤ â€” íŒ€ì— ì•Œë ¸ìŠµë‹ˆë‹¤.",
       "history": "ìµœê·¼ ê²°ì • ({count})",
-      "retry": "ë‹¤ì‹œ ì‹œë„"
+      "retry": "ë‹¤ì‹œ ì‹œë„",
+      "accept": "Accept",
+      "add_context": "Add context",
+      "deny": "Deny",
+      "add_context_label": "Add context for AIVO",
+      "context_placeholder": "Add context for AIVO — e.g. ‘He has speech therapy Tuesday mornings.’",
+      "send_to_aivo": "Send to AIVO",
+      "undo": "Undo",
+      "status_context": "Context sent to AIVO — we’ll refine this suggestion."
     },
     "tutor_memories": {
       "title": "íŠœí„°ê°€ ê¸°ì–µí•˜ëŠ” ê²ƒ",
