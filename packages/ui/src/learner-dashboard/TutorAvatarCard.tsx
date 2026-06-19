@@ -43,7 +43,7 @@ export function TutorAvatarCard({
   const cls = cn(
     "group flex flex-col items-center gap-3 p-5 rounded-[24px] bg-white border border-iw-border/60",
     "transition-all duration-150",
-    "hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-12px_rgba(15,23,42,0.18)] hover:border-[var(--color-aivo-primary)]/40",
+    "hover:-translate-y-0.5 hover:shadow-[0_16px_34px_-12px_rgba(60,40,110,0.18)] hover:border-[var(--color-aivo-primary)]/40",
     "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-aivo-primary)] focus-visible:ring-offset-2",
     className,
   );

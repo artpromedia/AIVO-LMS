@@ -56,7 +56,7 @@ export function LearnerQuestionCard({
     <article
       className={cn(
         "rounded-iw-hero bg-white border border-iw-border",
-        "shadow-[0_4px_12px_rgba(15,23,42,0.04),0_24px_48px_-20px_rgba(15,23,42,0.10)]",
+        "shadow-[0_10px_28px_rgba(60,40,110,0.07)]",
         "p-5 md:p-8 lg:p-10 flex flex-col gap-6",
         className,
       )}

@@ -92,7 +92,7 @@ export function SubjectCard({
       className={cn(
         "group relative flex flex-col gap-4 rounded-iw-card-lg bg-white border border-iw-border",
         "p-5 transition-all duration-150",
-        "hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-12px_rgba(15,23,42,0.18)]",
+        "hover:-translate-y-0.5 hover:shadow-[0_16px_34px_-12px_rgba(60,40,110,0.18)]",
         "focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-[var(--aivo-color-surface-canvas)]",
         locked && "opacity-60 pointer-events-none",
         className,
