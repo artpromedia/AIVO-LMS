@@ -4018,7 +4018,9 @@
       "stat_ready_for_session": "PrÃªts pour la sÃ©ance",
       "period_label_active": "actif",
       "period_label_vs_last_week": "vs la semaine derniÃ¨re",
-      "period_label_this_week": "cette semaine"
+      "period_label_this_week": "cette semaine",
+      "welcome_hi": "Welcome, {name}",
+      "welcome_blurb": "Your caseload — every learner you’re assigned to support. Contribute therapy goals that feed into their IEP."
     },
     "reports": {
       "title": "Rapports",

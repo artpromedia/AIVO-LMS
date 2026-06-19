@@ -4018,7 +4018,9 @@
       "stat_ready_for_session": "ã‚»ãƒƒã‚·ãƒ§ãƒ³æº–å‚™å®Œäº†",
       "period_label_active": "ã‚¢ã‚¯ãƒ†ã‚£ãƒ–",
       "period_label_vs_last_week": "å…ˆé€±ã¨ã®æ¯”è¼ƒ",
-      "period_label_this_week": "ä»Šé€±"
+      "period_label_this_week": "ä»Šé€±",
+      "welcome_hi": "Welcome, {name}",
+      "welcome_blurb": "Your caseload — every learner you’re assigned to support. Contribute therapy goals that feed into their IEP."
     },
     "reports": {
       "title": "ãƒ¬ãƒãƒ¼ãƒˆ",

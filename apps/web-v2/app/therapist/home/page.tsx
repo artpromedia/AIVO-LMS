@@ -12,7 +12,7 @@ import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader, SectionHeader } from "@/components/layout/page-header";
+import { SectionHeader } from "@/components/layout/page-header";
 import { THERAPIST_NAV } from "@/components/layout/role-shells";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -89,10 +89,14 @@ export default async function TherapistHomePage() {
       navItems={THERAPIST_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        title={`Welcome, ${session.displayName.split(" ")[0]}`}
-        description="Your caseload — every learner you're assigned to support."
-      />
+      <div className="rounded-iw-card-lg border border-iw-border bg-iw-primary-soft p-7 md:p-8">
+        <h1 className="font-iw-display text-3xl font-bold leading-tight text-iw-text-strong">
+          {t("welcome_hi", { name: session.displayName.split(" ")[0] })}
+        </h1>
+        <p className="mt-1.5 max-w-xl text-[15px] leading-relaxed text-iw-text-muted">
+          {t("welcome_blurb")}
+        </p>
+      </div>
 
       {fresh.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-3">
