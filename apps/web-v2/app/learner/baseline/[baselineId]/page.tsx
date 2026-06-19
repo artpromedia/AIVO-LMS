@@ -59,6 +59,7 @@ import { serverEnv } from "@/lib/env";
 import { BASELINE_BREAK_EVERY } from "@aivo/adaptive-baseline";
 import { LatencyTimer } from "./latency-timer";
 import { BaselineListenAudio } from "./listen-audio";
+import baselineTheme from "./baseline-theme.module.css";
 import type { BaselineQuestion } from "@/lib/db/types";
 
 /**
@@ -333,10 +334,12 @@ export default async function BaselineRunnerPage({
       <LearnerBaselineShell
         topBanner={topBanner}
         style={shellStyle}
+        canvasClassName={baselineTheme.readingForest}
+        chromeless
         headerLeft={
           <Link
             href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
-            className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
+            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-iw-text-strong bg-white shadow-[0_6px_18px_rgba(60,40,110,0.08)] hover:bg-[var(--aivo-color-surface-sunken)]"
           >
             <svg
               className="w-4 h-4"
@@ -395,7 +398,12 @@ export default async function BaselineRunnerPage({
   /* --------- Ready-to-submit screen (every question answered) --------- */
   if (!next) {
     return (
-      <LearnerBaselineShell topBanner={topBanner} style={shellStyle}>
+      <LearnerBaselineShell
+        topBanner={topBanner}
+        style={shellStyle}
+        canvasClassName={baselineTheme.readingForest}
+        chromeless
+      >
         <BaselineScanProvider
           config={scanConfig}
           speakOnFocus={speakOnScanFocus}
@@ -461,6 +469,8 @@ export default async function BaselineRunnerPage({
       <LearnerBaselineShell
         topBanner={topBanner}
         style={shellStyle}
+        canvasClassName={baselineTheme.readingForest}
+        chromeless
         status={[
           <PersonalizationChip key="paused" variant="paused" />,
           ...chips.slice(0, 3).map((v) => <PersonalizationChip key={v} variant={v} />),
@@ -548,6 +558,9 @@ export default async function BaselineRunnerPage({
   /* --------- Question screen --------- */
   const subject = subjectsById.get(next.subjectId);
   const tutor = subject ? tutorForSubjectSlug(subject.slug) : null;
+  // The themed "landmark" title shown in the handoff top-bar pill (e.g.
+  // "The Reading Forest"). Falls back to the plain subject name.
+  const forestLabel = tutor?.landmark ?? subject?.name ?? null;
 
   // Per-question dot states for the progress strip.
   const dots: DotState[] = questions.map((q, i) => {
@@ -595,16 +608,40 @@ export default async function BaselineRunnerPage({
     <LearnerBaselineShell
       topBanner={topBanner}
       style={shellStyle}
+      canvasClassName={baselineTheme.readingForest}
+      chromeless
       headerLeft={
-        <p className="text-xs text-iw-text-muted">
-          {subject?.name ?? "Question"} · {Math.min(totalAnswered + 1, questions.length)} of{" "}
-          {questions.length}
-        </p>
+        <div className="flex items-center gap-3.5 rounded-full bg-white px-4 py-2 shadow-[0_6px_18px_rgba(60,40,110,0.08)]">
+          <BaselineProgressDots states={dots} ariaLabel="Baseline progress" />
+          {forestLabel ? (
+            <>
+              <span
+                className="h-[18px] w-px bg-[var(--aivo-color-aivoPurple-100)]"
+                aria-hidden="true"
+              />
+              <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--aivo-color-aivoTeal-600)]">
+                <svg
+                  className="w-[17px] h-[17px]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 22V8M8 11l4-4 4 4M5 22h14" />
+                </svg>
+                {forestLabel}
+              </span>
+            </>
+          ) : null}
+        </div>
       }
       headerRight={
         <Link
           href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
-          className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
+          className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-iw-text-strong bg-white shadow-[0_6px_18px_rgba(60,40,110,0.08)] hover:bg-[var(--aivo-color-surface-sunken)]"
         >
           <svg
             className="w-4 h-4"
@@ -632,8 +669,6 @@ export default async function BaselineRunnerPage({
         scanHelpText={scanConfig.stepScan ? tScan("help_two_switch") : tScan("help_one_switch")}
         announceLabelTemplate={tScan.raw("announce")}
       >
-        <BaselineProgressDots states={dots} ariaLabel="Baseline progress" />
-
         <LearnerQuestionCard
           eyebrow={tutor ? `With ${tutor.name} · ${tutor.landmark}` : subject?.name}
           companion={

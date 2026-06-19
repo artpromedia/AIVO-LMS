@@ -75,8 +75,11 @@ describe("LearnerChoiceCard label consumes learner prefs and keeps its tap floor
     expect(html).toContain("--answer-base");
   });
 
-  it("keeps the 64px min touch-target floor (larger-of, never smaller)", () => {
-    expect(html).toContain("min-h-[64px]");
+  it("keeps the 76px min touch-target floor (larger-of, never smaller)", () => {
+    // BaselineAssessment handoff: the answer card grew to a 76px floor (52px
+    // icon square + generous padding). Still a floor, never a ceiling — a
+    // larger-text learner gets a taller card.
+    expect(html).toContain("min-h-[76px]");
   });
 
   it("uses the dyslexia-aware font-family var on the label", () => {

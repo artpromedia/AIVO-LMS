@@ -14,6 +14,12 @@ import { getImpersonationState } from "@/lib/impersonation/state";
 import { ImpersonationBanner } from "@/components/admin/impersonation/ImpersonationBanner";
 import { getTenantBranding, brandingCssVars } from "@/lib/branding";
 import { getTranslations } from "next-intl/server";
+import { getSession } from "@/lib/auth/session";
+import { listLearnersForParent } from "@/lib/db/repos";
+import { ParentLearnerSwitcher } from "@/components/layout/parent/parent-learner-switcher";
+import { ParentUserMenu } from "@/components/layout/parent/parent-user-menu";
+import { ParentNotificationsBell } from "@/components/layout/parent/parent-notifications-bell";
+import { SidebarMascotCard } from "@/components/layout/parent/sidebar-mascot-card";
 
 /**
  * Map a session role to the visual theme it should render under.
@@ -70,6 +76,8 @@ function SidebarBody({
   isDarkSidebar,
   supportHref,
   supportLabel,
+  eyebrow,
+  footer,
 }: {
   readonly navItems: RoleNavItem[];
   readonly ariaLabel: string;
@@ -78,9 +86,18 @@ function SidebarBody({
   /** Tenant support destination (Sprint B6) — AIVO default when unbranded. */
   readonly supportHref: string;
   readonly supportLabel: string;
+  /** Optional uppercase section label above the nav (e.g. "Family workspace"). */
+  readonly eyebrow?: string;
+  /** Optional card pinned below the user block (e.g. the parent mascot card). */
+  readonly footer?: React.ReactNode;
 }) {
   return (
     <>
+      {eyebrow ? (
+        <p className="px-2 pb-2.5 pt-1 text-[11px] font-bold uppercase tracking-[0.12em] text-iw-ink-muted">
+          {eyebrow}
+        </p>
+      ) : null}
       <RoleNav items={navItems} ariaLabel={ariaLabel} />
       <div
         className="mt-6 flex flex-col gap-2 border-t pt-4"
@@ -132,6 +149,7 @@ function SidebarBody({
           </form>
         </div>
       </div>
+      {footer}
     </>
   );
 }
@@ -163,12 +181,27 @@ export async function AppShell({
   variant = "standard",
   topBarSlot,
   jobTray,
+  topBarLead,
+  notificationsSlot,
+  userMenu,
+  sidebarEyebrow,
+  sidebarFooter,
 }: {
   role: string;
   roleLabel: string;
   navItems: RoleNavItem[];
   user: { displayName: string; email: string };
   children: React.ReactNode;
+  /** Element after the logo in the top bar (e.g. the parent learner switcher). */
+  topBarLead?: React.ReactNode;
+  /** Element in the top-bar action cluster (e.g. the notifications bell). */
+  notificationsSlot?: React.ReactNode;
+  /** Replaces the default name+avatar cluster (e.g. the parent account menu). */
+  userMenu?: React.ReactNode;
+  /** Uppercase label above the sidebar nav (e.g. "Family workspace"). */
+  sidebarEyebrow?: string;
+  /** Card pinned to the foot of the sidebar (e.g. the parent mascot card). */
+  sidebarFooter?: React.ReactNode;
   /**
    * `immersive` hides the nav rail so the page can render its own
    * workspace rail (used by the SensoryAdaptive learner home, where
@@ -218,6 +251,47 @@ export async function AppShell({
     branding?.supportUrl ??
     (branding?.supportEmail ? `mailto:${branding.supportEmail}` : "https://aivolearning.com/support");
   const supportLabel = tCommon("get_support");
+
+  // Parent shell chrome (ParentApp.dc.html): learner switcher + bell + account
+  // menu in the top bar, and the "Family workspace" eyebrow + encouragement
+  // card in the sidebar. Built here, gated to the parent theme, so every parent
+  // page gets it with no per-page wiring; other roles are untouched. Any
+  // explicitly-passed slot wins over these defaults.
+  let parentLead: React.ReactNode = null;
+  let parentBell: React.ReactNode = null;
+  let parentMenu: React.ReactNode = null;
+  let parentEyebrow: string | undefined;
+  let parentFooter: React.ReactNode = null;
+  if (theme === "parent") {
+    const session = await getSession();
+    if (session) {
+      const learners = await listLearnersForParent(session.userId, session.tenantId);
+      const tShell = await getTranslations("parent.shell");
+      parentEyebrow = tShell("workspace_eyebrow");
+      parentBell = <ParentNotificationsBell />;
+      parentMenu = (
+        <ParentUserMenu name={user.displayName} email={user.email} roleLabel={roleLabel} />
+      );
+      if (learners.length > 0) {
+        parentLead = (
+          <ParentLearnerSwitcher
+            learners={learners.map((l) => ({ id: l.id, name: l.displayName, avatar: l.avatar }))}
+          />
+        );
+        parentFooter = (
+          <SidebarMascotCard
+            title={tShell("mascot_title")}
+            body={tShell("mascot_body", { name: learners[0].displayName.split(" ")[0] })}
+          />
+        );
+      }
+    }
+  }
+  const finalTopBarLead = topBarLead ?? parentLead;
+  const finalNotifications = notificationsSlot ?? parentBell;
+  const finalUserMenu = userMenu ?? parentMenu;
+  const finalEyebrow = sidebarEyebrow ?? parentEyebrow;
+  const finalSidebarFooter = sidebarFooter ?? parentFooter;
 
   return (
     <div
@@ -272,6 +346,8 @@ export async function AppShell({
                   isDarkSidebar={isDarkSidebar}
                   supportHref={supportHref}
                   supportLabel={supportLabel}
+                  eyebrow={finalEyebrow}
+                  footer={finalSidebarFooter}
                 />
               </DrawerContent>
             </Drawer>
@@ -303,17 +379,26 @@ export async function AppShell({
             )}
           </Link>
 
+          {finalTopBarLead}
+
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
             {topBarSlot}
+            {immersive ? null : finalNotifications}
             {immersive ? null : <SensoryModePopover />}
             {immersive ? null : <LanguageSwitcher />}
-            <span className="hidden text-right sm:block">
-              <span className="block text-sm font-semibold leading-tight text-iw-ink">
-                {user.displayName}
-              </span>
-              <span className="block text-[11px] leading-tight text-iw-ink-muted">{roleLabel}</span>
-            </span>
-            <Avatar name={user.displayName} size="md" />
+            {finalUserMenu ?? (
+              <>
+                <span className="hidden text-right sm:block">
+                  <span className="block text-sm font-semibold leading-tight text-iw-ink">
+                    {user.displayName}
+                  </span>
+                  <span className="block text-[11px] leading-tight text-iw-ink-muted">
+                    {roleLabel}
+                  </span>
+                </span>
+                <Avatar name={user.displayName} size="md" />
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -345,6 +430,8 @@ export async function AppShell({
               isDarkSidebar={isDarkSidebar}
               supportHref={supportHref}
               supportLabel={supportLabel}
+              eyebrow={finalEyebrow}
+              footer={finalSidebarFooter}
             />
           </aside>
         )}

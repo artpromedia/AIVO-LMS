@@ -19,10 +19,13 @@ body {
 
 body {
   margin: 0;
+  /* PlatformAdmin/DistrictAdmin/SchoolAdmin handoff: a calm violet-grey console
+     canvas (#F6F6FB) with a faint violet wash at the top, instead of the older
+     blue→cream gradient — keeps the console tied to the AIVO violet accent. */
   background:
-    radial-gradient(circle at 15% 10%, rgba(25, 106, 212, 0.12), transparent 28rem),
-    linear-gradient(135deg, #f8fafc 0%, #eef6ff 48%, #f8f5ed 100%);
-  color: #172033;
+    radial-gradient(ellipse 90% 45% at 50% 0%, #f1eafe 0%, transparent 55%),
+    #f6f6fb;
+  color: #1e1b33;
 }
 
 /* Enterprise heading scale — calmer than the consumer font-black tone.

@@ -14,7 +14,6 @@ import {
   getLearnerEngagement,
   listLessonRunsForLearner,
   getMasteryMap,
-  listMasterySnapshots,
   listActiveAssignmentsForLearner,
   listSubjects,
 } from "@/lib/db/repos";
@@ -26,9 +25,11 @@ import type {
   ReadinessState,
   LessonRun,
 } from "@/lib/db/types";
-import { WhatsWorkingPanel } from "@/components/parent/whats-working-panel";
-import { PendingRecommendationsPanel } from "@/components/parent/pending-recommendations-panel";
+import { LiveUpdatesCard } from "@/components/parent/live-updates-card";
+import { IepReportsCard } from "@/components/parent/iep-reports-card";
+import { computeLearnerReportKpis } from "@/lib/parent/report-kpis";
 import { SectionCard } from "../home-v2/_components/SectionCard";
+import { ParentHomeHero } from "./parent-home-hero";
 
 /**
  * Parent home — shared daily-snapshot view.
@@ -284,13 +285,13 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
   const featuredReady = READY_STATES.has(featured.readinessState);
 
   // ---- real data for the featured learner ----
-  const [engagement, allRuns, mastery, snapshots, assignments, subjectList] = await Promise.all([
+  const [engagement, allRuns, mastery, assignments, subjectList, reportKpis] = await Promise.all([
     getLearnerEngagement(featured.id, session.tenantId),
     listLessonRunsForLearner(featured.id, session.tenantId),
     getMasteryMap(featured.id, session.tenantId),
-    listMasterySnapshots(featured.id, session.tenantId),
     listActiveAssignmentsForLearner(featured.id, session.tenantId),
     listSubjects(),
+    computeLearnerReportKpis(featured.id, session.tenantId),
   ]);
   const subjectName = new Map(subjectList.map((s) => [s.id, s.name]));
 
@@ -349,24 +350,6 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
     };
   });
 
-  // Insight: largest recent mastery gain across subjects (>= 2 snapshots).
-  const snapsBySubject = new Map<string, typeof snapshots>();
-  for (const s of snapshots) {
-    const list = snapsBySubject.get(s.subjectId);
-    if (list) list.push(s);
-    else snapsBySubject.set(s.subjectId, [s]);
-  }
-  let insight: { subject: string; points: number } | null = null;
-  for (const [subjectId, list] of snapsBySubject) {
-    if (list.length < 2) continue;
-    const sorted = [...list].sort((a, b) => a.capturedAt.localeCompare(b.capturedAt));
-    const delta = sorted[sorted.length - 1].averageScore - sorted[0].averageScore;
-    const points = Math.round(delta * 100);
-    if (points > 0 && (!insight || points > insight.points)) {
-      insight = { subject: subjectName.get(subjectId) ?? subjectId, points };
-    }
-  }
-
   // Next session: an active AI lesson first (real tutor persona), else a teacher
   // assignment. No human booking exists yet — we never imply one.
   const nextActive: LessonRun | undefined = activeRuns[0];
@@ -387,17 +370,12 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
 
   return shell(
     <div className="flex flex-col gap-6">
-      <LearningHero
-        greeting={
-          <span data-testid="home-v2-greeting">
-            Hi, {parentFirstName}.
-            <br />
-            <span className="text-iw-text-muted font-bold">
-              {featuredReady
-                ? t("hero_ready", { name: featuredFirst })
-                : t("hero_next", { name: featuredFirst })}
-            </span>
-          </span>
+      <ParentHomeHero
+        greeting={<span data-testid="home-v2-greeting">Hi, {parentFirstName}.</span>}
+        subline={
+          featuredReady
+            ? t("hero_ready", { name: featuredFirst })
+            : t("hero_next", { name: featuredFirst })
         }
         subhead={t("subhead")}
         actions={
@@ -416,41 +394,41 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
             </Button>
           </>
         }
+        snapshot={
+          <LearnerSnapshot
+            name={featured.displayName}
+            avatar={featured.avatar}
+            ageLabel={ageLabel}
+            streakLabel={streakLabel}
+            weekLabel={t("snapshot_week")}
+            dayDots={dayDots}
+          />
+        }
+        pills={
+          learners.length > 1 ? (
+            <nav aria-label={t("section_learners")} className="flex flex-wrap gap-2">
+              {learners.map((l) => {
+                const isActive = l.id === featured.id;
+                return (
+                  <Link
+                    key={l.id}
+                    href={`?learner=${l.id}`}
+                    aria-current={isActive ? "true" : undefined}
+                    className={[
+                      "inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold transition",
+                      isActive
+                        ? "border-transparent bg-[var(--aivo-aivoTeal-700)] text-white"
+                        : "border-iw-border bg-white text-iw-text-strong hover:bg-iw-card",
+                    ].join(" ")}
+                  >
+                    {l.displayName.split(" ")[0]}
+                  </Link>
+                );
+              })}
+            </nav>
+          ) : null
+        }
       />
-
-      <section aria-label={t("snapshot_for", { name: featuredFirst })}>
-        <LearnerSnapshot
-          name={featured.displayName}
-          avatar={featured.avatar}
-          ageLabel={ageLabel}
-          streakLabel={streakLabel}
-          weekLabel={t("snapshot_week")}
-          dayDots={dayDots}
-        />
-      </section>
-
-      {learners.length > 1 ? (
-        <nav aria-label={t("section_learners")} className="flex flex-wrap gap-2">
-          {learners.map((l) => {
-            const isActive = l.id === featured.id;
-            return (
-              <Link
-                key={l.id}
-                href={`?learner=${l.id}`}
-                aria-current={isActive ? "true" : undefined}
-                className={[
-                  "inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold transition",
-                  isActive
-                    ? "border-transparent bg-[var(--aivo-aivoTeal-700)] text-white"
-                    : "border-iw-border bg-white text-iw-text-strong hover:bg-iw-card",
-                ].join(" ")}
-              >
-                {l.displayName.split(" ")[0]}
-              </Link>
-            );
-          })}
-        </nav>
-      ) : null}
 
       {!featuredReady ? (
         <section aria-label={t("setup_for", { name: featuredFirst })}>
@@ -506,7 +484,17 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
         </div>
       </section>
 
-      <section aria-label={t("details")} className="grid gap-4 lg:grid-cols-2">
+      {featuredReady ? (
+        <section
+          aria-label={t("iep_live_section")}
+          className="grid gap-4 lg:grid-cols-[1.45fr_1fr]"
+        >
+          <IepReportsCard kpis={reportKpis} learnerId={featured.id} />
+          <LiveUpdatesCard learnerId={featured.id} learnerName={featuredFirst} />
+        </section>
+      ) : null}
+
+      <section aria-label={t("details")} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <SectionCard
           title={t("next_session_title")}
           iconName="goal"
@@ -544,44 +532,6 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
         </SectionCard>
 
         <SectionCard
-          title={t("upcoming_title")}
-          iconName="plan"
-          subtitle={t("upcoming_subtitle")}
-          badge={
-            activeRuns.length + assignments.length > 0
-              ? String(activeRuns.length + assignments.length)
-              : undefined
-          }
-          badgeTone="info"
-          cta={{ href: "/parent/schedule", label: t("view_schedule") }}
-        >
-          {activeRuns.length + assignments.length === 0 ? (
-            <p className="text-iw-text-muted">{t("upcoming_none")}</p>
-          ) : (
-            <ul className="space-y-2">
-              {activeRuns.slice(0, 3).map((r) => (
-                <li key={r.id} className="flex items-center justify-between gap-3">
-                  <span className="truncate text-iw-text-strong">
-                    {subjectName.get(r.subjectId) ?? r.subjectId}
-                  </span>
-                  <span className="text-xs text-iw-text-muted">{t("upcoming_active_lesson")}</span>
-                </li>
-              ))}
-              {sortedAssignments.slice(0, 3).map((a) => (
-                <li key={a.id} className="flex items-center justify-between gap-3">
-                  <span className="truncate text-iw-text-strong">{a.title}</span>
-                  {a.dueAt ? (
-                    <span className="text-xs text-iw-text-muted">
-                      {t("upcoming_due", { date: dateFmt.format(new Date(a.dueAt)) })}
-                    </span>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )}
-        </SectionCard>
-
-        <SectionCard
           title={t("recent_activity_title")}
           iconName="curriculum"
           subtitle={t("recent_activity_subtitle", { name: featuredFirst })}
@@ -608,14 +558,6 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
             </ul>
           )}
         </SectionCard>
-
-        {insight ? (
-          <SectionCard title={t("insight_title")} iconName="growth">
-            <p className="text-iw-text-strong">
-              {t("insight_body", { subject: insight.subject, points: insight.points })}
-            </p>
-          </SectionCard>
-        ) : null}
 
         <SectionCard
           title={t("quick_actions_title")}
@@ -670,21 +612,6 @@ export async function ParentHomeView({ selectedLearnerId }: { selectedLearnerId?
             </ul>
           </SectionCard>
         ) : null}
-      </section>
-
-      <section aria-label={t("recommendations_title")} className="grid gap-4 lg:grid-cols-2">
-        <div>
-          <h2 className="iw-label uppercase tracking-wider text-iw-text-muted mb-3">
-            {t("recommendations_title")}
-          </h2>
-          <PendingRecommendationsPanel learnerId={featured.id} />
-        </div>
-        <div>
-          <h2 className="iw-label uppercase tracking-wider text-iw-text-muted mb-3">
-            {t("whats_working_title")}
-          </h2>
-          <WhatsWorkingPanel learnerId={featured.id} learnerName={featuredFirst} />
-        </div>
       </section>
     </div>,
   );

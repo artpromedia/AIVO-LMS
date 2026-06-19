@@ -22,10 +22,16 @@ export interface TodayFocusCardProps {
   body?: React.ReactNode;
   meta?: React.ReactNode;
   action: React.ReactNode;
-  /** Accent for the soft side bar. */
+  /** Accent — tints the eyebrow + a soft corner glow. */
   accent?: string;
   /** Optional companion (tutor avatar). */
   companion?: React.ReactNode;
+  /**
+   * Large decorative glyph (emoji / icon) floated at the right edge — the
+   * handoff "Today's next step" hero shows e.g. a 📖. Purely ornamental;
+   * the title/body get right padding so text never collides with it.
+   */
+  decoration?: React.ReactNode;
   className?: string;
 }
 
@@ -37,36 +43,56 @@ export function TodayFocusCard({
   action,
   accent = "var(--aivo-sensory-primary)",
   companion,
+  decoration,
   className,
 }: TodayFocusCardProps) {
   return (
     <article
       className={cn(
-        "relative overflow-hidden rounded-iw-card-lg bg-white border border-iw-border",
-        "shadow-[0_4px_12px_rgba(15,23,42,0.04),0_24px_48px_-20px_rgba(15,23,42,0.10)]",
-        "p-5 md:p-6 flex flex-col gap-4",
+        // Handoff (LearnerApp) hero: lavender gradient card, soft warm shadow,
+        // 24px radius — no clinical white surface.
+        "relative overflow-hidden rounded-[24px] border border-[var(--aivo-color-aivoPurple-100,#e4ddf4)]",
+        "bg-gradient-to-br from-[var(--aivo-color-aivoPurple-50,#eee9fb)] to-[#f3eefe]",
+        "shadow-[0_8px_24px_rgba(60,40,110,0.06)]",
+        "p-6 md:p-7 flex flex-col gap-4",
         className,
       )}
     >
+      {/* Soft accent glow in the corner — keeps the card tied to the subject color. */}
       <span
         aria-hidden="true"
-        className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-iw-card-lg"
+        className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full opacity-20 blur-2xl"
         style={{ backgroundColor: accent }}
       />
-      <header className="flex items-start gap-4">
+      {decoration ? (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 select-none text-[72px] leading-none opacity-90 md:text-[88px]"
+        >
+          {decoration}
+        </span>
+      ) : null}
+      <header className={cn("relative flex items-start gap-4", decoration && "pr-20 md:pr-24")}>
         {companion ? <div aria-hidden="true">{companion}</div> : null}
         <div className="flex-1 min-w-0">
-          {eyebrow ? <p className="iw-label text-iw-text-muted truncate">{eyebrow}</p> : null}
-          <h2 className="text-xl md:text-2xl font-semibold text-iw-text-strong leading-snug">
+          {eyebrow ? (
+            <p
+              className="text-[12px] font-extrabold uppercase tracking-[0.1em]"
+              style={{ color: accent }}
+            >
+              {eyebrow}
+            </p>
+          ) : null}
+          <h2 className="font-iw-display text-2xl md:text-[34px] font-bold text-iw-text-strong leading-[1.08]">
             {title}
           </h2>
           {body ? (
-            <p className="text-sm md:text-base text-iw-text-muted leading-relaxed mt-1">{body}</p>
+            <p className="text-sm md:text-base text-iw-text-muted leading-relaxed mt-1.5">{body}</p>
           ) : null}
         </div>
       </header>
-      {meta ? <div className="flex items-center gap-2 flex-wrap">{meta}</div> : null}
-      <footer className="flex">{action}</footer>
+      {meta ? <div className="relative flex items-center gap-2 flex-wrap">{meta}</div> : null}
+      <footer className="relative flex">{action}</footer>
     </article>
   );
 }

@@ -478,7 +478,9 @@
     "progress": "进度",
     "subjects": "科目",
     "missions": "任务",
-    "library": "图书馆"
+    "library": "图书馆",
+    "coachGreeting": "I’m so happy to see you. Let’s keep learning together.",
+    "startNextThing": "Start my next thing"
   },
   "learnerBrain": {
     "title": "我的大脑",

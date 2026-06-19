@@ -56,26 +56,35 @@ export type PillCardGroupProps =
   | (BaseProps & { mode: "single"; defaultValue?: string })
   | (BaseProps & { mode: "multi"; defaultValues?: ReadonlyArray<string> });
 
-function pillClass(checked: boolean, disabled?: boolean) {
+// ParentAssessment.dc.html answer card: a big rounded card with an optional
+// icon circle on the left, the label, and a check circle on the right.
+function cardClass(checked: boolean, disabled?: boolean) {
   return cn(
-    "group relative flex items-start gap-3 cursor-pointer select-none",
-    "rounded-iw-card border bg-white p-4 transition-all duration-150",
-    "hover:border-[var(--aivo-color-aivoPurple-200,#ddd6fe)] hover:bg-[var(--aivo-color-aivoPurple-50,#f5f3ff)]/40",
+    "group relative flex items-center gap-3.5 cursor-pointer select-none",
+    "rounded-[18px] border-[1.5px] bg-white p-4 transition-all duration-150",
     checked
-      ? "border-[var(--aivo-sensory-primary,#7c3aed)] bg-[var(--aivo-color-aivoPurple-50,#f5f3ff)] shadow-[0_0_0_2px_var(--aivo-color-aivoPurple-100,#ede9fe)]"
-      : "border-iw-border",
+      ? "border-[var(--aivo-sensory-primary,#7c3aed)] shadow-[0_3px_10px_rgba(60,40,110,0.08)]"
+      : "border-[var(--aivo-color-aivoPurple-100,#ece7f6)] shadow-[0_3px_10px_rgba(60,40,110,0.03)] hover:border-[var(--aivo-color-aivoPurple-200,#ddd6fe)]",
     disabled && "opacity-50 cursor-not-allowed",
-    "focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--aivo-sensory-ringFocus,#7c3aed)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--aivo-color-surface-canvas,#f4f6f5)]",
+    "focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--aivo-sensory-ringFocus,#7c3aed)] focus-within:ring-offset-2",
   );
 }
 
-function indicatorClass(checked: boolean, isRadio: boolean) {
+function iconWrapClass(checked: boolean) {
   return cn(
-    "shrink-0 mt-0.5 flex items-center justify-center transition-colors",
-    isRadio ? "w-5 h-5 rounded-full border-2" : "w-5 h-5 rounded-[6px] border-2",
+    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[var(--aivo-sensory-primary,#7c3aed)]",
     checked
-      ? "border-[var(--aivo-sensory-primary,#7c3aed)] bg-[var(--aivo-sensory-primary,#7c3aed)]"
-      : "border-iw-border bg-white",
+      ? "bg-[var(--aivo-color-aivoPurple-200,#e7defb)]"
+      : "bg-[var(--aivo-color-aivoPurple-50,#f4f1fb)]",
+  );
+}
+
+function checkClass(checked: boolean) {
+  return cn(
+    "flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full transition-colors",
+    checked
+      ? "bg-[var(--aivo-sensory-primary,#7c3aed)]"
+      : "border-2 border-[var(--aivo-color-aivoPurple-200,#d8d0ea)] bg-white",
   );
 }
 
@@ -141,7 +150,7 @@ export function PillCardGroup(props: PillCardGroupProps) {
         {options.map((opt) => {
           const checked = selected.has(opt.value);
           return (
-            <label key={opt.value} className={pillClass(checked, opt.disabled)}>
+            <label key={opt.value} className={cardClass(checked, opt.disabled)}>
               <input
                 type={isSingle ? "radio" : "checkbox"}
                 name={name}
@@ -152,41 +161,44 @@ export function PillCardGroup(props: PillCardGroupProps) {
                 className="sr-only"
                 aria-describedby={opt.description ? `${name}-${opt.value}-desc` : undefined}
               />
-              <span className={indicatorClass(checked, isSingle)} aria-hidden="true">
-                {checked ? (
-                  isSingle ? (
-                    <span className="w-2 h-2 rounded-full bg-white" />
-                  ) : (
-                    <svg
-                      className="w-3 h-3 text-white"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="3 8 7 12 13 4" />
-                    </svg>
-                  )
-                ) : null}
-              </span>
+              {opt.icon ? (
+                <span className={iconWrapClass(checked)} aria-hidden="true">
+                  {opt.icon}
+                </span>
+              ) : null}
               <span className="flex-1 min-w-0">
-                <span className="flex items-center gap-2 text-sm font-semibold text-iw-text-strong">
-                  {opt.icon ? (
-                    <span className="text-iw-text-muted" aria-hidden="true">
-                      {opt.icon}
-                    </span>
-                  ) : null}
+                <span
+                  className={cn(
+                    "block text-base font-bold",
+                    checked
+                      ? "text-[var(--aivo-color-aivoPurple-800,#5b21b6)]"
+                      : "text-iw-text-strong",
+                  )}
+                >
                   {opt.label}
                 </span>
                 {opt.description ? (
                   <span
                     id={`${name}-${opt.value}-desc`}
-                    className="block text-xs text-iw-text-muted mt-0.5 leading-relaxed"
+                    className="mt-0.5 block text-xs leading-relaxed text-iw-text-muted"
                   >
                     {opt.description}
                   </span>
+                ) : null}
+              </span>
+              <span className={checkClass(checked)} aria-hidden="true">
+                {checked ? (
+                  <svg
+                    className="h-3.5 w-3.5 text-white"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="3 8 7 12 13 4" />
+                  </svg>
                 ) : null}
               </span>
             </label>

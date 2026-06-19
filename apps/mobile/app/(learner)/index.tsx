@@ -129,9 +129,35 @@ export default function LearnerWorldMap() {
               >
                 {t("learner.greeting", { name: user?.name || "Alex" })}
               </Text>
-              <Text style={[styles.heroSub, { color: palette.inkMuted }]}>
-                {t("learner.dailyChallengeDesc")}
-              </Text>
+              {/* Coach speech bubble (MobileApp handoff) */}
+              <View
+                style={[
+                  styles.speechBubble,
+                  { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
+                ]}
+              >
+                <View style={[styles.speechAvatar, { backgroundColor: palette.bgCard }]}>
+                  <Text style={styles.speechAvatarEmoji}>☁️</Text>
+                </View>
+                <Text style={[styles.speechText, { color: palette.ink }]}>
+                  {t("learner.coachGreeting")}
+                </Text>
+              </View>
+
+              {/* Primary action — "Start my next thing" (handoff hero CTA). */}
+              <Pressable
+                onPress={() => router.push("/(learner)/adventure" as Href)}
+                style={({ pressed }) => [
+                  styles.startCta,
+                  { backgroundColor: palette.primary, opacity: pressed ? 0.92 : 1 },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={t("learner.startNextThing")}
+              >
+                <Ionicons name="sparkles" size={18} color={colors.white} />
+                <Text style={styles.startCtaText}>{t("learner.startNextThing")}</Text>
+                <Ionicons name="arrow-forward" size={18} color={colors.white} />
+              </Pressable>
 
               <View
                 style={[
@@ -273,28 +299,40 @@ export default function LearnerWorldMap() {
                   }
                   accessibilityState={{ disabled: !entitled }}
                 >
-                  {!entitled && (
-                    <View
-                      style={[styles.lockBadge, { backgroundColor: palette.ink }]}
-                      accessibilityElementsHidden
-                    >
-                      <Ionicons name="lock-closed" size={11} color={colors.white} />
+                  {/* Colored banner (handoff stage card): tutor-color header
+                      with the art/icon in a translucent chip + a lock when
+                      the tutor isn't entitled, over a calm white body. */}
+                  <View
+                    style={[
+                      styles.worldBanner,
+                      { backgroundColor: entitled ? tutor.color : palette.inkMuted },
+                    ]}
+                  >
+                    <View style={styles.worldBannerIcon}>
+                      {getTutorArt(key) ? (
+                        <Image
+                          source={getTutorArt(key)!}
+                          style={styles.worldArt}
+                          accessibilityElementsHidden
+                          importantForAccessibility="no-hide-descendants"
+                        />
+                      ) : (
+                        <Text style={styles.worldIcon}>{tutor.icon}</Text>
+                      )}
                     </View>
-                  )}
-                  {getTutorArt(key) ? (
-                    <Image
-                      source={getTutorArt(key)!}
-                      style={styles.worldArt}
-                      accessibilityElementsHidden
-                      importantForAccessibility="no-hide-descendants"
-                    />
-                  ) : (
-                    <Text style={styles.worldIcon}>{tutor.icon}</Text>
-                  )}
-                  <Text style={[styles.worldName, { color: palette.ink }]}>{tutor.name}</Text>
-                  <Text style={[styles.worldDomain, { color: palette.inkMuted }]} numberOfLines={1}>
-                    {tutor.domain}
-                  </Text>
+                    {!entitled ? (
+                      <Ionicons name="lock-closed" size={13} color={colors.white} />
+                    ) : null}
+                  </View>
+                  <View style={styles.worldBody}>
+                    <Text style={[styles.worldName, { color: palette.ink }]}>{tutor.name}</Text>
+                    <Text
+                      style={[styles.worldDomain, { color: palette.inkMuted }]}
+                      numberOfLines={1}
+                    >
+                      {tutor.domain}
+                    </Text>
+                  </View>
                 </Pressable>
               );
             })}
@@ -487,6 +525,44 @@ const styles = StyleSheet.create({
     maxWidth: 260,
     marginBottom: spacing.md,
   },
+  speechBubble: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+    width: "100%",
+    padding: 14,
+    borderRadius: radius.lg,
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  speechAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  speechAvatarEmoji: { fontSize: 18 },
+  speechText: {
+    ...typography.bodyMd,
+    fontFamily: fontFamilies.bodySemiBold,
+    flex: 1,
+  },
+  startCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    width: "100%",
+    paddingVertical: 16,
+    borderRadius: radius.xl,
+    marginBottom: spacing.md,
+  },
+  startCtaText: {
+    fontFamily: fontFamilies.displayBold,
+    fontSize: 18,
+    color: colors.white,
+  },
   goalRow: {
     width: "100%",
     flexDirection: "row",
@@ -568,27 +644,30 @@ const styles = StyleSheet.create({
   worldCard: {
     borderRadius: radius.xl,
     borderWidth: 1,
-    padding: spacing.md,
+    overflow: "hidden",
+  },
+  worldBanner: {
+    height: 58,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
   },
-  worldIcon: { fontSize: 32, marginBottom: 6 },
-  worldArt: { width: 56, height: 56, borderRadius: 16, marginBottom: 4 },
-  worldName: { fontFamily: fontFamilies.bodyBold, fontSize: 13 },
-  worldDomain: {
-    fontFamily: fontFamilies.bodyRegular,
-    fontSize: 11,
-    textAlign: "center",
-  },
-  lockBadge: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+  worldBannerIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 11,
+    backgroundColor: "rgba(255,255,255,0.25)",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 1,
+  },
+  worldIcon: { fontSize: 20 },
+  worldArt: { width: 28, height: 28, borderRadius: 8 },
+  worldBody: { padding: 12 },
+  worldName: { fontFamily: fontFamilies.displayBold, fontSize: 14 },
+  worldDomain: {
+    fontFamily: fontFamilies.bodyRegular,
+    fontSize: 11.5,
   },
   quickActions: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   quickBtn: {

@@ -1,0 +1,98 @@
+/*
+ * CreatePin.dc.html — the child PIN keypad uses the cool "learner/onboarding"
+ * lavender palette (not the warm parent tokens), so the exact colors live here
+ * in a CSS module. Motion is gated behind prefers-reduced-motion.
+ */
+.canvas {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, #ece7fb 0%, transparent 60%),
+    #f3f1fb;
+}
+.headerBar {
+  background: #fff;
+  border-bottom: 1px solid #ece7f6;
+}
+.ink {
+  color: #1c1733;
+}
+.muted {
+  color: #5b5470;
+}
+.dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  transition: all 0.15s;
+}
+.dotFilled {
+  background: #7c3aed;
+  transform: scale(1.05);
+}
+.dotEmpty {
+  background: #fff;
+  border: 2px solid #d8d0ea;
+}
+.key {
+  background: #fff;
+  color: #1c1733;
+  box-shadow: 0 4px 12px rgba(60, 40, 110, 0.06);
+}
+.keyDel {
+  background: #f4f1fb;
+}
+.pinChip {
+  background: #f4f1fb;
+}
+.pinChipValue {
+  color: #7c3aed;
+  letter-spacing: 6px;
+}
+.doneCheck {
+  background: #ecfdf5;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bob {
+    animation: pinBob 4s ease-in-out infinite;
+  }
+  .shake {
+    animation: pinShake 0.4s;
+  }
+  .doneCard {
+    animation: pinPop 0.4s ease;
+  }
+}
+
+@keyframes pinBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@keyframes pinShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-7px);
+  }
+  40%,
+  80% {
+    transform: translateX(7px);
+  }
+}
+@keyframes pinPop {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

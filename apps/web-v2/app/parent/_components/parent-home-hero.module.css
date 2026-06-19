@@ -1,0 +1,15 @@
+/*
+ * Parent Home hero — the calm purple→cream gradient card from
+ * ParentApp.dc.html (isHome). Exact design colors live here in a CSS module
+ * (the .ts/.tsx hex lint doesn't apply to .css), so the gradient is
+ * pixel-faithful while the component itself stays on design tokens.
+ */
+.hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #efe7db;
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse 80% 90% at 85% 10%, #e5dbfb 0%, transparent 60%),
+    linear-gradient(120deg, #f3eefe 0%, #fbf4ea 100%);
+}

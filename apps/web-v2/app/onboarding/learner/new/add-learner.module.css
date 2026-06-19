@@ -1,0 +1,16 @@
+/*
+ * AddLearner.dc.html canvas + accent tints. Exact design colors kept in a CSS
+ * module so the .tsx hex lint stays satisfied while the gradient/teal note
+ * match the mockup pixel-for-pixel.
+ */
+.canvas {
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, #f3eefe 0%, transparent 55%),
+    #fbf8f2;
+}
+
+.privacyNote {
+  background: #f0f7f5;
+  border-color: #d6ebe5;
+  color: #3f6b63;
+}

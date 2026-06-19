@@ -1,427 +1,434 @@
 "use client";
 
 /**
- * Sprint C-05 — review rows (client).
+ * BrainReview right column (client) — BrainReview.dc.html.
  *
- * One inference per row, phrased as a conversation: ✓ "That's right" /
- * ✎ "Not quite". "Not quite" expands inline controls (native radios via
- * `ScaleField`, optional note via `SoftTextField` — both submit natively, so
- * nothing depends on client state to reach the server) and the sticky footer
- * stages everything server-side in one save.
+ * One native <form> spans the three handoff cards so the parent's removed tags,
+ * context/change notes, and consent all submit together without bespoke wiring:
  *
- * Therapist-pinned rows render locked with attribution and no controls; the
- * server rejects a forged unlock independently (`BrainCorrectionLockedError`).
+ *   - Removing a Superpower / Support tag (×) hides it and emits a hidden
+ *     `value:<field>=off` input — folded for accommodations, recorded-only for
+ *     superpowers (the server decides; therapist-pinned supports stay locked).
+ *   - "Add context" / "Request changes" reveal a shared note box; their buttons
+ *     submit via `stageAction` (stage + route to the clone-watch recap).
+ *   - "Approve & Create" submits the form to `approveAction` (stage + the shared
+ *     consent/RAI trust gate + fold + approval record), gated on the consent
+ *     checkbox AND opening the RAI disclosure — defense-in-depth still rejects a
+ *     forged POST server-side.
  *
- * Reduced motion: the only animation is the editor reveal; it uses
- * `motion-safe:` so `prefers-reduced-motion` users get an instant swap.
- * Live regions announce the adjustment count and save errors.
+ * Reduced motion: no entrance animation here; the only motion is the brain bob
+ * on the server-rendered hero, which is itself behind prefers-reduced-motion.
  */
 import * as React from "react";
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { Check, Lock, PencilLine } from "lucide-react";
-import { ScaleField, SoftTextField } from "@aivo/ui";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import type { ComfortLevel, LearnerBrainProfileState } from "@/lib/db/types";
-import type { SaveCorrectionsState } from "./actions";
+import {
+  ArrowRight,
+  Check,
+  MessageSquarePlus,
+  PencilLine,
+  Shield,
+  Sliders,
+  Sparkles,
+  Star,
+  X,
+  Zap,
+} from "lucide-react";
 
-export type ComfortRowDTO = {
-  field: "readingComfort" | "mathComfort";
-  current: ComfortLevel | "unspecified";
+export type TagDTO = { field: string; label: string; locked?: boolean };
+export type SensoryDTO = { body: string; tags: string[] };
+export type PacingDTO = { label: string; sub: string };
+export type GuideDTO = { name: string; icon: string; sub: string };
+export type RaiDTO = {
+  dataSources: string[];
+  biasMitigations: string[];
+  transparency: string;
+  oversight: string;
 };
 
-export type SupportRowDTO = {
-  slug: string;
-  field: string;
-  label: string;
-  enabled: boolean;
-  reasoning: string;
-  locked: boolean;
-};
+interface Props {
+  learnerId: string;
+  learnerName: string;
+  superpowers: TagDTO[];
+  supports: TagDTO[];
+  sensory: SensoryDTO | null;
+  pacing: PacingDTO;
+  guide: GuideDTO | null;
+  rai: RaiDTO | null;
+  editProfileHref: string;
+  backHref: string;
+  raiVersion: string;
+  initialError: string | null;
+  stageAction: (formData: FormData) => Promise<void>;
+  approveAction: (formData: FormData) => Promise<void>;
+}
 
-export type TutorRowDTO = {
-  key: string;
-  field: string;
-  name: string;
-  reasoning: string;
-};
+const CARD = "rounded-[22px] bg-white p-6 shadow-[0_12px_34px_rgba(60,40,110,0.08)]";
+const SECTION_LABEL =
+  "mb-2.5 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.04em] text-iw-text-muted";
 
-const COMFORT_OPTIONS: ComfortLevel[] = ["new", "growing", "confident", "advanced"];
-
-const INITIAL_SAVE_STATE: SaveCorrectionsState = { error: null };
+function ApproveButton({ ready, label }: { ready: boolean; label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={!ready || pending}
+      aria-disabled={!ready || pending}
+      className={
+        ready && !pending
+          ? "inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-[var(--aivo-color-aivoPurple-400)] to-[var(--aivo-sensory-primary)] px-6 py-3.5 text-base font-bold text-white shadow-[0_12px_26px_rgba(124,58,237,0.3)] hover:brightness-110"
+          : "inline-flex items-center gap-2.5 rounded-full bg-[var(--aivo-color-aivoPurple-200)] px-6 py-3.5 text-base font-bold text-white cursor-not-allowed"
+      }
+    >
+      {label}
+      <ArrowRight className="h-[19px] w-[19px]" aria-hidden="true" />
+    </button>
+  );
+}
 
 export function BrainReviewClient({
   learnerId,
   learnerName,
-  comfortRows,
-  modalities,
-  supportRows,
-  tutorRows,
-  initialValues,
-  initialNotes,
-  hasDraft,
-  saveAction,
-}: {
-  learnerId: string;
-  learnerName: string;
-  comfortRows: ComfortRowDTO[];
-  modalities: LearnerBrainProfileState["preferredModalities"];
-  supportRows: SupportRowDTO[];
-  tutorRows: TutorRowDTO[];
-  /** field → control value ("on"/"off" or a comfort level) from the staged draft. */
-  initialValues: Record<string, string>;
-  /** field → note text from the staged draft. */
-  initialNotes: Record<string, string>;
-  hasDraft: boolean;
-  saveAction: (prev: SaveCorrectionsState, formData: FormData) => Promise<SaveCorrectionsState>;
-}) {
+  superpowers,
+  supports,
+  sensory,
+  pacing,
+  guide,
+  rai,
+  editProfileHref,
+  backHref,
+  raiVersion,
+  initialError,
+  stageAction,
+  approveAction,
+}: Props) {
   const t = useTranslations("parent.brain_review");
-  const formRef = useRef<HTMLFormElement>(null);
-  const [saveState, formAction, pending] = useActionState(saveAction, INITIAL_SAVE_STATE);
+  const [denied, setDenied] = React.useState<ReadonlySet<string>>(new Set());
+  const [mode, setMode] = React.useState<"none" | "context" | "request">("none");
+  const [consent, setConsent] = React.useState(false);
+  const [raiSeen, setRaiSeen] = React.useState(false);
 
-  // Rows whose ✎ editor is open. Staged-draft rows resume open so the parent
-  // sees exactly what they saved last time.
-  const [openEditors, setOpenEditors] = useState<ReadonlySet<string>>(
-    () => new Set([...Object.keys(initialValues), ...Object.keys(initialNotes)]),
-  );
-  // Rows the parent confirmed with ✓ — visual acknowledgement only; an
-  // unconfirmed, untouched row is treated identically by the save.
-  const [confirmed, setConfirmed] = useState<ReadonlySet<string>>(new Set());
-  // Fields currently carrying a real adjustment (value differs or note text).
-  const [adjusted, setAdjusted] = useState<ReadonlySet<string>>(new Set());
-
-  // What "unchanged" means per field, for the live adjustment count.
-  const originals = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const row of comfortRows) map.set(row.field, row.current);
-    for (const row of supportRows) map.set(row.field, row.enabled ? "on" : "off");
-    for (const row of tutorRows) map.set(row.field, "on");
-    return map;
-  }, [comfortRows, supportRows, tutorRows]);
-
-  const recount = React.useCallback(() => {
-    const form = formRef.current;
-    if (!form) return;
-    const data = new FormData(form);
-    const next = new Set<string>();
-    for (const [key, entry] of data.entries()) {
-      if (typeof entry !== "string") continue;
-      if (key.startsWith("value:")) {
-        const field = key.slice("value:".length);
-        if (entry !== originals.get(field)) next.add(field);
-      } else if (key.startsWith("note:") && entry.trim().length > 0) {
-        next.add(key.slice("note:".length));
-      }
-    }
-    setAdjusted(next);
-  }, [originals]);
-
-  // Editors mount/unmount their native inputs — recount after each change.
-  useEffect(() => {
-    recount();
-  }, [openEditors, recount]);
-
-  const toggleEditor = (field: string) => {
-    setOpenEditors((prev) => {
+  const remove = (field: string) =>
+    setDenied((prev) => {
       const next = new Set(prev);
-      if (next.has(field)) next.delete(field);
-      else next.add(field);
+      next.add(field);
       return next;
     });
-    setConfirmed((prev) => {
-      if (!prev.has(field)) return prev;
-      const next = new Set(prev);
-      next.delete(field);
-      return next;
-    });
-  };
 
-  const confirmRow = (field: string) => {
-    setConfirmed((prev) => {
-      const next = new Set(prev);
-      if (next.has(field)) next.delete(field);
-      else next.add(field);
-      return next;
-    });
-    // Confirming closes the editor — the row stays exactly as AIVO built it.
-    setOpenEditors((prev) => {
-      if (!prev.has(field)) return prev;
-      const next = new Set(prev);
-      next.delete(field);
-      return next;
-    });
-  };
+  const deniedCount = denied.size;
+  const removedNote =
+    deniedCount === 1 ? t("removed_one") : t("removed_other", { count: deniedCount });
 
-  const comfortLabel = (value: ComfortLevel | "unspecified") =>
-    value === "unspecified" ? t("comfort_unspecified") : t(`comfort_${value}`);
+  const errorMsg =
+    initialError === "consent"
+      ? t("error_consent")
+      : initialError === "locked"
+        ? t("error_locked")
+        : initialError === "save"
+          ? t("error_save")
+          : null;
 
-  const rowActions = (field: string, locked: boolean) => {
-    if (locked) return null;
-    const isOpen = openEditors.has(field);
-    const isConfirmed = confirmed.has(field);
+  const renderTag = (tag: TagDTO, tone: "super" | "support") => {
+    if (denied.has(tag.field)) return null;
+    const toneClass =
+      tone === "super"
+        ? "bg-[var(--aivo-color-status-success-subtle)] text-[var(--aivo-color-status-success-strong)]"
+        : "bg-[var(--aivo-color-status-error-subtle)] text-[var(--aivo-color-status-error-strong)]";
     return (
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          type="button"
-          size="sm"
-          variant={isConfirmed ? "soft" : "outline"}
-          aria-pressed={isConfirmed}
-          onClick={() => confirmRow(field)}
-        >
-          <Check className="h-4 w-4" aria-hidden="true" />
-          {isConfirmed ? t("confirmed_row") : t("confirm_row")}
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant={isOpen ? "soft" : "outline"}
-          aria-expanded={isOpen}
-          aria-controls={`${field}-editor`}
-          onClick={() => toggleEditor(field)}
-        >
-          <PencilLine className="h-4 w-4" aria-hidden="true" />
-          {isOpen ? t("close_editor") : t("correct_row")}
-        </Button>
-      </div>
+      <span
+        key={tag.field}
+        className={`inline-flex items-center gap-1.5 rounded-full py-1.5 pl-3.5 pr-2 text-[13px] font-bold ${toneClass}`}
+      >
+        {tag.label}
+        {tag.locked ? (
+          <Shield className="h-3.5 w-3.5 opacity-70" aria-label={t("locked_badge")} />
+        ) : (
+          <button
+            type="button"
+            onClick={() => remove(tag.field)}
+            aria-label={t("remove_tag", { label: tag.label })}
+            className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-black/[0.07] hover:bg-black/[0.14]"
+          >
+            <X className="h-2.5 w-2.5" aria-hidden="true" />
+          </button>
+        )}
+      </span>
     );
   };
 
-  const editorShell = (field: string, children: React.ReactNode) => (
-    <div
-      id={`${field}-editor`}
-      className="brain-review-editor mt-3 space-y-4 rounded-iw-card border border-iw-border bg-iw-raised p-4"
-    >
-      {children}
-    </div>
-  );
-
-  const noteField = (field: string) => (
-    <SoftTextField
-      name={`note:${field}`}
-      label={t("note_label")}
-      placeholder={t("note_placeholder")}
-      multiline
-      maxLength={500}
-      defaultValue={initialNotes[field]}
-    />
-  );
-
-  const adjustedBadge = (field: string) =>
-    adjusted.has(field) ? <Badge tone="primary">{t("corrected_badge")}</Badge> : null;
-
-  const count = adjusted.size;
-
   return (
-    <form ref={formRef} action={formAction} onChange={recount} onInput={recount}>
+    <form action={approveAction} className="flex flex-col gap-5">
       <input type="hidden" name="learnerId" value={learnerId} />
+      <input type="hidden" name="raiVersion" value={raiVersion} />
+      <input type="hidden" name="consentGiven" value={consent ? "true" : "false"} />
+      <input type="hidden" name="raiAcknowledged" value={raiSeen ? "true" : "false"} />
+      {[...denied].map((field) => (
+        <input key={field} type="hidden" name={`value:${field}`} value="off" />
+      ))}
 
-      {hasDraft ? (
-        <Card variant="accent" className="mb-4 p-4">
-          <p role="status" className="text-sm text-iw-ink">
-            {t("resume_note")}
-          </p>
-        </Card>
-      ) : null}
-
-      {/* ── How {name} learns ─────────────────────────────────────── */}
-      <section aria-labelledby="brain-review-how" className="mb-8">
-        <h2 id="brain-review-how" className="text-lg font-semibold text-iw-ink">
-          {t("section_how_learns", { name: learnerName })}
-        </h2>
-        <p className="mt-1 text-sm text-iw-ink-muted">{t("section_how_learns_hint")}</p>
-        <ul className="mt-3 space-y-3">
-          {comfortRows.map((row) => {
-            const label =
-              row.field === "readingComfort"
-                ? t("reading_comfort_label")
-                : t("math_comfort_label");
-            return (
-              <li key={row.field}>
-                <Card className="p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-iw-ink">{label}</p>
-                    <span className="flex items-center gap-2">
-                      {adjustedBadge(row.field)}
-                      <Badge tone="neutral">{comfortLabel(row.current)}</Badge>
-                    </span>
-                  </div>
-                  <div className="mt-3">{rowActions(row.field, false)}</div>
-                  {openEditors.has(row.field)
-                    ? editorShell(
-                        row.field,
-                        <>
-                          <ScaleField
-                            name={`value:${row.field}`}
-                            legend={t("comfort_picker_legend", { name: learnerName })}
-                            options={COMFORT_OPTIONS.map((value) => ({
-                              value,
-                              label: t(`comfort_${value}`),
-                            }))}
-                            defaultValue={
-                              initialValues[row.field] ??
-                              (row.current === "unspecified" ? undefined : row.current)
-                            }
-                          />
-                          {noteField(row.field)}
-                        </>,
-                      )
-                    : null}
-                </Card>
-              </li>
-            );
-          })}
-          <li>
-            <Card className="p-4">
-              <p className="text-sm font-semibold text-iw-ink">{t("modalities_label")}</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {modalities.map((m) => (
-                  <Badge key={m} tone="primary">
-                    {t(`modality_${m}`)}
-                  </Badge>
-                ))}
-              </div>
-            </Card>
-          </li>
-        </ul>
-      </section>
-
-      {/* ── Supports ──────────────────────────────────────────────── */}
-      <section aria-labelledby="brain-review-supports" className="mb-8">
-        <h2 id="brain-review-supports" className="text-lg font-semibold text-iw-ink">
-          {t("section_supports")}
-        </h2>
-        <p className="mt-1 text-sm text-iw-ink-muted">
-          {t("section_supports_hint", { name: learnerName })}
-        </p>
-        <ul className="mt-3 space-y-3">
-          {supportRows.map((row) => (
-            <li key={row.field}>
-              <Card className="p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-iw-ink">{row.label}</p>
-                  <span className="flex items-center gap-2">
-                    {adjustedBadge(row.field)}
-                    {row.locked ? (
-                      <Badge tone="accent">
-                        <Lock className="h-3 w-3" aria-hidden="true" /> {t("locked_badge")}
-                      </Badge>
-                    ) : null}
-                    <Badge tone={row.enabled ? "success" : "neutral"}>
-                      {row.enabled ? t("support_on") : t("support_off")}
-                    </Badge>
-                  </span>
-                </div>
-                <p className="mt-2 text-sm text-iw-ink-muted">{row.reasoning}</p>
-                {row.locked ? (
-                  <p className="mt-3 flex items-start gap-2 rounded-iw-card bg-iw-accent-soft p-3 text-sm text-iw-ink">
-                    <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                    {t("locked_by_therapist", { name: learnerName })}
-                  </p>
-                ) : (
-                  <div className="mt-3">{rowActions(row.field, false)}</div>
-                )}
-                {!row.locked && openEditors.has(row.field)
-                  ? editorShell(
-                      row.field,
-                      <>
-                        <ScaleField
-                          name={`value:${row.field}`}
-                          legend={t("support_picker_legend")}
-                          options={[
-                            {
-                              value: "on",
-                              label: row.enabled ? t("support_keep_on") : t("support_turn_on"),
-                            },
-                            {
-                              value: "off",
-                              label: row.enabled ? t("support_turn_off") : t("support_keep_off"),
-                            },
-                          ]}
-                          defaultValue={initialValues[row.field] ?? (row.enabled ? "on" : "off")}
-                        />
-                        {noteField(row.field)}
-                      </>,
-                    )
-                  : null}
-              </Card>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* ── Tutors ────────────────────────────────────────────────── */}
-      <section aria-labelledby="brain-review-tutors" className="mb-8">
-        <h2 id="brain-review-tutors" className="text-lg font-semibold text-iw-ink">
-          {t("section_tutors", { name: learnerName })}
-        </h2>
-        <p className="mt-1 text-sm text-iw-ink-muted">{t("section_tutors_hint")}</p>
-        <ul className="mt-3 space-y-3">
-          {tutorRows.map((row) => (
-            <li key={row.field}>
-              <Card className="p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-iw-ink">{row.name}</p>
-                  {adjustedBadge(row.field)}
-                </div>
-                <p className="mt-2 text-sm text-iw-ink-muted">{row.reasoning}</p>
-                <div className="mt-3">{rowActions(row.field, false)}</div>
-                {openEditors.has(row.field)
-                  ? editorShell(
-                      row.field,
-                      <>
-                        <ScaleField
-                          name={`value:${row.field}`}
-                          legend={t("tutor_picker_legend", { name: learnerName })}
-                          options={[
-                            { value: "on", label: t("tutor_keep") },
-                            { value: "off", label: t("tutor_release") },
-                          ]}
-                          defaultValue={initialValues[row.field] ?? "on"}
-                        />
-                        {noteField(row.field)}
-                      </>,
-                    )
-                  : null}
-              </Card>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* ── Sticky footer: save & continue ─────────────────────────── */}
-      <div className="sticky bottom-0 z-10 -mx-2 px-2 pb-2">
-        <Card variant="elevated" className="flex flex-wrap items-center justify-between gap-3 p-4">
-          <div className="min-w-0">
-            <p aria-live="polite" className="text-sm font-medium text-iw-ink">
-              {count > 0 ? t("adjustments_count", { count }) : t("no_adjustments")}
-            </p>
-            {saveState.error ? (
-              <p role="alert" className="mt-1 text-sm text-iw-error">
-                {saveState.error === "locked" ? t("save_error_locked") : t("save_error")}
-              </p>
-            ) : null}
+      {/* ── Pre-Clone Review ─────────────────────────────────────────── */}
+      <section className={CARD}>
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <div className="font-iw-display flex items-center gap-2 text-xl font-bold text-iw-text-strong">
+            <Sparkles className="h-5 w-5 text-[var(--aivo-sensory-primary)]" aria-hidden="true" />
+            {t("review_heading")}
           </div>
-          <Button type="submit" disabled={pending} aria-disabled={pending}>
-            {count > 0 ? t("save_continue") : t("confirm_all_continue")}
-          </Button>
-        </Card>
-      </div>
+          <Link
+            href={editProfileHref}
+            className="inline-flex items-center gap-1.5 rounded-[11px] bg-[var(--aivo-color-aivoPurple-50)] px-3.5 py-2 text-[13.5px] font-bold text-[var(--aivo-sensory-primary)] hover:brightness-[0.97]"
+          >
+            <PencilLine className="h-[15px] w-[15px]" aria-hidden="true" />
+            {t("edit_profile")}
+          </Link>
+        </div>
 
-      {/* Calm editor reveal — disabled entirely under prefers-reduced-motion
-          (and by the manual [data-reduced-motion="reduce"] override in
-          globals.css, which zeroes all animation durations). */}
-      <style>{`
-        @keyframes brainReviewEditorIn {
-          from { opacity: 0; transform: translateY(4px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .brain-review-editor { animation: brainReviewEditorIn 160ms ease-out; }
-        @media (prefers-reduced-motion: reduce) {
-          .brain-review-editor { animation: none; }
-        }
-      `}</style>
+        <div className="mb-5 grid gap-5 sm:grid-cols-2">
+          <div>
+            <div className={SECTION_LABEL}>
+              <Star className="h-[15px] w-[15px] text-[var(--aivo-color-aivoOrange-500)]" aria-hidden="true" />
+              {t("superpowers_heading")}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {superpowers.length > 0 ? (
+                superpowers.map((tag) => renderTag(tag, "super"))
+              ) : (
+                <p className="text-[13px] text-iw-text-muted">{t("none_yet")}</p>
+              )}
+            </div>
+          </div>
+          <div>
+            <div className={SECTION_LABEL}>
+              <Zap className="h-[15px] w-[15px] text-[var(--aivo-color-aivoOrange-500)]" aria-hidden="true" />
+              {t("supports_heading")}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {supports.length > 0 ? (
+                supports.map((tag) => renderTag(tag, "support"))
+              ) : (
+                <p className="text-[13px] text-iw-text-muted">{t("none_yet")}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {sensory ? (
+          <>
+            <div className={SECTION_LABEL}>
+              <Sliders className="h-[15px] w-[15px]" aria-hidden="true" />
+              {t("sensory_heading")}
+            </div>
+            <div className="mb-5 rounded-[14px] bg-[var(--aivo-color-status-info-subtle)] p-4">
+              <p className="mb-2.5 text-sm font-semibold leading-relaxed text-[var(--aivo-color-status-info-strong)]">
+                {sensory.body}
+              </p>
+              {sensory.tags.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {sensory.tags.map((tg) => (
+                    <span
+                      key={tg}
+                      className="rounded-full bg-[var(--aivo-color-status-info-default)]/30 px-2.5 py-1 text-xs font-bold text-[var(--aivo-color-status-info-strong)]"
+                    >
+                      {tg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </>
+        ) : null}
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <div className={SECTION_LABEL}>{t("pacing_heading")}</div>
+            <div className="flex items-center gap-3 rounded-[14px] border-[1.5px] border-iw-border px-4 py-3">
+              <svg className="h-6 w-6 text-[var(--aivo-color-aivoOrange-500)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <div>
+                <div className="text-[14.5px] font-bold text-iw-text-strong">{pacing.label}</div>
+                <div className="text-[12.5px] text-iw-text-muted">{pacing.sub}</div>
+              </div>
+            </div>
+          </div>
+          {guide ? (
+            <div>
+              <div className={SECTION_LABEL}>{t("guide_heading")}</div>
+              <div className="flex items-center gap-3 rounded-[14px] border-[1.5px] border-iw-border px-4 py-2.5">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--aivo-color-aivoPurple-50)] text-xl" aria-hidden="true">
+                  {guide.icon}
+                </span>
+                <div>
+                  <div className="text-[14.5px] font-bold text-iw-text-strong">{guide.name}</div>
+                  <div className="text-[12.5px] text-iw-text-muted">{guide.sub}</div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      {/* ── Review actions ───────────────────────────────────────────── */}
+      <section className={CARD}>
+        <div className="font-iw-display mb-1 text-lg font-bold text-iw-text-strong">
+          {t("feel_right_title")}
+        </div>
+        <p className="mb-3.5 text-sm leading-relaxed text-iw-text-muted">{t("feel_right_body")}</p>
+        {deniedCount > 0 ? (
+          <div className="mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-[var(--aivo-color-status-error-subtle)] px-3 py-1.5 text-[12.5px] font-bold text-[var(--aivo-color-status-error-strong)]">
+            <X className="h-3 w-3" aria-hidden="true" />
+            {removedNote} — {t("removed_suffix")}
+          </div>
+        ) : null}
+        <div className="flex flex-wrap gap-2.5">
+          <button
+            type="button"
+            onClick={() => setMode((m) => (m === "context" ? "none" : "context"))}
+            aria-expanded={mode === "context"}
+            className="inline-flex items-center gap-1.5 rounded-xl border-[1.5px] border-[var(--aivo-color-aivoPurple-200)] bg-white px-4 py-2.5 text-sm font-bold text-[var(--aivo-sensory-primary)] hover:bg-[var(--aivo-color-aivoPurple-50)]"
+          >
+            <MessageSquarePlus className="h-[15px] w-[15px]" aria-hidden="true" />
+            {t("add_context")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode((m) => (m === "request" ? "none" : "request"))}
+            aria-expanded={mode === "request"}
+            className="inline-flex items-center gap-1.5 rounded-xl border-[1.5px] border-[var(--aivo-color-aivoOrange-200)] bg-white px-4 py-2.5 text-sm font-bold text-[var(--aivo-color-aivoOrange-700)] hover:bg-[var(--aivo-color-aivoOrange-50)]"
+          >
+            <PencilLine className="h-[15px] w-[15px]" aria-hidden="true" />
+            {t("request_changes")}
+          </button>
+        </div>
+        {mode !== "none" ? (
+          <div className="mt-3.5">
+            <label htmlFor="brain-review-note" className="sr-only">
+              {mode === "context" ? t("add_context") : t("request_changes")}
+            </label>
+            <textarea
+              id="brain-review-note"
+              name="note:concern"
+              rows={3}
+              placeholder={mode === "context" ? t("context_placeholder") : t("request_placeholder")}
+              className="w-full resize-y rounded-[13px] border-[1.5px] border-iw-border bg-white p-3.5 text-sm text-iw-text-strong placeholder:text-iw-text-muted/70 focus:border-[var(--aivo-sensory-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)]/40"
+            />
+            <div className="mt-2.5 flex items-center gap-2">
+              <button
+                type="submit"
+                formAction={stageAction}
+                className={
+                  mode === "context"
+                    ? "rounded-[11px] bg-[var(--aivo-sensory-primary)] px-5 py-2.5 text-sm font-bold text-white hover:brightness-110"
+                    : "rounded-[11px] bg-[var(--aivo-color-aivoOrange-700)] px-5 py-2.5 text-sm font-bold text-white hover:brightness-110"
+                }
+              >
+                {mode === "context" ? t("send_to_aivo") : t("submit_request")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("none")}
+                className="px-2 text-sm font-bold text-iw-text-muted hover:text-iw-text-strong"
+              >
+                {t("cancel")}
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </section>
+
+      {/* ── Parental consent ─────────────────────────────────────────── */}
+      <section className={CARD}>
+        <div className="font-iw-display mb-3.5 flex items-center gap-2 text-xl font-bold text-iw-text-strong">
+          <Shield className="h-5 w-5 text-[var(--aivo-sensory-primary)]" aria-hidden="true" />
+          {t("consent_heading")}
+        </div>
+        <p className="mb-4 text-[14.5px] leading-relaxed text-iw-text-muted">
+          {t("consent_body", { name: learnerName })}
+        </p>
+
+        {rai ? (
+          <details
+            className="mb-4 rounded-[14px] border border-iw-border bg-[var(--aivo-color-surface-sunken)] p-4"
+            onToggle={(e) => {
+              if ((e.currentTarget as HTMLDetailsElement).open) setRaiSeen(true);
+            }}
+          >
+            <summary className="cursor-pointer text-sm font-bold text-[var(--aivo-sensory-primary)]">
+              {t("rai_title", { name: learnerName })}
+            </summary>
+            <div className="mt-3 flex flex-col gap-3 text-[13px] leading-relaxed text-iw-text-muted">
+              {rai.dataSources.length > 0 ? (
+                <div>
+                  <p className="font-bold text-iw-text-strong">{t("rai_data_sources")}</p>
+                  <ul className="mt-1 list-disc pl-5">
+                    {rai.dataSources.map((d, i) => (
+                      <li key={i}>{d}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {rai.biasMitigations.length > 0 ? (
+                <div>
+                  <p className="font-bold text-iw-text-strong">{t("rai_bias")}</p>
+                  <ul className="mt-1 list-disc pl-5">
+                    {rai.biasMitigations.map((d, i) => (
+                      <li key={i}>{d}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {rai.transparency ? (
+                <p>
+                  <span className="font-bold text-iw-text-strong">{t("rai_transparency")}: </span>
+                  {rai.transparency}
+                </p>
+              ) : null}
+              {rai.oversight ? (
+                <p>
+                  <span className="font-bold text-iw-text-strong">{t("rai_oversight")}: </span>
+                  {rai.oversight}
+                </p>
+              ) : null}
+            </div>
+          </details>
+        ) : null}
+
+        <label className="mb-5 flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.currentTarget.checked)}
+            className="sr-only"
+          />
+          <span
+            aria-hidden="true"
+            className={
+              consent
+                ? "mt-0.5 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg bg-[var(--aivo-sensory-primary)] text-white"
+                : "mt-0.5 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg border-2 border-[var(--aivo-color-aivoPurple-200)] bg-white"
+            }
+          >
+            {consent ? <Check className="h-[15px] w-[15px]" strokeWidth={3.2} /> : null}
+          </span>
+          <span className="flex-1 text-sm leading-relaxed text-iw-text-strong">
+            {t("consent_agree", { name: learnerName })}
+          </span>
+        </label>
+
+        {errorMsg ? (
+          <p role="alert" className="mb-3 text-sm font-semibold text-[var(--aivo-color-status-error-strong)]">
+            {errorMsg}
+          </p>
+        ) : null}
+
+        <div className="flex items-center justify-between gap-4">
+          <Link href={backHref} className="px-2 py-3 text-base font-bold text-iw-text-muted hover:text-iw-text-strong">
+            {t("back")}
+          </Link>
+          <ApproveButton ready={consent && raiSeen} label={t("approve_cta")} />
+        </div>
+      </section>
     </form>
   );
 }

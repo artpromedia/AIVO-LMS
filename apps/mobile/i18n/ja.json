@@ -478,7 +478,9 @@
     "progress": "進捗",
     "subjects": "科目",
     "missions": "ミッション",
-    "library": "ライブラリ"
+    "library": "ライブラリ",
+    "coachGreeting": "I’m so happy to see you. Let’s keep learning together.",
+    "startNextThing": "Start my next thing"
   },
   "learnerBrain": {
     "title": "マイブレイン",

@@ -1,0 +1,14 @@
+/*
+ * Parent shell chrome — exact design accents from ParentApp.dc.html that the
+ * token set doesn't carry (the pink notification badge and the lavender
+ * "you're doing amazing" card gradient). Kept in a CSS module so the .tsx hex
+ * lint stays satisfied.
+ */
+.badge {
+  background: #ec4899;
+  color: #ffffff;
+}
+
+.mascotCard {
+  background: linear-gradient(180deg, #f4f0fe 0%, #ede7fb 100%);
+}

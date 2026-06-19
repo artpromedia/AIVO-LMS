@@ -478,7 +478,9 @@
     "progress": "Progresso",
     "subjects": "Matérias",
     "missions": "Missões",
-    "library": "Biblioteca"
+    "library": "Biblioteca",
+    "coachGreeting": "I’m so happy to see you. Let’s keep learning together.",
+    "startNextThing": "Start my next thing"
   },
   "learnerBrain": {
     "title": "Meu Cérebro",

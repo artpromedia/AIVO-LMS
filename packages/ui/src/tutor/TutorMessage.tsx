@@ -90,10 +90,13 @@ export function TutorMessage({
         )}
         <div
           className={cn(
-            "rounded-iw-card-lg border p-4 max-w-[36rem]",
+            "border p-4 max-w-[36rem]",
+            // Handoff (LearnerApp/HomeworkHelper) chat bubble: the asymmetric
+            // corner points back at the avatar, with a lavender hairline border;
+            // the tutor card carries a soft warm-purple drop shadow.
             isLearner
-              ? "bg-[var(--aivo-color-aivoPurple-50)] border-[var(--aivo-color-aivoPurple-100)] text-iw-text-strong"
-              : "bg-white border-iw-border text-iw-text-strong",
+              ? "rounded-[18px_4px_18px_18px] bg-[var(--aivo-color-aivoPurple-50)] border-[var(--aivo-color-aivoPurple-100)] text-iw-text-strong"
+              : "rounded-[4px_18px_18px_18px] bg-white border-[var(--aivo-color-aivoPurple-100)] text-iw-text-strong shadow-[0_8px_22px_rgba(60,40,110,0.06)]",
             thinking && "ring-2 ring-[var(--aivo-color-aivoPurple-100)] aivo-motion-ai-thinking",
           )}
         >

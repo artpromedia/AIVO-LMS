@@ -13,7 +13,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { bffFetch } from "@/lib/api/client";
 import { toast } from "@/lib/use-toast";
 import { useTranslations } from "next-intl";
-import { CheckCircle2, ShieldQuestion, XCircle } from "lucide-react";
+import { CheckCircle2, ShieldQuestion, XCircle, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -78,18 +78,18 @@ function RecommendationCard({
 }) {
   const t = useTranslations("parent.recommendations");
   const [decision, setDecision] = React.useState<Decision>(null);
-  const [mode, setMode] = React.useState<"none" | "amend" | "decline">("none");
-  const [amendValue, setAmendValue] = React.useState("");
+  const [mode, setMode] = React.useState<"none" | "context" | "decline">("none");
+  const [contextValue, setContextValue] = React.useState("");
   const [declineReason, setDeclineReason] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
 
   const respondMutation = useMutation({
-    mutationFn: (action: "accept" | "amend" | "decline") =>
+    mutationFn: (action: "accept" | "add_context" | "decline" | "undo") =>
       bffFetch<{ recommendation: { status: string } }>(`${apiBase}/${rec.id}/respond`, {
         method: "POST",
         body: {
           action,
-          ...(action === "amend" ? { amendedValue: amendValue } : {}),
+          ...(action === "add_context" ? { context: contextValue } : {}),
           ...(action === "decline" ? { declineReason } : {}),
         },
       }),
@@ -99,6 +99,12 @@ function RecommendationCard({
     },
     onSuccess: (data) => {
       const status = String(data.recommendation.status);
+      if (status === "PENDING") {
+        // Undo — return the card to its actionable state.
+        setDecision(null);
+        setMode("none");
+        return;
+      }
       setDecision({ state: "decided", status });
       onDecided(rec.id, status);
     },
@@ -113,27 +119,45 @@ function RecommendationCard({
     },
   });
 
-  function respond(action: "accept" | "amend" | "decline") {
+  function respond(action: "accept" | "add_context" | "decline" | "undo") {
     respondMutation.mutate(action);
   }
 
   if (decision?.state === "decided") {
     const applied = decision.status === "APPLIED";
     const declined = decision.status === "DECLINED";
+    const contextSent = decision.status === "CONTEXT_ADDED";
     return (
       <div className="rounded-lg border border-iw-border/60 p-4" data-testid="decided-card">
-        <div className="flex items-center gap-2">
-          {applied ? (
-            <CheckCircle2 className="h-5 w-5 text-iw-success" aria-hidden />
-          ) : declined ? (
-            <XCircle className="h-5 w-5 text-iw-ink-muted" aria-hidden />
-          ) : (
-            <ShieldQuestion className="h-5 w-5 text-iw-warning" aria-hidden />
-          )}
-          <p className="font-medium">{rec.title}</p>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            {applied ? (
+              <CheckCircle2 className="h-5 w-5 text-iw-success" aria-hidden />
+            ) : declined ? (
+              <XCircle className="h-5 w-5 text-iw-ink-muted" aria-hidden />
+            ) : contextSent ? (
+              <MessageSquarePlus className="h-5 w-5 text-iw-primary" aria-hidden />
+            ) : (
+              <ShieldQuestion className="h-5 w-5 text-iw-warning" aria-hidden />
+            )}
+            <p className="font-medium">{rec.title}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => respond("undo")}
+            className="shrink-0 text-xs font-semibold text-iw-ink-muted hover:underline"
+          >
+            {t("undo")}
+          </button>
         </div>
         <p className="mt-1 text-sm text-iw-ink-muted">
-          {applied ? t("status_applied") : declined ? t("status_declined") : t("status_failed")}
+          {applied
+            ? t("status_applied")
+            : declined
+              ? t("status_declined")
+              : contextSent
+                ? t("status_context")
+                : t("status_failed")}
         </p>
       </div>
     );
@@ -157,23 +181,31 @@ function RecommendationCard({
         </p>
       ) : null}
 
-      {mode === "amend" ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <label className="text-sm" htmlFor={`amend-${rec.id}`}>
-            {t("amend_label")}
+      {mode === "context" ? (
+        <div className="mt-3 flex flex-col gap-2">
+          <label className="text-sm" htmlFor={`context-${rec.id}`}>
+            {t("add_context_label")}
           </label>
-          <input
-            id={`amend-${rec.id}`}
-            className="rounded-md border border-iw-border px-2 py-1 text-sm"
-            value={amendValue}
-            onChange={(e) => setAmendValue(e.target.value)}
+          <textarea
+            id={`context-${rec.id}`}
+            rows={2}
+            className="rounded-md border border-iw-border px-2 py-1.5 text-sm"
+            placeholder={t("context_placeholder")}
+            value={contextValue}
+            onChange={(e) => setContextValue(e.target.value)}
           />
-          <Button size="sm" disabled={busy || amendValue.trim() === ""} onClick={() => respond("amend")}>
-            {t("confirm_adjust")}
-          </Button>
-          <Button size="sm" variant="ghost" disabled={busy} onClick={() => setMode("none")}>
-            {t("cancel")}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              disabled={busy || contextValue.trim() === ""}
+              onClick={() => respond("add_context")}
+            >
+              {t("send_to_aivo")}
+            </Button>
+            <Button size="sm" variant="ghost" disabled={busy} onClick={() => setMode("none")}>
+              {t("cancel")}
+            </Button>
+          </div>
         </div>
       ) : mode === "decline" ? (
         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -201,13 +233,13 @@ function RecommendationCard({
       ) : (
         <div className="mt-3 flex flex-wrap gap-2">
           <Button size="sm" disabled={busy} onClick={() => respond("accept")} aria-busy={busy}>
-            {t("approve")}
+            {t("accept")}
           </Button>
-          <Button size="sm" variant="outline" disabled={busy} onClick={() => setMode("amend")}>
-            {t("adjust")}
+          <Button size="sm" variant="outline" disabled={busy} onClick={() => setMode("context")}>
+            {t("add_context")}
           </Button>
           <Button size="sm" variant="ghost" disabled={busy} onClick={() => setMode("decline")}>
-            {t("decline")}
+            {t("deny")}
           </Button>
         </div>
       )}

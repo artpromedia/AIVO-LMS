@@ -16,6 +16,8 @@ import {
 } from "@aivo/ui";
 import { AISuggestionsToolbar } from "@/components/forms/ai-suggestions-toolbar";
 import { AssessmentAutosave } from "./assessment-autosave";
+import { CloudCoachCompanion } from "@/components/assessment/cloud-coach-companion";
+import assessmentTheme from "./assessment-theme.module.css";
 import type { FieldType, SuggestionContext } from "@/lib/ai/suggestions";
 import {
   getLearner,
@@ -1063,6 +1065,7 @@ export default async function AssessmentWizard({
 
   return (
     <AssessmentShell
+      canvasClassName={assessmentTheme.coolCanvas}
       eyebrow={`Parent assessment for ${learner.displayName}`}
       progress={
         <AssessmentProgress
@@ -1096,7 +1099,12 @@ export default async function AssessmentWizard({
           {t("autosave_indicator")}
         </span>
       }
-      reassurance={<ReassuranceColumn stepNum={stepNum} t={t} />}
+      reassurance={
+        <div className="flex flex-col gap-5">
+          <CloudCoachCompanion say={t(`coach_${stepNum}`)} />
+          <ReassuranceColumn stepNum={stepNum} t={t} />
+        </div>
+      }
     >
       <AssessmentAutosave learnerId={learner.id} sections={step.sections}>
         <form action={saveStepAction}>

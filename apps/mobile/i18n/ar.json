@@ -478,7 +478,9 @@
     "progress": "التقدم",
     "subjects": "المواد",
     "missions": "المهمات",
-    "library": "المكتبة"
+    "library": "المكتبة",
+    "coachGreeting": "I’m so happy to see you. Let’s keep learning together.",
+    "startNextThing": "Start my next thing"
   },
   "learnerBrain": {
     "title": "دماغي",

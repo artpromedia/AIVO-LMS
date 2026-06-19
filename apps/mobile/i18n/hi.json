@@ -478,7 +478,9 @@
     "progress": "प्रगति",
     "subjects": "विषय",
     "missions": "मिशन",
-    "library": "पुस्तकालय"
+    "library": "पुस्तकालय",
+    "coachGreeting": "I’m so happy to see you. Let’s keep learning together.",
+    "startNextThing": "Start my next thing"
   },
   "learnerBrain": {
     "title": "मेरा दिमाग",

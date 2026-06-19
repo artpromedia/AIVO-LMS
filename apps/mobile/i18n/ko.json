@@ -478,7 +478,9 @@
     "progress": "진도",
     "subjects": "과목",
     "missions": "미션",
-    "library": "라이브러리"
+    "library": "라이브러리",
+    "coachGreeting": "I’m so happy to see you. Let’s keep learning together.",
+    "startNextThing": "Start my next thing"
   },
   "learnerBrain": {
     "title": "내 두뇌",

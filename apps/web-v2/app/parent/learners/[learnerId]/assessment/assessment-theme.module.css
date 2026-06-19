@@ -1,0 +1,10 @@
+/*
+ * Parent assessment canvas — the cool-lavender onboarding palette from
+ * ParentAssessment.dc.html (distinct from the warm in-app surfaces). Exact
+ * gradient kept here so the .tsx hex lint stays satisfied.
+ */
+.coolCanvas {
+  background:
+    radial-gradient(ellipse 80% 50% at 70% 0%, #ece7fb 0%, transparent 60%),
+    #f3f1fb;
+}
