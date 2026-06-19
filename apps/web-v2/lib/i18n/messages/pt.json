@@ -2324,7 +2324,10 @@
       "consent": "Consentimento",
       "family": "FamÃ­lia",
       "join_school": "Entrar na escola",
-      "join_district": "Entrar no distrito"
+      "join_district": "Entrar no distrito",
+      "add_learner": "Add learner",
+      "assessment": "Assessment",
+      "ready": "Ready"
     },
     "welcome": {
       "brand_title": "Aprendizado que encontra cada crianÃ§a onde ela estÃ¡.",
@@ -2434,7 +2437,21 @@
       "iep_yes": "Sim",
       "iep_no": "NÃ£o",
       "iep_unsure": "Ainda nÃ£o tenho certeza",
-      "error_first_name": "Informe o primeiro nome do estudante para continuar."
+      "error_first_name": "Informe o primeiro nome do estudante para continuar.",
+      "maybe_later": "Maybe later",
+      "back": "Back",
+      "privacy_note": "Your learner’s information is private to your family and the team you invite.",
+      "privacy_link": "How we protect it",
+      "grade_preK": "Pre-K (3–4)",
+      "grade_k2": "K–2 (5–7)",
+      "grade_35": "3–5 (8–10)",
+      "grade_68": "6–8 (11–13)",
+      "grade_912": "9–12 (14–18)",
+      "done_title": "{name} is added! 🎉",
+      "done_subtitle": "Next, a short, calm assessment helps AIVO build a just-right starting plan. It takes about 5 minutes and saves as you go.",
+      "start_assessment": "Start the assessment",
+      "do_later": "I’ll do this later",
+      "error_seat_limit": "You’ve reached your plan’s learner limit. Contact support to add another."
     },
     "consent": {
       "eyebrow": "Seu consentimento â€” seu controle",

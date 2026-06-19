@@ -2324,7 +2324,10 @@
       "consent": "åŒæ„",
       "family": "å®¶æ—",
       "join_school": "å­¦æ ¡ã«å‚åŠ ",
-      "join_district": "å­¦åŒºã«å‚åŠ "
+      "join_district": "å­¦åŒºã«å‚åŠ ",
+      "add_learner": "Add learner",
+      "assessment": "Assessment",
+      "ready": "Ready"
     },
     "welcome": {
       "brand_title": "ä¸€äººã²ã¨ã‚Šã®å­ã©ã‚‚ã‚’ä»Šã„ã‚‹å ´æ‰€ã§è¿Žãˆã‚‹å­¦ã³ã€‚",
@@ -2434,7 +2437,21 @@
       "iep_yes": "ã¯ã„",
       "iep_no": "ã„ã„ãˆ",
       "iep_unsure": "ã¾ã ã‚ã‹ã‚‰ãªã„",
-      "error_first_name": "ç¶šè¡Œã™ã‚‹ã«ã¯å­¦ç¿’è€…ã®åï¼ˆãƒ•ã‚¡ãƒ¼ã‚¹ãƒˆãƒãƒ¼ãƒ ï¼‰ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚"
+      "error_first_name": "ç¶šè¡Œã™ã‚‹ã«ã¯å­¦ç¿’è€…ã®åï¼ˆãƒ•ã‚¡ãƒ¼ã‚¹ãƒˆãƒãƒ¼ãƒ ï¼‰ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚",
+      "maybe_later": "Maybe later",
+      "back": "Back",
+      "privacy_note": "Your learner’s information is private to your family and the team you invite.",
+      "privacy_link": "How we protect it",
+      "grade_preK": "Pre-K (3–4)",
+      "grade_k2": "K–2 (5–7)",
+      "grade_35": "3–5 (8–10)",
+      "grade_68": "6–8 (11–13)",
+      "grade_912": "9–12 (14–18)",
+      "done_title": "{name} is added! 🎉",
+      "done_subtitle": "Next, a short, calm assessment helps AIVO build a just-right starting plan. It takes about 5 minutes and saves as you go.",
+      "start_assessment": "Start the assessment",
+      "do_later": "I’ll do this later",
+      "error_seat_limit": "You’ve reached your plan’s learner limit. Contact support to add another."
     },
     "consent": {
       "eyebrow": "ã‚ãªãŸã®åŒæ„ â€” ã‚ãªãŸã®ç®¡ç†",

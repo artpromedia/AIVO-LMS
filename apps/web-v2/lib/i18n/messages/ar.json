@@ -2324,7 +2324,10 @@
       "consent": "Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©",
       "family": "Ø§Ù„Ø¹Ø§Ø¦Ù„Ø©",
       "join_school": "Ø§Ù„Ø§Ù†Ø¶Ù…Ø§Ù… Ø¥Ù„Ù‰ Ø§Ù„Ù…Ø¯Ø±Ø³Ø©",
-      "join_district": "Ø§Ù„Ø§Ù†Ø¶Ù…Ø§Ù… Ø¥Ù„Ù‰ Ø§Ù„Ù…Ù†Ø·Ù‚Ø© Ø§Ù„ØªØ¹Ù„ÙŠÙ…ÙŠØ©"
+      "join_district": "Ø§Ù„Ø§Ù†Ø¶Ù…Ø§Ù… Ø¥Ù„Ù‰ Ø§Ù„Ù…Ù†Ø·Ù‚Ø© Ø§Ù„ØªØ¹Ù„ÙŠÙ…ÙŠØ©",
+      "add_learner": "Add learner",
+      "assessment": "Assessment",
+      "ready": "Ready"
     },
     "welcome": {
       "brand_title": "ØªØ¹Ù„Ù‘Ù… ÙŠÙ„ØªÙ‚ÙŠ Ø¨ÙƒÙ„ Ø·ÙÙ„ Ø­ÙŠØ« Ù‡Ùˆ.",
@@ -2434,7 +2437,21 @@
       "iep_yes": "Ù†Ø¹Ù…",
       "iep_no": "Ù„Ø§",
       "iep_unsure": "Ù„Ø³Øª Ù…ØªØ£ÙƒØ¯Ù‹Ø§ Ø¨Ø¹Ø¯",
-      "error_first_name": "ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ù„Ø§Ø³Ù… Ø§Ù„Ø£ÙˆÙ„ Ù„Ù„Ù…ØªØ¹Ù„Ù‘Ù… Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©."
+      "error_first_name": "ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ù„Ø§Ø³Ù… Ø§Ù„Ø£ÙˆÙ„ Ù„Ù„Ù…ØªØ¹Ù„Ù‘Ù… Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©.",
+      "maybe_later": "Maybe later",
+      "back": "Back",
+      "privacy_note": "Your learner’s information is private to your family and the team you invite.",
+      "privacy_link": "How we protect it",
+      "grade_preK": "Pre-K (3–4)",
+      "grade_k2": "K–2 (5–7)",
+      "grade_35": "3–5 (8–10)",
+      "grade_68": "6–8 (11–13)",
+      "grade_912": "9–12 (14–18)",
+      "done_title": "{name} is added! 🎉",
+      "done_subtitle": "Next, a short, calm assessment helps AIVO build a just-right starting plan. It takes about 5 minutes and saves as you go.",
+      "start_assessment": "Start the assessment",
+      "do_later": "I’ll do this later",
+      "error_seat_limit": "You’ve reached your plan’s learner limit. Contact support to add another."
     },
     "consent": {
       "eyebrow": "Ù…ÙˆØ§ÙÙ‚ØªÙƒ â€” ØªØ­ÙƒÙ‘Ù…Ùƒ",
