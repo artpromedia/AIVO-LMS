@@ -24,15 +24,19 @@ import {
 
 const respondBodySchema = z
   .object({
-    action: z.enum(["accept", "amend", "decline"]),
+    action: z.enum(["accept", "amend", "decline", "add_context", "undo"]),
     amendedValue: z.unknown().optional(),
     declineReason: z.string().max(2000).optional(),
+    context: z.string().max(2000).optional(),
   })
   .refine((b) => b.action !== "amend" || b.amendedValue !== undefined, {
     message: "amendedValue is required when action is amend",
   })
   .refine((b) => b.action !== "decline" || (b.declineReason ?? "").trim().length > 0, {
     message: "declineReason is required when action is decline",
+  })
+  .refine((b) => b.action !== "add_context" || (b.context ?? "").trim().length > 0, {
+    message: "context is required when action is add_context",
   });
 
 export async function handleListRecommendations(
@@ -102,7 +106,9 @@ export async function handleRespondToRecommendation(
       {
         amendedValue: parsed.data.amendedValue,
         reason: parsed.data.declineReason,
+        context: parsed.data.context,
         actorRole,
+        learnerId,
       },
     );
     if (!result.ok) {

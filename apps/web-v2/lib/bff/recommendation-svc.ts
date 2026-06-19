@@ -9,6 +9,16 @@
  * enterprise auth hook accepts when NODE_ENV !== production.
  */
 import { serverEnv } from "@/lib/env";
+import { engineList, engineRespond, type EngineAction } from "@/lib/recommendations/engine";
+
+/**
+ * Use the in-memory engine when no real recommendation-svc is wired (no
+ * internal service token — i.e. local/dev/test). In production the token is
+ * present and we proxy the real upstream.
+ */
+function recommendationsUseEngine(): boolean {
+  return !process.env.RECOMMENDATION_SVC_SERVICE_TOKEN && !process.env.INTERNAL_SERVICE_TOKEN;
+}
 
 export interface RecommendationSummary {
   id: string;
@@ -55,6 +65,13 @@ export async function listRecommendationsForLearner(
   session: { userId: string; tenantId: string },
   learnerId: string,
 ): Promise<{ pending: RecommendationSummary[]; decided: RecommendationSummary[] }> {
+  if (recommendationsUseEngine()) {
+    const all = await engineList(learnerId, session.tenantId);
+    return {
+      pending: all.filter((r) => r.status === "PENDING"),
+      decided: all.filter((r) => r.status !== "PENDING").slice(0, 10),
+    };
+  }
   let res: Response;
   try {
     res = await fetch(
@@ -83,7 +100,7 @@ export async function listRecommendationsForLearner(
   };
 }
 
-export type RecommendationAction = "accept" | "amend" | "decline";
+export type RecommendationAction = "accept" | "amend" | "decline" | "add_context" | "undo";
 
 /** Approver roles the platform supports (Wave C, G5). */
 export type RecommendationActorRole = "parent" | "teacher" | "caregiver";
@@ -92,8 +109,26 @@ export async function respondToRecommendation(
   session: { userId: string; tenantId: string },
   recId: string,
   action: RecommendationAction,
-  opts: { amendedValue?: unknown; reason?: string; actorRole?: RecommendationActorRole },
+  opts: {
+    amendedValue?: unknown;
+    reason?: string;
+    context?: string;
+    actorRole?: RecommendationActorRole;
+    /** Required for the in-memory dev engine; ignored by the upstream proxy. */
+    learnerId?: string;
+  },
 ): Promise<{ ok: true; recommendation: RecommendationSummary } | { ok: false; status: number; error: string }> {
+  if (recommendationsUseEngine()) {
+    if (!opts.learnerId) {
+      return { ok: false, status: 400, error: "learnerId required for local engine" };
+    }
+    const rec = await engineRespond(opts.learnerId, session.tenantId, recId, action as EngineAction, {
+      context: opts.context,
+      reason: opts.reason,
+      amendedValue: opts.amendedValue,
+    });
+    return rec ? { ok: true, recommendation: rec } : { ok: false, status: 404, error: "not_found" };
+  }
   let res: Response;
   try {
     res = await fetch(
@@ -108,6 +143,7 @@ export async function respondToRecommendation(
           actorRole: opts.actorRole ?? "parent",
           amendedValue: opts.amendedValue,
           reason: opts.reason,
+          context: opts.context,
         }),
       },
     );

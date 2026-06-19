@@ -22,15 +22,19 @@ type Params = { params: Promise<{ learnerId: string; recId: string }> };
 
 const bodySchema = z
   .object({
-    action: z.enum(["accept", "amend", "decline"]),
+    action: z.enum(["accept", "amend", "decline", "add_context", "undo"]),
     amendedValue: z.unknown().optional(),
     declineReason: z.string().max(2000).optional(),
+    context: z.string().max(2000).optional(),
   })
   .refine((b) => b.action !== "amend" || b.amendedValue !== undefined, {
     message: "amendedValue is required when action is amend",
   })
   .refine((b) => b.action !== "decline" || (b.declineReason ?? "").trim().length > 0, {
     message: "declineReason is required when action is decline",
+  })
+  .refine((b) => b.action !== "add_context" || (b.context ?? "").trim().length > 0, {
+    message: "context is required when action is add_context",
   });
 
 export async function POST(req: Request, { params }: Params): Promise<NextResponse> {
@@ -61,7 +65,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       { userId: session!.userId, tenantId: session!.tenantId },
       recId,
       parsed.data.action,
-      { amendedValue: parsed.data.amendedValue, reason: parsed.data.declineReason },
+      {
+        amendedValue: parsed.data.amendedValue,
+        reason: parsed.data.declineReason,
+        context: parsed.data.context,
+        learnerId,
+      },
     );
     if (!result.ok) {
       if (result.status === 404) {
