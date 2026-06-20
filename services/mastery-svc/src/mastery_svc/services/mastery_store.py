@@ -11,6 +11,7 @@ from mastery_svc import config
 from mastery_svc.models.schemas import ObserveRequest
 from mastery_svc.models.tables import LearnerSkillMastery, MasteryObservation
 from mastery_svc.services import bkt
+from mastery_svc.services.aggregate import sync_brain_state_aggregate
 
 
 def _trend(recent: list[float]) -> str:
@@ -102,6 +103,11 @@ def observe(db: Session, req: ObserveRequest) -> tuple[LearnerSkillMastery | Non
     )
     db.commit()
     db.refresh(row)
+
+    # P2 — keep brain_states.mastery_levels a fresh per-subject aggregate of the per-skill rows
+    # (best-effort; no-op when brain_states is absent). This is what makes the brain improve every
+    # session instead of lagging until the next recommendation cycle.
+    sync_brain_state_aggregate(db, req.learner_id, row.subject)
     return row, False
 
 

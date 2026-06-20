@@ -117,6 +117,8 @@ def get_all(
             "trend": r.last_trend,
             "n_obs": r.n_obs,
             "subject": r.subject,
+            # recent posterior window — lets consumers (e.g. brain-svc regression) assess the series.
+            "recent_p": list(r.recent_p or []),
         }
         for r in rows
     }

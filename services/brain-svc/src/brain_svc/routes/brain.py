@@ -8,6 +8,7 @@ from sqlalchemy import text
 from brain_svc.models.database import get_db
 from brain_svc.models.schemas import BrainCloneRequest, BrainRollbackRequest, BrainApproveRequest, BrainAmendRequest, BrainDeclineRequest
 from brain_svc.services.clone_pipeline import clone_brain
+from brain_svc.services.regression import assess_skill_regression
 from brain_svc.services.access_control import verify_learner_access
 from brain_svc.audit import emit_brain_audit, emit_child_profile_disclosure
 from brain_svc.auth import AuthClaims, require_auth
@@ -1076,9 +1077,109 @@ async def get_brain_context(learner_id: str, db: Session = Depends(get_db), auth
     }
 
 
+MASTERY_SVC_URL = os.environ.get("MASTERY_SVC_URL", "http://localhost:3067")
+
+
+def _mastery_model_enabled() -> bool:
+    return os.environ.get("AIVO_MASTERY_MODEL_ENABLED", "").strip().lower() in (
+        "1", "true", "yes", "on", "enabled",
+    )
+
+
+def _detect_regressions_via_model(db: Session, learner_id: str) -> list[dict] | None:
+    """P2 — per-skill, confidence-aware regression from the local model's series. Inserts a
+    causal_analyses row per flagged skill and returns the list (uncommitted). Returns None when the
+    model is unreachable / has no data, so the caller falls back to the legacy per-subject path."""
+    import httpx
+
+    token = os.environ.get("INTERNAL_SERVICE_TOKEN") or (
+        "" if os.environ.get("NODE_ENV") == "production" else "aivo-internal-dev-token"
+    )
+    try:
+        resp = httpx.get(
+            f"{MASTERY_SVC_URL}/api/mastery/{learner_id}",
+            headers={"x-internal-service": "brain-svc", "x-service-token": token},
+            timeout=5.0,
+        )
+        if resp.status_code != 200:
+            return None
+        skills = resp.json()
+    except Exception:
+        return None
+    if not skills:
+        return None
+
+    regressions: list[dict] = []
+    for skill_id, st in skills.items():
+        current = float(st.get("p", 0) or 0)
+        assessment = assess_skill_regression(
+            p=current,
+            trend=st.get("trend", "stable"),
+            n_obs=int(st.get("n_obs", 0) or 0),
+            recent_p=st.get("recent_p") or [],
+        )
+        if not assessment.flag:
+            continue
+        previous = round(current + assessment.drop, 4)
+        analysis_id = str(uuid.uuid4())
+        domain = st.get("subject") or skill_id
+        hypothesis = (
+            f"Sustained decline in {skill_id}: mastery fell {assessment.rel:.0%} from "
+            f"{previous:.2f} to {current:.2f} over {st.get('n_obs')} observations."
+        )
+        db.execute(
+            text(
+                """INSERT INTO causal_analyses
+                    (id, learner_id, domain, mastery_drop, previous_mastery, current_mastery,
+                     correlated_factors, hypothesis, confidence, status, created_at)
+                    VALUES (:id, :lid, :domain, :drop, :prev, :curr, :factors, :hyp, :conf, 'DETECTED', :now)"""
+            ),
+            {
+                "id": analysis_id,
+                "lid": learner_id,
+                "domain": domain,
+                "drop": assessment.drop,
+                "prev": previous,
+                "curr": current,
+                "factors": json.dumps([]),
+                "hyp": hypothesis,
+                "conf": assessment.confidence,
+                "now": _utcnow(),
+            },
+        )
+        regressions.append({
+            "skillId": skill_id,
+            "domain": domain,
+            "drop": assessment.drop,
+            "previousMastery": previous,
+            "currentMastery": current,
+            "confidence": assessment.confidence,
+            "correlatedFactors": [],
+            "hypothesis": hypothesis,
+            "analysisId": analysis_id,
+        })
+    return regressions
+
+
 @router.post("/{learner_id}/regression-check")
 async def check_regression(learner_id: str, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
     verify_learner_access(db, auth, learner_id)
+
+    # P2 — when the local model is on, assess regression on the per-skill SERIES (confidence-aware:
+    # needs enough observations + a sustained declining trend), which stops a single noisy session
+    # from false-firing. Falls back to the legacy per-subject snapshot diff when the model is off or
+    # has no data for this learner.
+    if _mastery_model_enabled():
+        model_regressions = _detect_regressions_via_model(db, learner_id)
+        if model_regressions is not None:
+            if model_regressions:
+                db.commit()
+                await _maybe_emit_regression_candidates(learner_id, model_regressions)
+            return {
+                "learnerId": learner_id,
+                "regressionsDetected": len(model_regressions),
+                "regressions": model_regressions,
+            }
 
     brain = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),
