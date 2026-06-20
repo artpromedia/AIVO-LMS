@@ -431,6 +431,51 @@ def _build_initial_episodic(discovery_results, parent_data) -> list:
     return events
 
 
+def _build_iep_profile(parent_data, functioning_level: str, accommodations: list) -> dict:
+    """P6 — backfill the IEP profile from intake instead of leaving it empty. Diagnoses become
+    disability categories; the seeded accommodations + functioning level are recorded so downstream
+    IEP surfaces have real structure from day one. Empty only when there is genuinely no intake."""
+    if not parent_data:
+        return {}
+    diagnoses = list(getattr(parent_data, "diagnoses", None) or [])
+    accommodations = list(accommodations or [])
+    if not diagnoses and not accommodations:
+        return {}
+    return {
+        "disabilityCategories": diagnoses,
+        "accommodations": accommodations,
+        "functioningLevel": functioning_level,
+        "source": "parent_intake",
+        "goals": [],
+    }
+
+
+def _build_sensory_profile(parent_data) -> dict:
+    """P6 — backfill a sensory profile from intake signals (attention, communication, device, and any
+    sensory-tagged questionnaire responses) instead of leaving it empty."""
+    if not parent_data:
+        return {}
+    profile: dict = {}
+    attention = getattr(parent_data, "attentionSpan", None)
+    if attention and attention not in ("typical", "age_appropriate"):
+        profile["attentionSpan"] = attention
+    comm = getattr(parent_data, "communicationMode", None)
+    if comm and comm != "verbal":
+        profile["communicationMode"] = comm
+    device = getattr(parent_data, "deviceInteraction", None)
+    if device and device != "independent":
+        profile["deviceInteraction"] = device
+    responses = getattr(parent_data, "responses", None) or {}
+    sensitivities = [
+        {"key": k, "value": v}
+        for k, v in responses.items()
+        if any(t in str(k).lower() for t in ("sensor", "sound", "light", "touch", "texture", "noise"))
+    ]
+    if sensitivities:
+        profile["sensitivities"] = sensitivities
+    return profile
+
+
 MASTERY_SVC_URL = os.environ.get("MASTERY_SVC_URL", "http://localhost:3067")
 
 # Discovery chapter domain → mastery-svc canonical subject key (matches @aivo/scoring
@@ -579,8 +624,8 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
             "source": functioning_level_source,
             "master_brain_version": master_version,  # P3 lineage (None until the master store is seeded)
         },
-        "iep_profile": {},
-        "sensory_profile": {},
+        "iep_profile": _build_iep_profile(request.parent_assessment_data, functioning_level, active_accommodations),
+        "sensory_profile": _build_sensory_profile(request.parent_assessment_data),
         "active_accommodations": active_accommodations,
         "curriculum_alignment": curriculum_alignment,
         "active_tutors": active_tutors,

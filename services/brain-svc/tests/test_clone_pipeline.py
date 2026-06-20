@@ -309,6 +309,25 @@ class TestCloneBrain:
         insert_sql = str(db.execute.call_args_list[4].args[0])
         assert "pending_parent_review" in insert_sql
 
+    def test_iep_profile_populated_from_intake(self):
+        """P6 acceptance: iep_profile is no longer left empty when intake data exists."""
+        import json
+
+        db = self._make_db(learner_row=(None,))
+        request = BrainCloneRequest(
+            learner_id="cccccccc-cccc-cccc-cccc-cccccccccccc",
+            tenant_id="dddddddd-dddd-dddd-dddd-dddddddddddd",
+            parent_assessment_data=ParentAssessmentData(
+                communicationMode="verbal", diagnoses=["Dyslexia", "ADHD"]
+            ),
+        )
+        clone_brain(db, request)
+        params = db.execute.call_args_list[4].args[1]  # brain_states INSERT params
+        iep = json.loads(params["ip"])
+        assert iep != {}
+        assert iep["disabilityCategories"] == ["Dyslexia", "ADHD"]
+        assert iep["source"] == "parent_intake"
+
     def test_duplicate_learner_returns_error(self):
         db = self._make_db(existing=("existing-brain-state-id",))
         request = BrainCloneRequest(

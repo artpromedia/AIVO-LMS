@@ -93,6 +93,9 @@ class BrainApproveRequest(BaseModel):
 class BrainAmendRequest(BaseModel):
     parent_notes: str
     context_additions: Optional[dict] = None
+    # P6: amendments may now carry value changes (mastery_levels.<d>/accommodation.<a>/tutor.<t>),
+    # not just a note — so an amendment actually mutates what gets taught, like the approve path.
+    parent_modifications: list[ParentModification] = []
 
 class BrainDeclineRequest(BaseModel):
     reason: Optional[str] = None

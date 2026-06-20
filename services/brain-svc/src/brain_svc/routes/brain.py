@@ -9,6 +9,7 @@ from brain_svc.models.database import get_db
 from brain_svc.models.schemas import BrainCloneRequest, BrainRollbackRequest, BrainApproveRequest, BrainAmendRequest, BrainDeclineRequest
 from brain_svc.services.clone_pipeline import clone_brain
 from brain_svc.services.regression import assess_skill_regression
+from brain_svc.services.amendments import apply_parent_modifications
 from brain_svc.services.access_control import verify_learner_access
 from brain_svc.audit import emit_brain_audit, emit_child_profile_disclosure
 from brain_svc.auth import AuthClaims, require_auth
@@ -711,6 +712,24 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
     now = _utcnow()
     new_version = (current["version"] or 1) + 1
 
+    # P6 — apply the parent's amended VALUES (not just the note). Mirror the approve path's fold so an
+    # amendment actually mutates mastery / accommodations / tutors that get taught.
+    mastery = current.get("mastery_levels", {})
+    if isinstance(mastery, str):
+        try: mastery = json.loads(mastery)
+        except: mastery = {}
+    accommodations = current.get("active_accommodations", [])
+    if isinstance(accommodations, str):
+        try: accommodations = json.loads(accommodations)
+        except: accommodations = []
+    tutors = current.get("active_tutors", [])
+    if isinstance(tutors, str):
+        try: tutors = json.loads(tutors)
+        except: tutors = []
+    mastery, accommodations, tutors, parent_mods_record = apply_parent_modifications(
+        mastery, accommodations, tutors, request.parent_modifications
+    )
+
     episodic = current.get("episodic_memory", [])
     if isinstance(episodic, str):
         try: episodic = json.loads(episodic)
@@ -723,6 +742,7 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
         "timestamp": now.isoformat(),
         "notes": request.parent_notes,
         "context": request.context_additions or {},
+        "modifications": parent_mods_record,
     })
 
     xai = current.get("xai_explanation", {})
@@ -737,22 +757,34 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
         "timestamp": now.isoformat(),
         "notes": request.parent_notes,
         "context": request.context_additions or {},
+        "modifications": parent_mods_record,
     })
+    if parent_mods_record:
+        xai["parent_modifications"] = parent_mods_record
 
     db.execute(
         text("""UPDATE brain_states
                 SET approval_status = 'amended', parent_notes = :notes,
+                    mastery_levels = :ml, active_accommodations = :aa, active_tutors = :at,
                     episodic_memory = :em, xai_explanation = :xai,
                     version = :v, updated_at = :now
                 WHERE id = :id"""),
-        {"notes": request.parent_notes, "em": json.dumps(episodic),
-         "xai": json.dumps(xai), "v": new_version, "now": now, "id": current["id"]}
+        {"notes": request.parent_notes, "ml": json.dumps(mastery),
+         "aa": json.dumps(accommodations), "at": json.dumps(tutors),
+         "em": json.dumps(episodic), "xai": json.dumps(xai),
+         "v": new_version, "now": now, "id": current["id"]}
     )
 
+    # Snapshot reflects the AMENDED values (the folded mastery/accommodations/tutors), not a copy of
+    # the pre-amendment state.
+    folded = {"mastery_levels": mastery, "active_accommodations": accommodations, "active_tutors": tutors}
     snap_data = {}
     for field in ["mastery_levels", "disability_signals", "functioning_level_profile",
                   "iep_profile", "sensory_profile", "active_accommodations",
                   "active_tutors", "functional_curriculum", "visual_identity"]:
+        if field in folded:
+            snap_data[field] = folded[field]
+            continue
         val = current.get(field)
         if isinstance(val, str):
             try: val = json.loads(val)
@@ -798,7 +830,7 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
         # remain the consent anchor. "1.0" is the legacy default (ADR 0042 §4).
         consentVersion="1.0",
         raiVersion=str(new_version),
-        modifications=[],
+        modifications=parent_mods_record,
         ipHash=None,
         createdAt=now.isoformat(),
     )
@@ -808,9 +840,7 @@ async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session =
 
     try:
         import httpx
-        mastery = current.get("mastery_levels", {})
-        if isinstance(mastery, str):
-            mastery = json.loads(mastery)
+        # Use the AMENDED mastery (folded above), not the pre-amendment copy.
         fl = current.get("functioning_level_profile", {})
         if isinstance(fl, str):
             fl = json.loads(fl)
