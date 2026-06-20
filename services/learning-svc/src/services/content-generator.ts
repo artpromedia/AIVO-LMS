@@ -65,6 +65,10 @@ export async function generateLessonContent(params: {
   functioningLevel: string;
   brainContext: Record<string, unknown>;
   contentType?: string;
+  /** Live mastery signals from the local model (P0). Forwarded to prompt_builder's adaptive
+   * block; omitted entirely when the model flag is off so the request is byte-identical to today. */
+  currentMastery?: number;
+  masteryTrend?: string;
 }): Promise<{
   content: string;
   model: string;
@@ -85,6 +89,8 @@ export async function generateLessonContent(params: {
       functioning_level: params.functioningLevel,
       brain_context: params.brainContext,
       content_type: params.contentType || "LESSON",
+      ...(params.currentMastery !== undefined ? { current_mastery: params.currentMastery } : {}),
+      ...(params.masteryTrend !== undefined ? { mastery_trend: params.masteryTrend } : {}),
     }),
   });
 

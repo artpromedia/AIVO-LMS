@@ -15,7 +15,8 @@ import {
 } from "../services/scoring.js";
 import { canonicalSubjectKey } from "@aivo/scoring";
 import { resolveGradeTargets } from "../services/grade-target.js";
-import { emitMasterySignals, type MasteryMovement } from "../services/mastery-signal-emitter.js";
+import { emitMasterySignals, emitMasteryObservations, type MasteryMovement } from "../services/mastery-signal-emitter.js";
+import { resolveModelDelivery } from "../services/mastery-model-client.js";
 import { writeMasteryToWebStore } from "../services/web-mastery-writer.js";
 import { resolveTenantId, requireLearnerAccess } from "../lib/tenant.js";
 import { checkLearnerTutorAccess } from "../lib/entitlements.js";
@@ -479,6 +480,23 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
       );
     }
 
+    // P0 — local model link: when the mastery-model flag is on and the model has data for this
+    // (learner, subject), the delivery level + adaptive mastery signals come LIVE from mastery-svc
+    // instead of the static curriculum_alignment placement. Null → flag off / cold model / svc down
+    // → keep the existing grade-target resolution unchanged.
+    const modelDelivery = await resolveModelDelivery({
+      learnerId,
+      subject,
+      enrolledBand: gradeResolution.gradeTarget,
+    });
+    const effectiveDeliveryLevel = modelDelivery?.deliveryLevel ?? gradeResolution.deliveryLevel;
+    if (modelDelivery) {
+      request.log.info(
+        { event: "mastery_model.delivery", learnerId, subject, deliveryLevel: effectiveDeliveryLevel, trend: modelDelivery.masteryTrend },
+        "delivery level sourced from local mastery model",
+      );
+    }
+
     // Sprint 05: pull subject-brain context when the flag is on. The result
     // is merged into brainContext so the existing generator pipeline picks
     // it up without behavioral change when the flag is off.
@@ -540,10 +558,13 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         subject,
         topic: topic || `Introduction to ${subject}`,
         gradeTarget: gradeResolution.gradeTarget,
-        deliveryLevel: gradeResolution.deliveryLevel,
+        deliveryLevel: effectiveDeliveryLevel,
         functioningLevel,
         brainContext: enrichedBrainContext,
         contentType: contentType || "LESSON",
+        ...(modelDelivery
+          ? { currentMastery: modelDelivery.currentMastery, masteryTrend: modelDelivery.masteryTrend }
+          : {}),
       });
 
       // Sprint 10: evaluate the generated content with responsible-AI when
@@ -574,7 +595,7 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         subject,
         topic: topic || `Introduction to ${subject}`,
         gradeTarget: gradeResolution.gradeTarget,
-        deliveryLevel: gradeResolution.deliveryLevel,
+        deliveryLevel: effectiveDeliveryLevel,
         generatedContent: { raw: generated.content },
         qualityScore: generated.qualityScore,
         qualityGateLog: generated.qualityGateLog,
@@ -795,6 +816,14 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
                 ? new Date(profileRow.baselineCompletedAt).toISOString()
                 : undefined,
             },
+          });
+          // P0 — close the loop into the local model: the same per-skill movements become BKT
+          // observations so the brain improves every session (flag-gated, fire-and-forget).
+          await emitMasteryObservations({
+            tenantId: session.tenantId,
+            learnerId: session.learnerId,
+            sessionId: session.id,
+            movements: masteryMovements.map((m) => ({ ...m, subjectKey })),
           });
         })().catch(() => {});
       }

@@ -4,6 +4,7 @@ export * from "./users.js";
 export * from "./learners.js";
 export * from "./assessments.js";
 export * from "./brain.js";
+export * from "./learner-skill-mastery.js";
 export * from "./engagement.js";
 export * from "./billing.js";
 export * from "./audit.js";

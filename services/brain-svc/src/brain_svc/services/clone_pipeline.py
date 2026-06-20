@@ -431,6 +431,70 @@ def _build_initial_episodic(discovery_results, parent_data) -> list:
     return events
 
 
+MASTERY_SVC_URL = os.environ.get("MASTERY_SVC_URL", "http://localhost:3067")
+
+# Discovery chapter domain → mastery-svc canonical subject key (matches @aivo/scoring
+# canonicalSubjectKey: "ela"→"reading", "sel"→"social", …).
+DOMAIN_TO_CANONICAL_SUBJECT = {
+    "ela": "reading",
+    "math": "math",
+    "science": "science",
+    "sel": "social",
+    "speech": "speech",
+    "executive_function": "executive-function",
+}
+
+
+def _mastery_model_enabled() -> bool:
+    return os.environ.get("AIVO_MASTERY_MODEL_ENABLED", "").strip().lower() in (
+        "1", "true", "yes", "on", "enabled",
+    )
+
+
+def _seed_mastery_model(learner_id: str, tenant_id: str, discovery_results) -> None:
+    """P0 — cold-start the local knowledge-tracing model (mastery-svc) from the discovery
+    baseline: replay each chapter's correct/incorrect items as BKT observations so the model's
+    per-skill mastery reflects the learner's own demonstrated ability from day one. Flag-gated and
+    fire-and-forget — a clone never fails because mastery-svc is unreachable."""
+    if not _mastery_model_enabled() or not discovery_results:
+        return
+    import httpx
+
+    token = os.environ.get("INTERNAL_SERVICE_TOKEN") or (
+        "" if os.environ.get("NODE_ENV") == "production" else "aivo-internal-dev-token"
+    )
+    headers = {
+        "x-internal-service": "brain-svc",
+        "x-service-token": token,
+        "content-type": "application/json",
+    }
+    for ch in discovery_results.chapterResults:
+        total = max(0, int(ch.total))
+        correct = max(0, min(total, int(ch.correct)))
+        subject = DOMAIN_TO_CANONICAL_SUBJECT.get(ch.domain, ch.domain)
+        skill_id = f"{subject}.baseline"
+        sequence = [True] * correct + [False] * (total - correct)
+        for i, was_correct in enumerate(sequence):
+            try:
+                httpx.post(
+                    f"{MASTERY_SVC_URL}/api/mastery/observe",
+                    json={
+                        "learner_id": learner_id,
+                        "tenant_id": tenant_id,
+                        "skill_id": skill_id,
+                        "subject": subject,
+                        "correct": was_correct,
+                        "difficulty": ch.difficulty,
+                        "source": "discovery_clone",
+                        "event_id": f"clone:{learner_id}:{ch.domain}:{i}",
+                    },
+                    headers=headers,
+                    timeout=5.0,
+                )
+            except Exception:
+                pass
+
+
 def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
     existing = db.execute(
         text("SELECT id FROM brain_states WHERE learner_id = :lid"),
@@ -583,6 +647,9 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
             )
     except Exception:
         pass
+
+    # P0 — seed the local mastery model from the discovery baseline (flag-gated, fire-and-forget).
+    _seed_mastery_model(request.learner_id, request.tenant_id, request.discovery_results)
 
     return {
         "brain_state_id": brain_state_id,

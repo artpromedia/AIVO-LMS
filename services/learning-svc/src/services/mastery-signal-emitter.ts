@@ -11,6 +11,16 @@
  * recommendation loop is evidence, never a blocker for the lesson flow).
  */
 const RECOMMENDATION_SVC_URL = process.env.RECOMMENDATION_SVC_URL ?? "http://localhost:3066";
+const MASTERY_SVC_URL = process.env.MASTERY_SVC_URL ?? "http://localhost:3067";
+const INTERNAL_SERVICE_TOKEN =
+  process.env.INTERNAL_SERVICE_TOKEN ||
+  (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-token");
+
+/** P0 local-model rollout flag. OFF (default) → the model sink is dormant and nothing changes. */
+function masteryModelEnabled(): boolean {
+  const v = String(process.env.AIVO_MASTERY_MODEL_ENABLED ?? "").trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes" || v === "on" || v === "enabled";
+}
 
 function profileRecommendationsV2Enabled(): boolean {
   const raw = process.env.AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2;
@@ -93,4 +103,50 @@ export async function emitMasterySignals(input: {
   } catch {
     // Fire-and-forget: candidate generation must never break completion.
   }
+}
+
+/**
+ * Upstream closed-loop sink (P0): feed the same per-skill mastery movements into the local
+ * knowledge-tracing model (mastery-svc) so the brain improves as the learner improves — and does so
+ * EVERY session, fixing the audit's "brain_states.mastery_levels lags" gap. Each movement becomes one
+ * BKT observation whose binary signal is "did this skill hold or improve this session" (after ≥ before).
+ *
+ * Flag-gated on AIVO_MASTERY_MODEL_ENABLED and fire-and-forget: when off, or on any error, the lesson
+ * flow is completely unaffected. `event_id` is stable per (session, skill) so an at-least-once retry of
+ * the completion is idempotent at the model.
+ */
+export async function emitMasteryObservations(input: {
+  tenantId: string;
+  learnerId: string;
+  sessionId?: string;
+  movements: MasteryMovement[];
+}): Promise<void> {
+  if (!masteryModelEnabled()) return;
+  if (input.movements.length === 0) return;
+  const stamp = input.sessionId ?? "nosession";
+  await Promise.all(
+    input.movements.map(async (m) => {
+      try {
+        await fetch(`${MASTERY_SVC_URL}/api/mastery/observe`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-internal-service": "learning-svc",
+            "x-service-token": INTERNAL_SERVICE_TOKEN,
+          },
+          body: JSON.stringify({
+            learner_id: input.learnerId,
+            tenant_id: input.tenantId,
+            skill_id: m.skillId,
+            subject: m.subjectKey ?? m.subjectId,
+            correct: m.after >= m.before,
+            source: "lesson",
+            event_id: `${stamp}:${m.skillId}`,
+          }),
+        });
+      } catch {
+        // Fire-and-forget: the model sink must never break completion.
+      }
+    }),
+  );
 }
