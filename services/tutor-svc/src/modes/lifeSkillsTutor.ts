@@ -69,7 +69,7 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
     ADULT: "scaffold",
   },
   // Wave E (S8): agent loop instruments + per-level action policy.
-  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "break_down_task"],
+  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "break_down_task", "file_evidence", "propose_recommendation"],
   actionPolicy: standardActionPolicy(),
   memoryPolicy: NO_MEMORY,
   policy: {

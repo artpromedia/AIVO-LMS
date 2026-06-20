@@ -26,7 +26,7 @@ import { speechTutor } from "../src/modes/speechTutor.js";
 import { getTutorDefinition } from "../src/modes/registry.js";
 import { registerTutorSessionRoutes } from "../src/routes/tutorSession.js";
 import { executeDomainTool } from "../src/agent/tools.js";
-import { DOMAIN_TOOLS, READ_TOOLS } from "../src/agent/orchestrator.js";
+import { DOMAIN_TOOLS, READ_TOOLS, WRITE_TOOLS } from "../src/agent/orchestrator.js";
 
 describe("Echo certification — instruments", () => {
   it("is the registry's echo entry and validates clean", () => {
@@ -38,7 +38,7 @@ describe("Echo certification — instruments", () => {
     assert.ok(speechTutor.toolset.includes("score_pronunciation"));
     for (const tool of speechTutor.toolset) {
       assert.ok(
-        READ_TOOLS.has(tool) || DOMAIN_TOOLS.has(tool),
+        READ_TOOLS.has(tool) || DOMAIN_TOOLS.has(tool) || WRITE_TOOLS.has(tool),
         `tool ${tool} has no executor`,
       );
     }

@@ -60,7 +60,7 @@ export const scienceTutor: TutorDefinition = defineTutor({
     "12": "scaffold",
   },
   // Wave E (S8): agent loop instruments + per-level action policy.
-  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "evaluate_science_answer"],
+  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "evaluate_science_answer", "file_evidence", "propose_recommendation"],
   actionPolicy: standardActionPolicy(),
   memoryPolicy: NO_MEMORY,
   policy: {

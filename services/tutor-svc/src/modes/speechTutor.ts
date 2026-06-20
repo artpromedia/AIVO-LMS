@@ -66,7 +66,7 @@ export const speechTutor: TutorDefinition = defineTutor({
     "12": "authored",
   },
   // Wave E (S8): agent loop instruments + per-level action policy.
-  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "score_pronunciation"],
+  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "score_pronunciation", "file_evidence", "propose_recommendation"],
   actionPolicy: standardActionPolicy(),
   memoryPolicy: NO_MEMORY,
   policy: {

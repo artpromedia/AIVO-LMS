@@ -55,7 +55,7 @@ export const geographyTutor: TutorDefinition = defineTutor({
     "12": "scaffold",
   },
   // Wave E (S8): agent loop instruments + per-level action policy.
-  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context"],
+  toolset: ["get_learner_snapshot", "get_skill_position", "get_curriculum_context", "file_evidence", "propose_recommendation"],
   actionPolicy: standardActionPolicy(),
   memoryPolicy: NO_MEMORY,
   policy: {
