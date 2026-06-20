@@ -512,7 +512,12 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
     )
     request.functioning_level = functioning_level
 
-    template = SEED_TEMPLATES.get(functioning_level, SEED_TEMPLATES["STANDARD"])
+    # P3 — derive from the central master brain (versioned store); fall back to the in-code seed when
+    # the store is unseeded or in mock-db tests. `master_version` records the lineage on the brain.
+    from brain_svc.services.master_brain import load_master_template
+
+    store_template, master_version = load_master_template(db, functioning_level)
+    template = store_template or SEED_TEMPLATES.get(functioning_level, SEED_TEMPLATES["STANDARD"])
 
     brain_state_id = str(uuid.uuid4())
     now = _utcnow()
@@ -572,6 +577,7 @@ def clone_brain(db: Session, request: BrainCloneRequest) -> dict:
             "level": functioning_level,
             "determined_at": now.isoformat(),
             "source": functioning_level_source,
+            "master_brain_version": master_version,  # P3 lineage (None until the master store is seeded)
         },
         "iep_profile": {},
         "sensory_profile": {},

@@ -2,7 +2,7 @@ import os
 import uuid
 import json
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from brain_svc.models.database import get_db
@@ -1159,6 +1159,47 @@ def _detect_regressions_via_model(db: Session, learner_id: str) -> list[dict] | 
             "analysisId": analysis_id,
         })
     return regressions
+
+
+# ── Master brain (P3) ────────────────────────────────────────────────────────
+@router.post("/master/seed")
+async def master_seed(db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
+    """Idempotently seed the central master brain (versioned templates + KT priors)."""
+    from brain_svc.services.master_brain import seed_master_brain
+
+    return {"seeded_levels": seed_master_brain(db)}
+
+
+@router.post("/master/{functioning_level}/upgrade")
+async def master_upgrade(
+    functioning_level: str,
+    body: dict = Body(...),
+    db: Session = Depends(get_db),
+    auth: AuthClaims = Depends(require_auth),
+):
+    """Upgrade the master brain for a functioning level and propagate: a pending brain_upgrade
+    recommendation per APPROVED learner; new defaults applied directly to PENDING learners."""
+    from brain_svc.services.master_brain import propagate_upgrade
+
+    template = body.get("template")
+    if not isinstance(template, dict):
+        raise HTTPException(status_code=400, detail="template (object) required")
+    return propagate_upgrade(
+        db, functioning_level, template, kt_priors=body.get("kt_priors"), actor=getattr(auth, "sub", "system")
+    )
+
+
+@router.post("/master/apply/{recommendation_id}")
+async def master_apply(
+    recommendation_id: str,
+    db: Session = Depends(get_db),
+    auth: AuthClaims = Depends(require_auth),
+):
+    """Apply an APPROVED brain_upgrade recommendation (parent-approval path) — applies the delta and
+    writes a main_brain_upgrade snapshot with lineage."""
+    from brain_svc.services.master_brain import apply_master_upgrade
+
+    return apply_master_upgrade(db, recommendation_id)
 
 
 @router.post("/{learner_id}/regression-check")

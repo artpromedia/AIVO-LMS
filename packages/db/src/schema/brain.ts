@@ -9,12 +9,22 @@ import {
 import { learners } from "./learners.js";
 import { tenants } from "./tenants.js";
 
+/**
+ * The central "master brain" store (P3). One versioned row per functioning level holding the shared
+ * template (mastery skills + accommodations + tutors + functional curriculum) and the KT priors
+ * mastery-svc cold-starts from. Each learner brain derives from a specific `version`; bumping the
+ * version is a master-brain upgrade that propagates to learners via approve/amend/deny.
+ */
 export const brainSeedTemplates = pgTable("brain_seed_templates", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   gradeBand: varchar("grade_band", { length: 50 }).notNull(),
   functioningLevel: varchar("functioning_level", { length: 50 }).notNull(),
   template: jsonb("template").notNull(),
+  /** Monotonic master-brain version for this functioning level; lineage links here. */
+  version: integer("version").notNull().default(1),
+  /** Per-subject BKT priors the model cold-starts from (versioned with the template). */
+  ktPriors: jsonb("kt_priors").default({}),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

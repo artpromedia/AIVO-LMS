@@ -240,18 +240,21 @@ class TestCloneBrain:
     def _make_db(self, learner_row=None, existing=None, insights=None):
         db = MagicMock()
         # Sequence of execute() calls inside clone_brain:
-        # 1) check existing brain_states  → .first() = existing
-        # 2) load learner row             → .first() = learner_row
-        # 3) load collaborator insights   → .fetchall() = insights
-        # 4) brain_states INSERT          → MagicMock
-        # 5) brain_state_snapshots INSERT → MagicMock
+        # 1) check existing brain_states    → .first() = existing
+        # 2) load master template (P3)      → .mappings().first() = None (falls back to seed dict)
+        # 3) load learner row               → .first() = learner_row
+        # 4) load collaborator insights     → .fetchall() = insights
+        # 5) brain_states INSERT            → MagicMock
+        # 6) brain_state_snapshots INSERT   → MagicMock
         existing_res = MagicMock()
         existing_res.first.return_value = existing
+        master_res = MagicMock()
+        master_res.mappings.return_value.first.return_value = None
         learner_res = MagicMock()
         learner_res.first.return_value = learner_row
         insights_res = MagicMock()
         insights_res.fetchall.return_value = insights or []
-        execute_results = [existing_res, learner_res, insights_res, MagicMock(), MagicMock()]
+        execute_results = [existing_res, master_res, learner_res, insights_res, MagicMock(), MagicMock()]
         db.execute.side_effect = execute_results
         return db
 
@@ -269,9 +272,9 @@ class TestCloneBrain:
         assert result["functioning_level"] == "STANDARD"
         assert result["active_tutors"] == SEED_TEMPLATES["STANDARD"]["active_tutors"]
 
-        # Inspect the brain_states INSERT params (call #4: after existing,
-        # learner-row, and collaborator-insights loads)
-        insert_brain_call = db.execute.call_args_list[3]
+        # Inspect the brain_states INSERT params (call #5: after existing,
+        # master-template, learner-row, and collaborator-insights loads)
+        insert_brain_call = db.execute.call_args_list[4]
         params = insert_brain_call.args[1]
         assert params["lid"] == request.learner_id
         assert params["tid"] == request.tenant_id
@@ -286,8 +289,8 @@ class TestCloneBrain:
         )
         clone_brain(db, request)
 
-        # 5th execute call is the snapshot INSERT
-        snapshot_call = db.execute.call_args_list[4]
+        # 6th execute call is the snapshot INSERT
+        snapshot_call = db.execute.call_args_list[5]
         sql_text = str(snapshot_call.args[0])
         assert "brain_state_snapshots" in sql_text
         # trigger='initial_clone' is a SQL literal in the INSERT
@@ -303,7 +306,7 @@ class TestCloneBrain:
             tenant_id="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
         )
         clone_brain(db, request)
-        insert_sql = str(db.execute.call_args_list[3].args[0])
+        insert_sql = str(db.execute.call_args_list[4].args[0])
         assert "pending_parent_review" in insert_sql
 
     def test_duplicate_learner_returns_error(self):
