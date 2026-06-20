@@ -51,3 +51,43 @@ def params_for_subject(subject: str | None) -> dict[str, float]:
     if subject and subject in BKT_PARAMS:
         return BKT_PARAMS[subject]
     return BKT_PARAMS["DEFAULT"]
+
+
+# ── DKT serving (P1) ─────────────────────────────────────────────────────────
+# DKT is a drop-in upgrade behind the same contract, selectable per subject and gated three ways:
+#   1. AIVO_MODEL_BACKEND = "bkt" (default) | "dkt" | "math:dkt,reading:bkt" (per-subject)
+#   2. DKT_MIN_OBS — cold-start floor; below it BKT serves even on a dkt-backed subject.
+#   3. AIVO_DKT_DARK_LAUNCH — compute DKT but keep serving BKT (the safe first rollout step).
+def _int_env(name: str, default: int) -> int:
+    raw = os.environ.get(name, "")
+    return int(raw) if raw.strip().lstrip("-").isdigit() else default
+
+
+DKT_MIN_OBS = _int_env("DKT_MIN_OBS", 5)
+
+
+def dkt_dark_launch() -> bool:
+    return os.environ.get("AIVO_DKT_DARK_LAUNCH", "").strip().lower() in (
+        "1", "true", "yes", "on", "enabled",
+    )
+
+
+def _parse_backend_map(raw: str) -> dict[str, str]:
+    raw = (raw or "").strip().lower()
+    if raw in ("", "bkt"):
+        return {"*": "bkt"}
+    if raw == "dkt":
+        return {"*": "dkt"}
+    out: dict[str, str] = {}
+    for part in raw.split(","):
+        if ":" in part:
+            subject, backend = part.split(":", 1)
+            out[subject.strip()] = backend.strip()
+    return out or {"*": "bkt"}
+
+
+def model_backend_for_subject(subject: str | None) -> str:
+    mapping = _parse_backend_map(os.environ.get("AIVO_MODEL_BACKEND", ""))
+    if subject and subject in mapping:
+        return mapping[subject]
+    return mapping.get("*", "bkt")

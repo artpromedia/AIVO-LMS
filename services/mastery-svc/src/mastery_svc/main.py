@@ -16,6 +16,14 @@ async def lifespan(app: FastAPI):
     # standalone/test runs against an empty database.
     if engine is not None:
         Base.metadata.create_all(bind=engine, checkfirst=True)
+    # P1 — load the latest trained DKT weights if configured (DKT_WEIGHTS_PATH). A missing file or a
+    # torch-less deployment simply leaves DKT unavailable and BKT serves everything.
+    from mastery_svc.services import dkt
+
+    if dkt.service.load():
+        import logging
+
+        logging.getLogger("mastery-svc").info("DKT weights loaded (%s)", dkt.service.version)
     yield
 
 

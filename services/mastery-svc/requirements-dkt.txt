@@ -1,0 +1,5 @@
+# DKT (Deep Knowledge Tracing) extras — install ON TOP of requirements.txt to enable the PyTorch
+# model + offline training (scripts/train_dkt.py). BKT-only deployments can skip this: dkt.py guards
+# the torch import and reports DKT unavailable, so mastery-svc serves BKT for everything.
+# Install the CPU build in prod images:  pip install -r requirements-dkt.txt --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2

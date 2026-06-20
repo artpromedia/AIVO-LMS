@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from mastery_svc import config
 from mastery_svc.models.schemas import ObserveRequest
 from mastery_svc.models.tables import LearnerSkillMastery, MasteryObservation
-from mastery_svc.services import bkt
+from mastery_svc.services import bkt, dkt
 from mastery_svc.services.aggregate import sync_brain_state_aggregate
 
 
@@ -104,11 +104,47 @@ def observe(db: Session, req: ObserveRequest) -> tuple[LearnerSkillMastery | Non
     db.commit()
     db.refresh(row)
 
+    # P1 — DKT refine: when the subject is dkt-backed, the model is loaded, and the learner has
+    # enough history, replace the BKT posterior with the LSTM's prediction (BKT remains the committed
+    # baseline + cold-start fallback). Dark-launch computes but does not serve. Runs BEFORE the
+    # aggregate so brain_states reflects the served model.
+    _maybe_apply_dkt(db, row, req)
+
     # P2 — keep brain_states.mastery_levels a fresh per-subject aggregate of the per-skill rows
     # (best-effort; no-op when brain_states is absent). This is what makes the brain improve every
     # session instead of lagging until the next recommendation cycle.
     sync_brain_state_aggregate(db, req.learner_id, row.subject)
     return row, False
+
+
+def _maybe_apply_dkt(db: Session, row: LearnerSkillMastery, req: ObserveRequest) -> None:
+    if config.model_backend_for_subject(row.subject) != "dkt":
+        return
+    if not dkt.service.is_loaded() or (row.n_obs or 0) < config.DKT_MIN_OBS:
+        return  # cold-start / not loaded → keep BKT
+    history = [
+        (o.skill_id, bool(o.correct))
+        for o in db.query(MasteryObservation)
+        .filter(MasteryObservation.learner_id == req.learner_id)
+        .order_by(MasteryObservation.created_at)
+        .all()
+    ]
+    pred = dkt.service.predict(history, req.skill_id)
+    if pred is None or config.dkt_dark_launch():
+        return  # unknown skill, or dark-launch (compute but don't serve)
+
+    recent = list(row.recent_p or [])
+    if recent:
+        recent[-1] = pred.p
+    else:
+        recent = [pred.p]
+    row.p_mastery = pred.p
+    row.theta = pred.theta
+    row.model_version = pred.model_version
+    row.recent_p = recent
+    row.last_trend = _trend(recent)
+    db.commit()
+    db.refresh(row)
 
 
 def next_skill(db: Session, learner_id: str, subject: str) -> LearnerSkillMastery | None:
