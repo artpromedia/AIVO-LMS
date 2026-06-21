@@ -104,7 +104,7 @@ export default function NewLearnerPage() {
         {created ? (
           <div className="rounded-iw-hero border border-iw-border bg-white p-9 text-center shadow-soft-3">
             <Image
-              src="/images/mascots/mascot-coach.png"
+              src="/images/mascots/cloud-coach.png"
               alt=""
               width={140}
               height={140}

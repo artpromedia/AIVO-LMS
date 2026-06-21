@@ -16,7 +16,7 @@ export function CloudCoachCompanion({ say }: { say: string }) {
           {say}
         </p>
         <Image
-          src="/images/mascots/mascot-coach.png"
+          src="/images/mascots/cloud-coach.png"
           alt=""
           width={150}
           height={150}

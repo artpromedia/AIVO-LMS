@@ -239,7 +239,7 @@ export default function PinSetupPage() {
         ) : (
           <div className="w-[420px] max-w-full text-center">
             <Image
-              src="/images/mascots/mascot-coach.png"
+              src="/images/mascots/cloud-coach.png"
               alt=""
               width={120}
               height={120}
