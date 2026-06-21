@@ -14,7 +14,7 @@ for IMG in "${IMAGES[@]}"; do
     echo "--- import to $N ---"
     if [ "$N" = "10.0.0.2" ]; then
       # app1: local
-      k3s ctr images import "$TMP"
+      sudo k3s ctr images import "$TMP"
     else
       scp -o StrictHostKeyChecking=no "$TMP" "root@$N:$TMP"
       ssh -o StrictHostKeyChecking=no "root@$N" "k3s ctr images import $TMP && rm -f $TMP"

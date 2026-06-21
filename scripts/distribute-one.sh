@@ -11,7 +11,7 @@ docker save "$IMG" -o "$TMP"
 ls -lh "$TMP"
 
 echo "=== import to app1 ==="
-k3s ctr images import "$TMP"
+sudo k3s ctr images import "$TMP"
 
 for N in 10.0.0.3 10.0.0.4; do
   echo "=== import to $N ==="
