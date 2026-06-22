@@ -27,7 +27,7 @@ jobs:
 
       - uses: pnpm/action-setup@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -63,7 +63,7 @@ jobs:
 
       - uses: pnpm/action-setup@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -90,7 +90,7 @@ jobs:
       # full `pnpm install`.
       - uses: pnpm/action-setup@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
@@ -127,7 +127,7 @@ jobs:
 
       - uses: pnpm/action-setup@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -187,7 +187,7 @@ jobs:
       - uses: pnpm/action-setup@v5
         if: steps.filter.outputs.bff == 'true'
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         if: steps.filter.outputs.bff == 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -309,7 +309,7 @@ jobs:
       - uses: pnpm/action-setup@v5
         if: steps.filter.outputs.web == 'true'
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         if: steps.filter.outputs.web == 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -369,7 +369,7 @@ jobs:
       - uses: pnpm/action-setup@v5
         if: steps.filter.outputs.web == 'true'
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         if: steps.filter.outputs.web == 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -465,7 +465,7 @@ jobs:
       - uses: pnpm/action-setup@v5
         if: steps.filter.outputs.pkgs == 'true'
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         if: steps.filter.outputs.pkgs == 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -511,7 +511,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -592,7 +592,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -744,7 +744,7 @@ jobs:
 
       - uses: pnpm/action-setup@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -773,7 +773,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -872,7 +872,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -942,7 +942,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -988,7 +988,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
