@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: ZAP Baseline Scan (admin)
-        uses: zaproxy/action-baseline@v0.12.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
           target: ${{ github.event.inputs.target || 'https://admin.aivolearning.com' }}
           # Authenticated session — provide the bearer in repo secrets.
@@ -58,7 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: ZAP Baseline Scan (district)
-        uses: zaproxy/action-baseline@v0.12.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
           target: https://district.aivolearning.com
           cmd_options: >-
