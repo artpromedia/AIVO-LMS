@@ -658,7 +658,7 @@ jobs:
           pytest tests/ --cov=src/brain_svc --cov-report=term-missing -v
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           files: services/brain-svc/coverage.xml
           flags: brain-svc
